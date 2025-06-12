@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chess Cipher</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .container {
+        background-color: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      #ciphertext {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 4px;
+        font-family: monospace;
+        word-break: break-all;
+        min-height: 50px;
+        margin-top: 20px;
+      }
+      .loading {
+        color: #666;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>A chessboard is worth 64 squares</h1>
+      <p><em>How did we get here?</em></p>
+
+      <div id="ciphertext" class="loading">Loading ciphertext...</div>
+    </div>
+
+    <script>
+      async function getCiphertext() {
+        const ciphertextDiv = document.getElementById("ciphertext");
+        ciphertextDiv.innerHTML = '<span class="loading">Loading...</span>';
+
+        try {
+          const response = await fetch("/get_ciphertext");
+          const data = await response.json();
+          ciphertextDiv.innerHTML = data.ciphertext;
+          ciphertextDiv.className = "";
+        } catch (error) {
+          ciphertextDiv.innerHTML =
+            "Error loading ciphertext: " + error.message;
+          ciphertextDiv.className = "";
+        }
+      }
+
+      // Load ciphertext automatically when page loads
+      window.onload = function () {
+        getCiphertext();
+      };
+    </script>
+  </body>
+</html>
