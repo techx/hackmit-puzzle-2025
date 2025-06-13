@@ -42,12 +42,33 @@ typedef enum {
 } OperatingMode;
 
 typedef struct __attribute__((packed)) {
-    char log_buf[266];
+    char debug_password[266];
     OperatingMode mode;
 } DebugControl;
 
 __attribute__((aligned(256)))
 DebugControl g_debug_control = { .mode = MODE_NORMAL };
+
+__attribute__((constructor))
+void init_debug_control(void) {
+    int fd = open("/dev/urandom", O_RDONLY);
+    if (fd < 0) {
+        perror("open /dev/urandom");
+        exit(1);
+    }
+
+    size_t i;
+    for (i = 0; i < 25; ++i) {
+        unsigned char byte;
+        if (read(fd, &byte, 1) != 1) {
+            perror("read");
+            exit(1);
+        }
+        g_debug_control.debug_password[i] = 'a' + (byte % 26);
+    }
+    g_debug_control.debug_password[i] = '\0';
+    close(fd);
+}
 
 int ingredient_score(int amount, int optimal) {
     if (amount == 0) return 0;
@@ -344,19 +365,38 @@ int main(void) {
             continue;
         }
 
+        if (strcmp(cmd, "admin_login") == 0) {
+            puts("admin login disabled");
+            return 1;
+        }
+
+        // Usage: send_flag <debug_password>
         if (strcmp(cmd, "send_flag") == 0) {
             if (g_debug_control.mode != MODE_ADMIN) {
-                puts("access denied");
+                puts("access denied: admin mode must be enabled");
                 return 1;
             }
+
+            char passw[sizeof(g_debug_control.debug_password)] = {0};
+            if (
+                scanf("%127s", passw) != 1 ||
+                strncmp(
+                    passw, g_debug_control.debug_password, sizeof(g_debug_control.debug_password) - 1
+                ) != 0
+            ) {
+                puts("access denied: incorrect password");
+                return 1;
+            }
+
             fputs("flag: ", stdout);
             int fd = open("flag", O_RDONLY);
-            if (fd == -1) {
+            if (fd < 0) {
                 perror("open");
                 return 1;
             }
             if (sendfile(STDOUT_FILENO, fd, 0, 0x1000) == -1) {
                 perror("sendfile");
+                return 1;
             }
             continue;
         }
