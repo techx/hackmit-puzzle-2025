@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "./App.css";
 
 type Recipe = { lemons?: number; sugar?: number; ice?: number; price?: number };
@@ -17,6 +17,8 @@ function isDefined<T>(val: T | undefined | null): val is T {
 const App = () => {
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [connected, setConnected] = useState(false);
+  const [connecting, setConnecting] = useState(false);
+  const [connectionFailed, setConnectionFailed] = useState(false);
   const [stands, setStands] = useState<Stand[]>([]);
   const [output, setOutput] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -27,14 +29,35 @@ const App = () => {
 
   // const outputRef = useRef(null);
 
-  useEffect(() => {
+  const connectWebSocket = useCallback(() => {
+    setConnecting(true);
+    setConnectionFailed(false);
+
     const socket = new WebSocket(
       `${location.protocol === "https:" ? "wss" : "ws"}://127.0.0.1:4300`,
     );
     socket.binaryType = "arraybuffer";
 
-    socket.onopen = () => setConnected(true);
-    socket.onclose = () => setConnected(false);
+    socket.onopen = () => {
+      setConnected(true);
+      setConnecting(false);
+      setConnectionFailed(false);
+    };
+
+    socket.onclose = () => {
+      setConnected(false);
+      setConnecting(false);
+      // Only attempt to reconnect if we were previously connected
+      // (meaning the connection was established but then lost)
+      if (connected && !connectionFailed) {
+        setTimeout(connectWebSocket, 2000);
+      }
+    };
+
+    socket.onerror = () => {
+      setConnectionFailed(true);
+      setConnecting(false);
+    };
 
     socket.onmessage = (event) => {
       let text;
@@ -50,7 +73,12 @@ const App = () => {
 
     setWs(socket);
     return () => socket.close();
-  }, []);
+  }, [connected, connectionFailed]);
+
+  useEffect(() => {
+    const cleanup = connectWebSocket();
+    return cleanup;
+  }, [connectWebSocket]);
 
   const send = (cmd: string) => {
     if (connected && ws && ws.readyState === WebSocket.OPEN) {
@@ -121,10 +149,42 @@ const App = () => {
     send(`simulate ${index}`);
   };
 
+  const duplicateStand = (
+    sourceIndex: number,
+    sourceName: string,
+    sourceRecipe: Recipe,
+  ) => {
+    const newIndex = allocateIndex();
+    if (newIndex === -1) return;
+
+    const newName = `${sourceName} Copy`;
+    send(`stand_create ${newIndex} ${newName.length} ${newName}`);
+    send(`copy_recipe ${sourceIndex} ${newIndex}`);
+
+    setStands((prev) => [
+      ...prev,
+      { index: newIndex, name: newName, recipe: sourceRecipe },
+    ]);
+  };
+
   return (
     <div className="space-y-6 p-6" aria-disabled={!connected}>
       <h1 className="text-2xl font-bold">Lemonade Stand Simulator</h1>
-      {!connected && <p className="text-red-500">Disconnected from server</p>}
+      {connecting && <p className="text-blue-500">Connecting to server...</p>}
+      {!connected && !connecting && connectionFailed && (
+        <div className="text-red-500">
+          <p>Failed to connect to server</p>
+          <button
+            className="mt-2 rounded bg-blue-600 px-3 py-1 text-white"
+            onClick={connectWebSocket}
+          >
+            Retry Connection
+          </button>
+        </div>
+      )}
+      {!connected && !connecting && !connectionFailed && (
+        <p className="text-yellow-500">Attempting to reconnect...</p>
+      )}
 
       {showCreateForm ? (
         <form
@@ -260,6 +320,14 @@ const App = () => {
                 onClick={() => simulate(index)}
               >
                 Simulate
+              </button>
+              <button
+                className="btn rounded bg-blue-400 p-1 px-3 text-white"
+                onClick={() => duplicateStand(index, name, recipe)}
+                disabled={stands.length >= 16}
+                title="Duplicate stand"
+              >
+                📋
               </button>
               <button
                 className="btn rounded bg-red-500 p-1 px-3 text-white"
