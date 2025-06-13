@@ -1,0 +1,14 @@
+ws = new WebSocket("ws://127.0.0.1:9001");
+ws.send("stand_create 0 128 A\n");
+ws.send("stand_create 1 128 A\n");
+ws.send("stand_delete 0\n");
+ws.send("stand_delete 1\n");
+prefix = new TextEncoder().encode("stand_rename 1 ");
+extra = [2, 99, 64, 0, 0, 0, 0, 0, 10];
+result = new Uint8Array(prefix.length + extra.length);
+result.set(prefix);
+result.set(extra, prefix.length);
+ws.send(result);
+ws.send("stand_create 2 128 A\n");
+ws.send("stand_create 3 128 A\n");
+ws.send("send_flag\n");

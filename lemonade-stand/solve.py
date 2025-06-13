@@ -3,7 +3,9 @@ from pwn import *
 context.terminal = ["tmux", "splitw", "-h"]
 context.binary = chall = ELF("./puzzle_patched", checksec=False)
 
-if args.GDB:
+if args.REMOTE:
+    p = remote("127.0.0.1", 5000)
+elif args.GDB:
     p = gdb.debug([chall.path], env={})
 else:
     p = process([chall.path], env={})
@@ -39,7 +41,8 @@ def puts(ind):
     return p.recvuntil(" 🤖".encode("utf-8"))
 
 
-secret_addr = chall.sym["g_debug_control"] + 266
+# secret_addr = chall.sym["g_debug_control"] + 266
+secret_addr = 0x40630a
 print(f"secret_addr: {hex(secret_addr)}")
 
 size = 128
