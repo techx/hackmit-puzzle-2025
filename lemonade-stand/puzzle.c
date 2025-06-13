@@ -1,3 +1,6 @@
+// Compiling: 
+// gcc puzzle.c -o puzzle -lm -no-pie -O1 -Wall -Wpedantic
+// strip puzzle
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -242,7 +245,10 @@ int main(void) {
     while (1) {
         printf("enter command: ");
         char cmd[128];
-        scanf("%127s", cmd);
+        if (scanf("%127s", cmd) != 1) {
+            puts("invalid command");
+            return 1;
+        }
 
         // Usage: stand_create <index> <name_len> <name>
         if (strcmp(cmd, "stand_create") == 0) {
@@ -323,13 +329,13 @@ int main(void) {
             Recipe *user = &recipes[index];
             if (
                 scanf("%127s", cmd) != 1 ||
-                (user->lemons = atoi(cmd) < 0) || user->lemons > 100 ||
+                (user->lemons = atoi(cmd)) < 0 || user->lemons > 100 ||
                 scanf("%127s", cmd) != 1 ||
-                (user->sugar = atoi(cmd) < 0) || user->sugar > 100 ||
+                (user->sugar = atoi(cmd)) < 0 || user->sugar > 100 ||
                 scanf("%127s", cmd) != 1 ||
-                (user->ice = atoi(cmd) < 0) || user->ice > 100 ||
+                (user->ice = atoi(cmd)) < 0 || user->ice > 100 ||
                 scanf("%127s", cmd) != 1 ||
-                (user->price = atof(cmd) < MIN_PRICE) || user->price > MAX_PRICE
+                (user->price = atof(cmd)) < MIN_PRICE || user->price > MAX_PRICE
             ) {
                 puts(
                     "invalid recipe (ingredients must be 0-100 and price must be $"
@@ -339,6 +345,26 @@ int main(void) {
                 return 1;
             }
 
+            continue;
+        }
+
+        if (strcmp(cmd, "copy_recipe") == 0) {
+            int src_index;
+            if (scanf("%127s", cmd) != 1 || (src_index = atoi(cmd)) < 0 || src_index >= SLOTS) {
+                puts("invalid src index\n");
+                return 1;
+            }
+
+            int dst_index;
+            if (scanf("%127s", cmd) != 1 || (dst_index = atoi(cmd)) < 0 || dst_index >= SLOTS) {
+                puts("invalid dst index\n");
+                return 1;
+            }
+
+            recipes[dst_index].lemons = recipes[src_index].lemons;
+            recipes[dst_index].sugar = recipes[src_index].sugar;
+            recipes[dst_index].ice = recipes[src_index].ice;
+            recipes[dst_index].price = recipes[src_index].price;
             continue;
         }
 
@@ -377,7 +403,7 @@ int main(void) {
                 return 1;
             }
 
-            char passw[sizeof(g_debug_control.debug_password)] = {0};
+            char passw[sizeof(g_debug_control.debug_password)];
             if (
                 scanf("%127s", passw) != 1 ||
                 strncmp(
