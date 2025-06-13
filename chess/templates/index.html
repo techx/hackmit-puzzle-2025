@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chess Cipher</title>
+    <title>Chess</title>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -22,7 +22,7 @@
         text-align: center;
         color: #333;
       }
-      #ciphertext {
+      #caption {
         background-color: #f9f9f9;
         border: 1px solid #ddd;
         padding: 15px;
@@ -43,29 +43,36 @@
       <h1>A chessboard is worth 64 squares</h1>
       <p><em>How did we get here?</em></p>
 
-      <div id="ciphertext" class="loading">Loading ciphertext...</div>
+      <div style="text-align: center; margin: 20px 0">
+        <img
+          src="https://via.placeholder.com/400x300/cccccc/666666?text=Chess+Board"
+          alt="Chess Board Placeholder"
+          style="max-width: 100%; height: auto"
+        />
+      </div>
+
+      <div id="caption" class="loading">Loading...</div>
     </div>
 
     <script>
-      async function getCiphertext() {
-        const ciphertextDiv = document.getElementById("ciphertext");
-        ciphertextDiv.innerHTML = '<span class="loading">Loading...</span>';
+      async function getCaption() {
+        const captionDiv = document.getElementById("caption");
+        captionDiv.innerHTML = '<span class="loading">Loading...</span>';
 
         try {
-          const response = await fetch("/get_ciphertext");
+          const response = await fetch("/get_caption");
           const data = await response.json();
-          ciphertextDiv.innerHTML = data.ciphertext;
-          ciphertextDiv.className = "";
+          captionDiv.innerHTML = data.caption;
+          captionDiv.className = "";
         } catch (error) {
-          ciphertextDiv.innerHTML =
-            "Error loading ciphertext: " + error.message;
-          ciphertextDiv.className = "";
+          captionDiv.innerHTML = "Error loading caption: " + error.message;
+          captionDiv.className = "";
         }
       }
 
-      // Load ciphertext automatically when page loads
+      // Load caption automatically when page loads
       window.onload = function () {
-        getCiphertext();
+        getCaption();
       };
     </script>
   </body>

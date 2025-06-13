@@ -1,11 +1,11 @@
-# Chess Cipher Web App
+# Chess Web App
 
-A minimal client-server web application with Flask backend and HTML frontend for displaying ciphertext.
+A minimal client-server web application with Flask backend and HTML frontend for displaying captions.
 
 ## Features
 
-- Simple web interface with automatic ciphertext loading
-- Flask backend that serves ciphertext via REST API
+- Simple web interface with automatic caption loading
+- Flask backend that serves captions via REST API
 - Clean, responsive design
 
 ## Setup and Running
@@ -58,12 +58,12 @@ python app.py
 http://localhost:5000
 ```
 
-The ciphertext will load automatically when the page opens.
+The caption will load automatically when the page opens.
 
 ## API Endpoints
 
 - `GET /` - Serves the main web interface
-- `GET /get_ciphertext` - Returns JSON with ciphertext
+- `GET /get_caption` - Returns JSON with caption
 
 ## Development
 
