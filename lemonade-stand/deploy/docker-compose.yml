@@ -1,0 +1,25 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    privileged: true
+    expose:
+      - "5000"
+    networks:
+      - internal
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge

@@ -1,4 +1,5 @@
-ws = new WebSocket("ws://127.0.0.1:9001");
+// ws = new WebSocket("ws://127.0.0.1:4300");
+ws = new WebSocket("ws://" + location.host + "/ws/");
 
 const onOpen = async () => {
   const waitMsg = () =>

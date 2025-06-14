@@ -42,8 +42,10 @@ const App = () => {
   const connectWebSocket = useCallback(() => {
     setConnectionState("OPENING");
 
+    // const host = "127.0.0.1:4300";
+    const host = location.host + "/ws/";
     const socket = new WebSocket(
-      `${location.protocol === "https:" ? "wss" : "ws"}://127.0.0.1:4300`,
+      `${location.protocol === "https:" ? "wss" : "ws"}://${host}`,
     );
     wsRef.current = socket;
     socket.binaryType = "arraybuffer";
