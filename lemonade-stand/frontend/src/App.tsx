@@ -52,7 +52,6 @@ const App = () => {
       setConnectionState("OPEN");
       // reset state
       setStands([]);
-      setShowModal(false);
       setShowCreateForm(false);
       setCreateName("");
       setEditing(null);
@@ -61,7 +60,9 @@ const App = () => {
       setCreateNameError("");
       simBufferRef.current = "";
       awaitingSimRef.current = false;
-      setOutput("");
+      // don't reset these so user has time to read the error if any
+      // setShowModal(false);
+      // setOutput("");
     };
 
     socket.onclose = () => {
@@ -190,7 +191,6 @@ const App = () => {
     const nameError = validateStandName(name);
     if (nameError) {
       setStandErrors((prev) => ({ ...prev, [index]: { name: nameError } }));
-      return;
     }
 
     const encodedName = encodeURIComponent(name);
@@ -343,7 +343,7 @@ const App = () => {
                 onSubmit={(e) => {
                   e.preventDefault();
                   const newName = (
-                    (e.target as HTMLFormElement).namedItem(
+                    (e.target as HTMLFormElement).elements.namedItem(
                       `rename-${index}`,
                     ) as HTMLInputElement
                   ).value;
