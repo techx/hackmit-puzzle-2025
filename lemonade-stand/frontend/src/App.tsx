@@ -17,6 +17,8 @@ function isDefined<T>(val: T | undefined | null): val is T {
   return val !== undefined && val !== null;
 }
 
+const PROMPT = "enter command: ";
+
 type ConnectionState = "OPENING" | "OPEN" | "CLOSED";
 
 const App = () => {
@@ -24,7 +26,6 @@ const App = () => {
   const [connectionState, setConnectionState] =
     useState<ConnectionState>("OPENING");
   const [stands, setStands] = useState<Stand[]>([]);
-  const [output, setOutput] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [createName, setCreateName] = useState("");
@@ -34,8 +35,9 @@ const App = () => {
     Record<number, StandValidationErrors>
   >({});
   const [createNameError, setCreateNameError] = useState<string>("");
-
-  // const outputRef = useRef(null);
+  const simBufferRef = useRef<string>("");
+  const awaitingSimRef = useRef(false);
+  const [output, setOutput] = useState("");
 
   const connectWebSocket = useCallback(() => {
     setConnectionState("OPENING");
@@ -48,15 +50,31 @@ const App = () => {
 
     socket.onopen = () => {
       setConnectionState("OPEN");
+      // reset state
+      setStands([]);
+      setShowModal(false);
+      setShowCreateForm(false);
+      setCreateName("");
+      setEditing(null);
+      setErrors({});
+      setStandErrors({});
+      setCreateNameError("");
+      simBufferRef.current = "";
+      awaitingSimRef.current = false;
+      setOutput("");
     };
 
     socket.onclose = () => {
-      // timeout to handle if close gets called before error
+      // if the server closed mid-simulation flush what we have so far
+      if (awaitingSimRef.current && simBufferRef.current) {
+        setOutput(simBufferRef.current.trim());
+        setShowModal(true);
+      }
+      // existing reconnection logic …
       setTimeout(
         () =>
           setConnectionState((state) => {
-            // don't reconnect if onerror already set state to CLOSED
-            if (state == "OPEN") {
+            if (state === "OPEN") {
               connectWebSocket();
               return "OPENING";
             }
@@ -67,19 +85,50 @@ const App = () => {
     };
 
     socket.onerror = () => {
+      // same defensive flush – you may prefer to surface an explicit error UI
+      if (awaitingSimRef.current && simBufferRef.current) {
+        setOutput(simBufferRef.current.trim());
+        setShowModal(true);
+      }
       setConnectionState("CLOSED");
     };
 
     socket.onmessage = (event) => {
-      let text;
-      try {
-        text = new TextDecoder().decode(event.data);
-      } catch (e) {
-        void e;
-        return;
+      let text: string;
+      if (typeof event.data === "string") {
+        text = event.data;
+      } else {
+        try {
+          text = new TextDecoder().decode(event.data);
+        } catch {
+          return;
+        }
       }
-      setOutput(text);
-      setShowModal(true);
+
+      text.split("\n").forEach((line) => {
+        if (!line) return;
+
+        if (line === PROMPT) {
+          if (awaitingSimRef.current) {
+            // simulation output just ended, flush buffer to UI
+            awaitingSimRef.current = false;
+            const flushed = simBufferRef.current.trim();
+            simBufferRef.current = "";
+            if (flushed) {
+              setOutput(flushed);
+              setShowModal(true);
+            }
+          }
+          return; // don't treat prompt as output
+        }
+
+        if (awaitingSimRef.current) {
+          simBufferRef.current += line + "\n";
+        } else {
+          setOutput((prev) => prev + line + "\n"); // one-shot result from non-simulate command
+          setShowModal(true);
+        }
+      });
     };
 
     return () => socket.close();
@@ -91,7 +140,11 @@ const App = () => {
   }, [connectWebSocket]);
 
   const send = (cmd: string) => {
-    if (connectionState == "OPEN") {
+    if (connectionState === "OPEN") {
+      if (cmd.startsWith("simulate")) {
+        awaitingSimRef.current = true; // begin accumulation
+        simBufferRef.current = ""; // reset buffer
+      }
       wsRef.current!.send(cmd + "\n");
     }
   };
@@ -350,6 +403,7 @@ const App = () => {
                     placeholder={key}
                     step={key === "price" ? "0.01" : "1"}
                     className="input w-full border p-1"
+                    defaultValue={recipe[key]}
                     onChange={(e) => {
                       setStands((prev) =>
                         prev.map((s) =>
@@ -378,7 +432,7 @@ const App = () => {
                 className="btn rounded bg-blue-500 p-1 px-3 text-white"
                 onClick={() => setRecipe(index, recipe)}
               >
-                Set
+                Save
               </button>
             </div>
             <div className="mt-2 flex gap-2">
