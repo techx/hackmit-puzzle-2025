@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "./App.css";
 
 type Recipe = { lemons?: number; sugar?: number; ice?: number; price?: number };
@@ -8,17 +8,21 @@ type ValidationErrors = {
   ice?: string;
   price?: string;
 };
+type StandValidationErrors = {
+  name?: string;
+};
 type Stand = { index: number; name: string; recipe: Recipe };
 
 function isDefined<T>(val: T | undefined | null): val is T {
   return val !== undefined && val !== null;
 }
 
+type ConnectionState = "OPENING" | "OPEN" | "CLOSED";
+
 const App = () => {
-  const [ws, setWs] = useState<WebSocket | null>(null);
-  const [connected, setConnected] = useState(false);
-  const [connecting, setConnecting] = useState(false);
-  const [connectionFailed, setConnectionFailed] = useState(false);
+  const wsRef = useRef<WebSocket | null>(null);
+  const [connectionState, setConnectionState] =
+    useState<ConnectionState>("OPENING");
   const [stands, setStands] = useState<Stand[]>([]);
   const [output, setOutput] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -26,37 +30,44 @@ const App = () => {
   const [createName, setCreateName] = useState("");
   const [editing, setEditing] = useState<number | null>(null);
   const [errors, setErrors] = useState<Record<number, ValidationErrors>>({});
+  const [standErrors, setStandErrors] = useState<
+    Record<number, StandValidationErrors>
+  >({});
+  const [createNameError, setCreateNameError] = useState<string>("");
 
   // const outputRef = useRef(null);
 
   const connectWebSocket = useCallback(() => {
-    setConnecting(true);
-    setConnectionFailed(false);
+    setConnectionState("OPENING");
 
     const socket = new WebSocket(
       `${location.protocol === "https:" ? "wss" : "ws"}://127.0.0.1:4300`,
     );
+    wsRef.current = socket;
     socket.binaryType = "arraybuffer";
 
     socket.onopen = () => {
-      setConnected(true);
-      setConnecting(false);
-      setConnectionFailed(false);
+      setConnectionState("OPEN");
     };
 
     socket.onclose = () => {
-      setConnected(false);
-      setConnecting(false);
-      // Only attempt to reconnect if we were previously connected
-      // (meaning the connection was established but then lost)
-      if (connected && !connectionFailed) {
-        setTimeout(connectWebSocket, 2000);
-      }
+      // timeout to handle if close gets called before error
+      setTimeout(
+        () =>
+          setConnectionState((state) => {
+            // don't reconnect if onerror already set state to CLOSED
+            if (state == "OPEN") {
+              connectWebSocket();
+              return "OPENING";
+            }
+            return state;
+          }),
+        10,
+      );
     };
 
     socket.onerror = () => {
-      setConnectionFailed(true);
-      setConnecting(false);
+      setConnectionState("CLOSED");
     };
 
     socket.onmessage = (event) => {
@@ -71,9 +82,8 @@ const App = () => {
       setShowModal(true);
     };
 
-    setWs(socket);
     return () => socket.close();
-  }, [connected, connectionFailed]);
+  }, []);
 
   useEffect(() => {
     const cleanup = connectWebSocket();
@@ -81,8 +91,8 @@ const App = () => {
   }, [connectWebSocket]);
 
   const send = (cmd: string) => {
-    if (connected && ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(cmd + "\n");
+    if (connectionState == "OPEN") {
+      wsRef.current!.send(cmd + "\n");
     }
   };
 
@@ -94,20 +104,48 @@ const App = () => {
     return -1;
   };
 
+  const validateStandName = (name: string): string | null => {
+    if (!name.trim()) {
+      return "Stand name cannot be empty";
+    }
+    const encoded = encodeURIComponent(name);
+    if (encoded.length > 1024) {
+      return "Stand name too long (encoded length exceeds 1024 characters)";
+    }
+    return null;
+  };
+
   const createStand = (name: string) => {
+    const nameError = validateStandName(name);
+    if (nameError) {
+      setCreateNameError(nameError);
+      return;
+    }
+
     const index = allocateIndex();
     if (index === -1) return;
-    send(`stand_create ${index} ${name.length} ${name}`);
-    setStands((prev) => [...prev, { index, name, recipe: {} }]);
+
+    const encodedName = encodeURIComponent(name);
+    send(`stand_create ${index} ${encodedName.length} ${encodedName}`);
+    setStands((prev) => [...prev, { index, name: encodedName, recipe: {} }]);
     setCreateName("");
+    setCreateNameError("");
     setShowCreateForm(false);
   };
 
   const renameStand = (index: number, name: string) => {
-    send(`stand_rename ${index} ${name}`);
+    const nameError = validateStandName(name);
+    if (nameError) {
+      setStandErrors((prev) => ({ ...prev, [index]: { name: nameError } }));
+      return;
+    }
+
+    const encodedName = encodeURIComponent(name);
+    send(`stand_rename ${index} ${encodedName}`);
     setStands((prev) =>
-      prev.map((s) => (s.index === index ? { ...s, name } : s)),
+      prev.map((s) => (s.index === index ? { ...s, name: encodedName } : s)),
     );
+    setStandErrors((prev) => ({ ...prev, [index]: {} }));
     setEditing(null);
   };
 
@@ -157,21 +195,32 @@ const App = () => {
     const newIndex = allocateIndex();
     if (newIndex === -1) return;
 
-    const newName = `${sourceName} Copy`;
-    send(`stand_create ${newIndex} ${newName.length} ${newName}`);
+    // Decode the source name, add " Copy", then encode the new name
+    const decodedSourceName = decodeURIComponent(sourceName);
+    const newName = `${decodedSourceName} Copy`;
+    const nameError = validateStandName(newName);
+    if (nameError) {
+      // Could show an error here, but for now just silently fail
+      return;
+    }
+
+    const encodedNewName = encodeURIComponent(newName);
+    send(`stand_create ${newIndex} ${encodedNewName.length} ${encodedNewName}`);
     send(`copy_recipe ${sourceIndex} ${newIndex}`);
 
     setStands((prev) => [
       ...prev,
-      { index: newIndex, name: newName, recipe: sourceRecipe },
+      { index: newIndex, name: encodedNewName, recipe: sourceRecipe },
     ]);
   };
 
   return (
-    <div className="space-y-6 p-6" aria-disabled={!connected}>
+    <div className="space-y-6 p-6" aria-disabled={connectionState != "OPEN"}>
       <h1 className="text-2xl font-bold">Lemonade Stand Simulator</h1>
-      {connecting && <p className="text-blue-500">Connecting to server...</p>}
-      {!connected && !connecting && connectionFailed && (
+      {connectionState == "OPENING" && (
+        <p className="text-blue-500">Connecting to server...</p>
+      )}
+      {connectionState == "CLOSED" && (
         <div className="text-red-500">
           <p>Failed to connect to server</p>
           <button
@@ -182,9 +231,6 @@ const App = () => {
           </button>
         </div>
       )}
-      {!connected && !connecting && !connectionFailed && (
-        <p className="text-yellow-500">Attempting to reconnect...</p>
-      )}
 
       {showCreateForm ? (
         <form
@@ -194,13 +240,21 @@ const App = () => {
             if (createName) createStand(createName);
           }}
         >
-          <input
-            type="text"
-            placeholder="Stand name"
-            value={createName}
-            onChange={(e) => setCreateName(e.target.value)}
-            className="border p-2"
-          />
+          <div className="flex flex-col">
+            <input
+              type="text"
+              placeholder="Stand name"
+              value={createName}
+              onChange={(e) => {
+                setCreateName(e.target.value);
+                setCreateNameError("");
+              }}
+              className="border p-2"
+            />
+            {createNameError && (
+              <p className="mt-1 text-sm text-red-500">{createNameError}</p>
+            )}
+          </div>
           <button
             className="rounded bg-green-600 px-3 py-1 text-white"
             type="submit"
@@ -210,7 +264,10 @@ const App = () => {
           <button
             className="text-gray-500"
             type="button"
-            onClick={() => setShowCreateForm(false)}
+            onClick={() => {
+              setShowCreateForm(false);
+              setCreateNameError("");
+            }}
           >
             Cancel
           </button>
@@ -219,7 +276,7 @@ const App = () => {
         <button
           className="btn rounded bg-blue-600 p-2 text-white disabled:opacity-50"
           onClick={() => setShowCreateForm(true)}
-          disabled={!connected || stands.length >= 16}
+          disabled={connectionState != "OPEN" || stands.length >= 16}
         >
           + Add Stand
         </button>
@@ -243,9 +300,14 @@ const App = () => {
                 <input
                   name={`rename-${index}`}
                   type="text"
-                  defaultValue={name}
+                  defaultValue={decodeURIComponent(name)}
                   className="input mt-2 block w-full border p-1"
                 />
+                {standErrors[index]?.name && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {standErrors[index].name}
+                  </p>
+                )}
                 <div className="mt-1 flex gap-2">
                   <button
                     type="submit"
@@ -256,7 +318,10 @@ const App = () => {
                   <button
                     type="button"
                     className="text-gray-500"
-                    onClick={() => setEditing(null)}
+                    onClick={() => {
+                      setEditing(null);
+                      setStandErrors((prev) => ({ ...prev, [index]: {} }));
+                    }}
                   >
                     Cancel
                   </button>
@@ -264,7 +329,9 @@ const App = () => {
               </form>
             ) : (
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold">{name}</h2>
+                <h2 className="text-xl font-semibold">
+                  {decodeURIComponent(name)}
+                </h2>
                 <button
                   onClick={() => setEditing(index)}
                   className="text-blue-600"
@@ -324,7 +391,10 @@ const App = () => {
               <button
                 className="btn rounded bg-blue-400 p-1 px-3 text-white"
                 onClick={() => duplicateStand(index, name, recipe)}
-                disabled={stands.length >= 16}
+                disabled={
+                  stands.length >= 16 ||
+                  validateStandName(decodeURIComponent(name) + " Copy") != null
+                }
                 title="Duplicate stand"
               >
                 📋
