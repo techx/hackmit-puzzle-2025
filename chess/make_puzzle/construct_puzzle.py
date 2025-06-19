@@ -60,32 +60,30 @@ def encode_ciphertext(ct: bytes) -> str:
 # ─────────────────────────  MAIN  ───────────────────────────────
 
 def main() -> None:
-    for _ in range(10000):
-        # 1. Get PGN & index list (random or supplied)
-        pgn_text = PGN_TEXT.strip()
-        indices  = key_from_pgn(pgn_text)
+    # 1. Get PGN & index list
+    pgn_text   = PGN_TEXT.strip()
+    indices    = key_from_pgn(pgn_text)
 
-        key_b64   = indices_to_b64(indices)
-        key_bytes = base64.b64decode(key_b64)
+    key_b64    = indices_to_b64(indices)
+    key_bytes  = base64.b64decode(key_b64)
 
-        # 2. Build ciphertext for the chosen PLAINTEXT
-        PLAINTEXT = PLAINTEXT1 + PLAINTEXT2
-        pt_bytes = PLAINTEXT.encode("utf-8")
-        ct_bytes = xor_bytes(pt_bytes, key_bytes)
-        ciphertext = encode_ciphertext(ct_bytes)
+    # 2. Build ciphertext for the chosen PLAINTEXT
+    PLAINTEXT  = PLAINTEXT1 + PLAINTEXT2
+    pt_bytes   = PLAINTEXT.encode("utf-8")
+    ct_bytes   = xor_bytes(pt_bytes, key_bytes)
+    ciphertext = encode_ciphertext(ct_bytes)
 
-        # 3. Print the puzzle components
-        print("───── PGN ─────")
-        print(pgn_text)
-        print("\n───── Base-64 Key Stream ──────")
-        print(key_b64)
-        print(f"\n───── Ciphertext ─────")
-        print(ciphertext)
+    # 3. Print the puzzle components
+    print("───── PGN ─────")
+    print(pgn_text)
+    print("\n───── Base-64 Key Stream ──────")
+    print(key_b64)
+    print(f"\n───── Ciphertext ─────")
+    print(ciphertext)
 
-        # 4. Sanity check (private)
-        recovered = xor_bytes(ct_bytes, key_bytes).decode("utf-8")
-        assert recovered == PLAINTEXT, "Sanity check failed: decryption mismatch"
-        break
+    # 4. Sanity check (private)
+    recovered = xor_bytes(ct_bytes, key_bytes).decode("utf-8")
+    assert recovered == PLAINTEXT, "Sanity check failed: decryption mismatch"
 
 if __name__ == "__main__":
     main()
