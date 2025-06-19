@@ -4,14 +4,14 @@
 # ───────────────────────  CONFIG  ───────────────────────────────
 
 PLAINTEXT1 = (
-    "Well done! To find the key that you seek, you must complete a full wikipedia-GIF knight's tour. If a white piece needs to get out of the way of the tour, then move it forward. The black king always prefers moving to squares that are of the smallest possible value (a8=0, b8=1, ...), but will never capture a piece. Finally, finish with a mate in 3. The key is as follows: "
+    "To obtain the flag, complete a full wikipedia-GIF knight's tour. If a white piece needs to get out of the way of the tour, then move it forward. The black king always prefers moving to squares that are of the smallest possible value (a8=0, b8=1, ...), but will never capture a piece. Finally, finish with a mate in 3. "
 )
 
 PLAINTEXT2 = (
-    """hello1 hello2 hello3 hello4 hello5 hello6 hello7 hello8 hello9 hello10 hello11 hello12 hello13 hello14 hello15 hello16 hello17 hello18 hello19 """
+    """hello1 hello2 hello3 hello4 hello5 hello6 hello7 hello8 hello9 hello10 hello11 hello12 hello13 hello14 hello15 hello16 hello17 hello18 hello19  """
 )
 
-assert(len(PLAINTEXT1) == 372 and len(PLAINTEXT2) == 143)
+assert(len(PLAINTEXT1) == 318 and len(PLAINTEXT2) == 144)
 
 # set to None for random game generation:
 PGN_TEXT = """
@@ -48,7 +48,9 @@ def key_from_pgn(pgn_text: str) -> List[int]:
     return indices
 
 def indices_to_b64(indices: List[int]) -> str:
-    return base64.b64encode(bytes(indices)).decode("ascii")
+    """Convert indices (0-63) directly to base64 characters."""
+    base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+    return ''.join(base64_chars[i] for i in indices)
 
 def xor_bytes(data: bytes, key: bytes) -> bytes:
     """XOR data with key; repeat key cyclically if shorter."""
@@ -64,7 +66,9 @@ def main() -> None:
     pgn_text   = PGN_TEXT.strip()
     indices    = key_from_pgn(pgn_text)
 
+    print(len(indices))
     key_b64    = indices_to_b64(indices)
+    print(len(key_b64))
     key_bytes  = base64.b64decode(key_b64)
 
     # 2. Build ciphertext for the chosen PLAINTEXT
