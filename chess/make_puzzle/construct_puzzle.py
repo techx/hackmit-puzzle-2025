@@ -1,16 +1,7 @@
 #!/usr/bin/env python3
 # construct_puzzle.py
-#
-# Generates everything a solver needs: PGN, key, ciphertext.
-# Can either create a random no-castle game or use a supplied PGN.
 
 # ───────────────────────  CONFIG  ───────────────────────────────
-
-# key = """hello1 hello2 hello3 hello4 hello5 hello6 hello7 hello8 hello9 hello10 hello11 hello12 hello13 hello14 hello15 hello16 hello17 hello18 hello19 """
-
-# PLAINTEXT = (
-#     f"Well done! To find the key that you seek, you must complete a full wikipedia-GIF knight's tour. If a white piece needs to get out of the way of the tour, then move it forward. The black king always prefers moving to squares that are of the smallest possible value (a8=0, b8=1, ...), but will never capture a piece. Finally, finish with a mate in 3. The key is as follows: {key}"
-# )
 
 PLAINTEXT1 = (
     "Well done! To find the key that you seek, you must complete a full wikipedia-GIF knight's tour. If a white piece needs to get out of the way of the tour, then move it forward. The black king always prefers moving to squares that are of the smallest possible value (a8=0, b8=1, ...), but will never capture a piece. Finally, finish with a mate in 3. The key is as follows: "
@@ -38,9 +29,6 @@ import chess.pgn
 
 # ────────────────────  UTILITY FUNCTIONS  ──────────────────────
 
-MAX_HALFMOVES_RANDOM = 1024      # safety cap for random generator
-CIPHERTEXT_ENCODING = "base64"      # choose "hex"  or  "base64"
-
 def square_to_index(sq: chess.Square) -> int:
     """python-chess square (0=a1 …) → row-major index (a8=0 … h1=63)."""
     file = chess.square_file(sq)           # 0 = a … 7 = h
@@ -66,17 +54,13 @@ def xor_bytes(data: bytes, key: bytes) -> bytes:
     """XOR data with key; repeat key cyclically if shorter."""
     return bytes(b ^ key[i % len(key)] for i, b in enumerate(data))
 
-def encode_ciphertext(ct: bytes, fmt: str) -> str:
-    if fmt.lower() == "hex":
-        return ct.hex()
-    if fmt.lower() == "base64":
-        return base64.b64encode(ct).decode("ascii")
-    raise ValueError("CIPHERTEXT_ENCODING must be 'hex' or 'base64'")
+def encode_ciphertext(ct: bytes) -> str:
+    return base64.b64encode(ct).decode("ascii")
 
 # ─────────────────────────  MAIN  ───────────────────────────────
 
 def main() -> None:
-    for i in range(10000):
+    for _ in range(10000):
         # 1. Get PGN & index list (random or supplied)
         pgn_text = PGN_TEXT.strip()
         indices  = key_from_pgn(pgn_text)
@@ -88,14 +72,14 @@ def main() -> None:
         PLAINTEXT = PLAINTEXT1 + PLAINTEXT2
         pt_bytes = PLAINTEXT.encode("utf-8")
         ct_bytes = xor_bytes(pt_bytes, key_bytes)
-        ciphertext = encode_ciphertext(ct_bytes, CIPHERTEXT_ENCODING)
+        ciphertext = encode_ciphertext(ct_bytes)
 
         # 3. Print the puzzle components
-        print("───── PGN (give this to solvers) ─────")
+        print("───── PGN ─────")
         print(pgn_text)
-        print("\n───── Base-64 Key Stream (give) ──────")
+        print("\n───── Base-64 Key Stream ──────")
         print(key_b64)
-        print(f"\n───── Ciphertext ({CIPHERTEXT_ENCODING}) (give) ─────")
+        print(f"\n───── Ciphertext ─────")
         print(ciphertext)
 
         # 4. Sanity check (private)
