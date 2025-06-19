@@ -6,11 +6,21 @@
 
 # ───────────────────────  CONFIG  ───────────────────────────────
 
-key = """hello1 hello2 hello3 hello4 hello5 hello6 hello7 hello8 hello9 hello10 hello11 hello12 hello13 hello14 hello15 hello16 hello17 hello18 hello19 """
+# key = """hello1 hello2 hello3 hello4 hello5 hello6 hello7 hello8 hello9 hello10 hello11 hello12 hello13 hello14 hello15 hello16 hello17 hello18 hello19 """
 
-PLAINTEXT = (
-    f"Well done! To find the key that you seek, you must complete a full wikipedia-GIF knight's tour. If a white piece needs to get out of the way of the tour, then move it forward. The black king always prefers moving to squares that are of the smallest possible value (a8=0, b8=1, ...), but will never capture a piece. Finally, finish with a mate in 3. The key is as follows: {key}"
+# PLAINTEXT = (
+#     f"Well done! To find the key that you seek, you must complete a full wikipedia-GIF knight's tour. If a white piece needs to get out of the way of the tour, then move it forward. The black king always prefers moving to squares that are of the smallest possible value (a8=0, b8=1, ...), but will never capture a piece. Finally, finish with a mate in 3. The key is as follows: {key}"
+# )
+
+PLAINTEXT1 = (
+    "Well done! To find the key that you seek, you must complete a full wikipedia-GIF knight's tour. If a white piece needs to get out of the way of the tour, then move it forward. The black king always prefers moving to squares that are of the smallest possible value (a8=0, b8=1, ...), but will never capture a piece. Finally, finish with a mate in 3. The key is as follows: "
 )
+
+PLAINTEXT2 = (
+    """hello1 hello2 hello3 hello4 hello5 hello6 hello7 hello8 hello9 hello10 hello11 hello12 hello13 hello14 hello15 hello16 hello17 hello18 hello19 """
+)
+
+assert(len(PLAINTEXT1) == 372 and len(PLAINTEXT2) == 143)
 
 # set to None for random game generation:
 PGN_TEXT = """
@@ -75,6 +85,7 @@ def main() -> None:
         key_bytes = base64.b64decode(key_b64)
 
         # 2. Build ciphertext for the chosen PLAINTEXT
+        PLAINTEXT = PLAINTEXT1 + PLAINTEXT2
         pt_bytes = PLAINTEXT.encode("utf-8")
         ct_bytes = xor_bytes(pt_bytes, key_bytes)
         ciphertext = encode_ciphertext(ct_bytes, CIPHERTEXT_ENCODING)
