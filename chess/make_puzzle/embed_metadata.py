@@ -16,7 +16,7 @@ color_light = tuple(int("fffcdc"[i:i+2], 16) for i in (0, 2, 4))
 color_dark = tuple(int("88a464"[i:i+2], 16) for i in (0, 2, 4))
 
 # Manhattan distance threshold
-threshold = 12
+threshold = 6
 
 # Apply staircase (diamond) coloring based on Manhattan distance from each corner (get rid of rounded corners)
 for x in range(width):
