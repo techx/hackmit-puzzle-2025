@@ -21,7 +21,6 @@ PGN_TEXT = """
 
 import base64
 import io
-import random
 from typing import List
 
 import chess
@@ -50,26 +49,6 @@ def key_from_pgn(pgn_text: str) -> List[int]:
         indices.append(square_to_index(move.to_square))
     return indices
 
-def random_no_castle_game(max_halfmoves: int = 1024) -> tuple[str, List[int]]:
-    """Generate a random legal game without castling; return PGN and index list."""
-    board = chess.Board()
-    game = chess.pgn.Game()
-    node = game
-    indices: List[int] = []
-
-    while not board.is_game_over() and board.fullmove_number * 2 <= max_halfmoves:
-        non_castles = [m for m in board.legal_moves if not board.is_castling(m)]
-        if not non_castles:  # only castles remain
-            break
-        move = random.choice(non_castles)
-        board.push(move)
-        node = node.add_variation(move)
-        indices.append(square_to_index(move.to_square))
-
-    outcome = board.outcome()
-    game.headers["Result"] = outcome.result() if outcome else "*"
-    return str(game), indices
-
 def indices_to_b64(indices: List[int]) -> str:
     return base64.b64encode(bytes(indices)).decode("ascii")
 
@@ -84,45 +63,13 @@ def encode_ciphertext(ct: bytes, fmt: str) -> str:
         return base64.b64encode(ct).decode("ascii")
     raise ValueError("CIPHERTEXT_ENCODING must be 'hex' or 'base64'")
 
-# ────────────────────  EXTRA CHECK  ────────────────────────────
-REQUIRED_HALFMOVE = 150
-
-def condition_holds(pgn_text: str, halfmove: int = REQUIRED_HALFMOVE) -> bool:
-    """
-    Return True iff, *after the given half-move*, there is
-      • at least one white pawn on file d, **and**
-      • at least one white pawn on file e.
-    If the game is shorter than the required half-move, the
-    condition automatically fails.
-    """
-    game  = chess.pgn.read_game(io.StringIO(pgn_text))
-    board = game.board()
-
-    ply = 0
-    for move in game.mainline_moves():
-        ply += 1
-        board.push(move)
-        if ply == halfmove:
-            break
-
-    if ply < halfmove:                        # game ended too soon
-        return False
-
-    wpawns = board.pieces(chess.PAWN, chess.WHITE)
-    has_file_d = any(chess.square_file(sq) == 3 for sq in wpawns)  # file d → index 3
-    has_file_e = any(chess.square_file(sq) == 4 for sq in wpawns)  # file e → index 4
-    return has_file_d and has_file_e
-
 # ─────────────────────────  MAIN  ───────────────────────────────
 
 def main() -> None:
     for i in range(10000):
         # 1. Get PGN & index list (random or supplied)
-        if PGN_TEXT and PGN_TEXT.strip():
-            pgn_text = PGN_TEXT.strip()
-            indices  = key_from_pgn(pgn_text)
-        else:
-            pgn_text, indices = random_no_castle_game(MAX_HALFMOVES_RANDOM)
+        pgn_text = PGN_TEXT.strip()
+        indices  = key_from_pgn(pgn_text)
 
         key_b64   = indices_to_b64(indices)
         key_bytes = base64.b64decode(key_b64)
@@ -131,11 +78,6 @@ def main() -> None:
         pt_bytes = PLAINTEXT.encode("utf-8")
         ct_bytes = xor_bytes(pt_bytes, key_bytes)
         ciphertext = encode_ciphertext(ct_bytes, CIPHERTEXT_ENCODING)
-
-        if not condition_holds(pgn_text, REQUIRED_HALFMOVE):
-            if i%10 == 0:
-                print(f"Condition not met on game {i}, trying again...")
-            continue
 
         # 3. Print the puzzle components
         print("───── PGN (give this to solvers) ─────")
