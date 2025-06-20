@@ -7,7 +7,7 @@ from flask_cors import CORS
 
 from make_puzzle.construct_puzzle import get_ciphertext
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='assets', static_url_path='/assets')
 CORS(app)
 
 #### command center stuff ####

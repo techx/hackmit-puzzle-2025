@@ -6,146 +6,101 @@
     <title>Chess</title>
     <style>
       body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        max-width: 900px;
-        margin: 30px auto;
-        padding: 20px;
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        background-color: #ffffff;
+        color: #333;
         line-height: 1.6;
-      }
-      .container {
-        background-color: white;
-        padding: 40px;
-        border-radius: 12px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
       }
       h1 {
         text-align: center;
-        color: #2c3e50;
-        margin-bottom: 30px;
-        font-size: 2.2em;
-        font-weight: 300;
-      }
-      .info-section {
-        background-color: #f8f9fa;
-        border-left: 4px solid #007bff;
-        padding: 20px;
-        margin: 20px 0;
-        border-radius: 6px;
-      }
-      .info-section p {
-        margin: 0;
-        color: #495057;
-      }
-      .info-section em {
-        color: #6c757d;
-        display: block;
-        margin-bottom: 10px;
+        margin-bottom: 40px;
+        font-size: 2em;
+        font-weight: 600;
+        color: #333;
       }
       .chess-board {
         text-align: center;
-        margin: 30px 0;
-        padding: 20px;
-        background-color: #f8f9fa;
-        border-radius: 8px;
+        margin: 40px 0;
       }
       .chess-board img {
         max-width: 100%;
         height: auto;
-        border: 2px solid #dee2e6;
-        border-radius: 8px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid #ddd;
+      }
+      .chess-caption {
+        text-align: center;
+        margin-top: 8px;
+        font-size: 14px;
+        color: #666;
+        font-style: italic;
       }
       .ciphertext-section {
-        margin-top: 30px;
+        margin-top: 50px;
       }
       .ciphertext-label {
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 10px;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 15px;
         display: block;
+        font-size: 16px;
       }
       #ciphertext {
         background-color: #f8f9fa;
-        border: 2px solid #e9ecef;
+        border: 1px solid #e9ecef;
         padding: 20px;
-        border-radius: 8px;
-        font-family: 'Courier New', monospace;
-        font-size: 14px;
+        border-radius: 4px;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-size: 13px;
         word-wrap: break-word;
         word-break: break-all;
         white-space: pre-wrap;
         min-height: 100px;
         max-height: 300px;
         overflow-y: auto;
-        line-height: 1.4;
-        color: #212529;
-        transition: all 0.3s ease;
+        line-height: 1.5;
+        color: #333;
       }
       #ciphertext.loading {
-        color: #6c757d;
+        color: #999;
         font-style: italic;
         text-align: center;
-        font-family: 'Segoe UI', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
       }
       #ciphertext.error {
-        color: #dc3545;
-        border-color: #dc3545;
-        background-color: #f8d7da;
+        color: #d73a49;
+        border-color: #d73a49;
+        background-color: #ffeaea;
       }
-      .refresh-button {
-        margin-top: 15px;
-        padding: 10px 20px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: background-color 0.3s ease;
-      }
-      .refresh-button:hover {
-        background-color: #0056b3;
-      }
-      .refresh-button:disabled {
-        background-color: #6c757d;
-        cursor: not-allowed;
-      }
+
     </style>
   </head>
   <body>
-    <div class="container">
-      <h1>A chessboard is worth 64 squares</h1>
-      
-      <div class="info-section">
-        <em>How did we get here?</em>
-        <p><strong>a8=0</strong></p>
-      </div>
+    <h1>A chessboard is worth 64 squares</h1>
 
-      <div class="chess-board">
-        <img
-          src="../assets/puzzle_board.png"
-          alt="Chess Puzzle Board"
-        />
-      </div>
+    <div class="chess-board">
+      <img
+        src="/assets/puzzle_board.png"
+        alt="Chess Puzzle Board"
+        style="width: 400px;"
+      />
+      <div class="chess-caption">How did we get here? — a8=0</div>
+    </div>
 
-      <div class="ciphertext-section">
-        <label class="ciphertext-label">Ciphertext:</label>
-        <div id="ciphertext" class="loading">Loading ciphertext...</div>
-        <button id="refresh-btn" class="refresh-button" onclick="getCiphertext()">Refresh Ciphertext</button>
-      </div>
+    <div class="ciphertext-section">
+      <label class="ciphertext-label">Ciphertext:</label>
+      <div id="ciphertext" class="loading">Loading ciphertext...</div>
     </div>
 
     <script>
       async function getCiphertext() {
         const ciphertextDiv = document.getElementById("ciphertext");
-        const refreshBtn = document.getElementById("refresh-btn");
         
         // Set loading state
         ciphertextDiv.className = "loading";
         ciphertextDiv.textContent = "Loading ciphertext...";
-        refreshBtn.disabled = true;
-        refreshBtn.textContent = "Loading...";
 
         try {
           const response = await fetch("/get_caption?userId=default_user");
@@ -164,10 +119,6 @@
           console.error("Error fetching ciphertext:", error);
           ciphertextDiv.className = "error";
           ciphertextDiv.textContent = `Error loading ciphertext: ${error.message}`;
-        } finally {
-          // Reset button state
-          refreshBtn.disabled = false;
-          refreshBtn.textContent = "Refresh Ciphertext";
         }
       }
 
