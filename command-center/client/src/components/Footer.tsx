@@ -31,7 +31,7 @@ const Footer = ({
                   fontFamily: "NYT-700",
                 }}
               >
-                ABOUT HACKTIMES GAMES
+                ABOUT COOLHACKGAMES GAMES
               </Text>
               <Text
                 style={{
@@ -39,7 +39,7 @@ const Footer = ({
                   fontSize: "20px",
                 }}
               >
-                Since the launch of HackMIT in 2013, HackTimes has captivated
+                Since the launch of HackMIT in 2013, COOLHACKGAMES has captivated
                 solvers by providing engaging word and logic puzzles. In 2022,
                 we introduced HackScope — followed by bakery, VMHack, and
                 HackxGPT. In early 2023, we proudly added Xd to our collection.
@@ -57,7 +57,7 @@ const Footer = ({
                   fontFamily: "NYT-700",
                 }}
               >
-                HACKTIMES GAMES
+                COOLHACKGAMES
               </Text>
               <Stack>
                 {puzzles.map((puzzle) => (
@@ -95,7 +95,7 @@ const Footer = ({
                   fontFamily: "NYT-700",
                 }}
               >
-                ABOUT HACKTIMES GAMES
+                ABOUT COOLHACKGAMES
               </Text>
               <Text
                 style={{
@@ -118,7 +118,7 @@ const Footer = ({
                   fontFamily: "NYT-700",
                 }}
               >
-                HACKTIMES GAMES
+                COOLHACKGAMES
               </Text>
               <Stack>
                 {puzzles.map((puzzle) => (

@@ -69,6 +69,7 @@ IS_VERCEL = {
     "Wodou": True,
     "😈 Connections 😈": True,
     "Curseword": False,
+    "PapasCipheria": False,
 }
 
 PUZZLE_SECRETS = {
@@ -78,6 +79,7 @@ PUZZLE_SECRETS = {
     "Wodou": cast(str, _get_config_option("WODOU_PUZZLE_SECRET")),
     "😈 Connections 😈": cast(str, _get_config_option("CONNECTIONS_PUZZLE_SECRET")),
     "Curseword": cast(str, _get_config_option("CURSEWORD_PUZZLE_SECRET")),
+    "PapasCipheria": cast(str, _get_config_option("PAPAS_PUZZLE_SECRET")),
 }
 
 PUZZLE_TABLE_METADATA = {
@@ -96,6 +98,8 @@ PUZZLE_TABLE_METADATA = {
         "abbrv": "Crw",
         "url": "https://curseword.hackmit.org",
     },
+    "PapasCipheria": {"abbrv": "Pc", "url": "https://papas-cipheria.hackmit.org"},
+
 }
 
 PUZZLE_FAILURE_MESSAGES = {
@@ -116,6 +120,10 @@ PUZZLE_FAILURE_MESSAGES = {
         "Did you try Googling?",
         "Some answers are easier than others",
     ],
+    "PapasCipheria": [
+        "wrong 🐦",
+        "did you try answering every question? 🤔",
+    ],
 }
 
 PUZZLE_CORRECT_MESSAGES = {
@@ -131,4 +139,5 @@ PUZZLE_CORRECT_MESSAGES = {
     "Wodou": ["Correct!"],
     "😈 Connections 😈": ["🤑🤑🤑🤑nice one 🤑🤑🤑🤑"],
     "Curseword": ["Correct!"],
+    "PapasCipheria": ["Correct!"],
 }
