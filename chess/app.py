@@ -5,6 +5,8 @@ import base64
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 
+from make_puzzle.construct_puzzle import get_ciphertext
+
 app = Flask(__name__)
 CORS(app)
 
@@ -34,29 +36,28 @@ def verify_username(uname):
     
 #### puzzle stuff ####
 
-FULL_GAME_PGN = "asdf"
-INSTRUCTION = "walk the king counterclockwise"
-
 def get_caption(user_id):
     flag = get_flag(user_id)
-    padding_length = len(FULL_GAME_PGN) - (len(INSTRUCTION) + len("_Submit this token: ") + len(flag))
-    full_plaintext = f"{INSTRUCTION}" + "_" * padding_length + f"Submit this token: {flag}"
+
+    return get_ciphertext(flag)
+    # padding_length = len(FULL_GAME_PGN) - (len(INSTRUCTION) + len("_Submit this token: ") + len(flag))
+    # full_plaintext = f"{INSTRUCTION}" + "_" * padding_length + f"Submit this token: {flag}"
     
-    # Base64 encode FULL_GAME_PGN
-    encoded_pgn = base64.b64encode(FULL_GAME_PGN.encode('utf-8')).decode('utf-8')
+    # # Base64 encode FULL_GAME_PGN
+    # encoded_pgn = base64.b64encode(FULL_GAME_PGN.encode('utf-8')).decode('utf-8')
     
-    # Base64 encode full_plaintext
-    encoded_plaintext = base64.b64encode(full_plaintext.encode('utf-8')).decode('utf-8')
+    # # Base64 encode full_plaintext
+    # encoded_plaintext = base64.b64encode(full_plaintext.encode('utf-8')).decode('utf-8')
     
-    # XOR the two base64 encoded strings
-    ciphertext = ""
-    for i in range(len(encoded_pgn)):
-        if i < len(encoded_plaintext):
-            ciphertext += chr(ord(encoded_pgn[i]) ^ ord(encoded_plaintext[i]))
-        else:
-            ciphertext += encoded_pgn[i]
+    # # XOR the two base64 encoded strings
+    # ciphertext = ""
+    # for i in range(len(encoded_pgn)):
+    #     if i < len(encoded_plaintext):
+    #         ciphertext += chr(ord(encoded_pgn[i]) ^ ord(encoded_plaintext[i]))
+    #     else:
+    #         ciphertext += encoded_pgn[i]
     
-    return full_plaintext
+    # return full_plaintext
 
 #### api ####
 
@@ -72,4 +73,4 @@ def get_caption():
     return jsonify({'caption': caption})
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000) 
+    app.run(debug=True, host='0.0.0.0', port=5003) 

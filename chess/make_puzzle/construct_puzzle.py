@@ -7,7 +7,7 @@ PLAINTEXT1 = (
     "To obtain the flag, complete a full wikipedia-GIF knight's tour. If a white piece needs to get out of the way of the tour, then move it forward. The black king always prefers moving to squares that are of the smallest possible value (a8=0, b8=1, ...), but will never capture a piece. Finally, finish with a mate in 3. "
 )
 
-PLAINTEXT2 = " " * 66
+PLAINTEXT2 = "a" * 64 + "  "
 
 assert(len(PLAINTEXT1) == 318 and len(PLAINTEXT2) == 66)
 
@@ -46,16 +46,25 @@ def key_from_pgn(pgn_text: str) -> List[int]:
         indices.append(square_to_index(move.to_square))
     return indices
 
-def indices_to_b64_number(indices: List[int]) -> bytes:
-    """Convert indices as base64 digits to binary using NumPy."""
-    decimal_value = np.polyval(indices, 64)
+def indices_to_bytes(indices: List[int]) -> bytes:
+    """Convert indices as base64 digits to binary."""
+    # Pad with zeros to make length divisible by 4
+    padded_indices = indices[:]
+    while len(padded_indices) % 4 != 0:
+        padded_indices.append(0)
     
-    # Convert to integer if it's a float
-    decimal_value = int(decimal_value)
+    result_bytes = b''
     
-    # Calculate number of bytes needed
-    byte_length = (decimal_value.bit_length() + 7) // 8
-    return decimal_value.to_bytes(byte_length, byteorder='big')
+    # Process in groups of 4 (4 base-64 digits = 24 bits = 3 bytes)
+    for i in range(0, len(padded_indices), 4):
+        group = padded_indices[i:i+4]
+        # Convert 4 base-64 digits to a 24-bit number
+        value = group[0] * (64**3) + group[1] * (64**2) + group[2] * 64 + group[3]
+        # Convert to 3 bytes (24 bits)
+        bytes_3 = value.to_bytes(3, byteorder='big')
+        result_bytes += bytes_3
+    
+    return result_bytes
 
 def xor_bytes(data: bytes, key: bytes) -> bytes:
     """XOR data with key, without repeating data or key."""
@@ -63,6 +72,25 @@ def xor_bytes(data: bytes, key: bytes) -> bytes:
 
 def encode_ciphertext(ct: bytes) -> str:
     return base64.b64encode(ct).decode("ascii")
+
+def get_ciphertext(flag: str) -> str:
+    # 1. Get PGN & index list
+    pgn_text   = PGN_TEXT.strip()
+    indices    = key_from_pgn(pgn_text)
+
+    key_bytes   = indices_to_bytes(indices)
+
+    # 2. Build ciphertext for the chosen PLAINTEXT
+    PLAINTEXT  = PLAINTEXT1 + flag + "  "
+    assert len(PLAINTEXT) == 318 + 66
+    pt_bytes   = PLAINTEXT.encode("ascii")
+
+    assert len(pt_bytes) == len(key_bytes)
+    ct_bytes   = xor_bytes(pt_bytes, key_bytes)
+    ciphertext = encode_ciphertext(ct_bytes)
+    assert len(ciphertext) == len(indices)
+
+    return ciphertext
 
 # ─────────────────────────  MAIN  ───────────────────────────────
 
@@ -72,7 +100,7 @@ def main() -> None:
     indices    = key_from_pgn(pgn_text)
 
     print(len(indices))
-    key_bytes   = indices_to_b64_number(indices)
+    key_bytes   = indices_to_bytes(indices)
     print(len(key_bytes))
     # key_bytes  = base64.b64decode(key_b64)
 
@@ -84,6 +112,7 @@ def main() -> None:
     ct_bytes   = xor_bytes(pt_bytes, key_bytes)
     print("ct length: ", len(ct_bytes))
     ciphertext = encode_ciphertext(ct_bytes)
+    print("base 64 cypher text length: ", len(ciphertext))
 
     # 3. Print the puzzle components
     print("───── PGN ─────")
@@ -96,6 +125,8 @@ def main() -> None:
     # 4. Sanity check (private)
     recovered = xor_bytes(ct_bytes, key_bytes).decode("utf-8")
     assert recovered == PLAINTEXT, "Sanity check failed: decryption mismatch"
+    print(f"\n───── Decrypted ─────")
+    print(recovered)
 
 if __name__ == "__main__":
     main()
