@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # construct_puzzle.py
+import math
 
 # ───────────────────────  CONFIG  ───────────────────────────────
 
@@ -88,7 +89,7 @@ def get_ciphertext(flag: str) -> str:
     assert len(pt_bytes) == len(key_bytes)
     ct_bytes   = xor_bytes(pt_bytes, key_bytes)
     ciphertext = encode_ciphertext(ct_bytes)
-    assert len(ciphertext) == len(indices)
+    assert len(ciphertext) == math.ceil(len(indices) / 4) * 4
 
     return ciphertext
 

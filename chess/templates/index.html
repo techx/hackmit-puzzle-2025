@@ -6,74 +6,175 @@
     <title>Chess</title>
     <style>
       body {
-        font-family: Arial, sans-serif;
-        max-width: 800px;
-        margin: 50px auto;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 900px;
+        margin: 30px auto;
         padding: 20px;
-        background-color: #f5f5f5;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        line-height: 1.6;
       }
       .container {
         background-color: white;
-        padding: 30px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
       }
       h1 {
         text-align: center;
-        color: #333;
+        color: #2c3e50;
+        margin-bottom: 30px;
+        font-size: 2.2em;
+        font-weight: 300;
       }
-      #caption {
-        background-color: #f9f9f9;
-        border: 1px solid #ddd;
-        padding: 15px;
-        border-radius: 4px;
-        font-family: monospace;
+      .info-section {
+        background-color: #f8f9fa;
+        border-left: 4px solid #007bff;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 6px;
+      }
+      .info-section p {
+        margin: 0;
+        color: #495057;
+      }
+      .info-section em {
+        color: #6c757d;
+        display: block;
+        margin-bottom: 10px;
+      }
+      .chess-board {
+        text-align: center;
+        margin: 30px 0;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+      }
+      .chess-board img {
+        max-width: 100%;
+        height: auto;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+      .ciphertext-section {
+        margin-top: 30px;
+      }
+      .ciphertext-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 10px;
+        display: block;
+      }
+      #ciphertext {
+        background-color: #f8f9fa;
+        border: 2px solid #e9ecef;
+        padding: 20px;
+        border-radius: 8px;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        word-wrap: break-word;
         word-break: break-all;
-        min-height: 50px;
-        margin-top: 20px;
+        white-space: pre-wrap;
+        min-height: 100px;
+        max-height: 300px;
+        overflow-y: auto;
+        line-height: 1.4;
+        color: #212529;
+        transition: all 0.3s ease;
       }
-      .loading {
-        color: #666;
+      #ciphertext.loading {
+        color: #6c757d;
         font-style: italic;
+        text-align: center;
+        font-family: 'Segoe UI', sans-serif;
+      }
+      #ciphertext.error {
+        color: #dc3545;
+        border-color: #dc3545;
+        background-color: #f8d7da;
+      }
+      .refresh-button {
+        margin-top: 15px;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s ease;
+      }
+      .refresh-button:hover {
+        background-color: #0056b3;
+      }
+      .refresh-button:disabled {
+        background-color: #6c757d;
+        cursor: not-allowed;
       }
     </style>
   </head>
   <body>
     <div class="container">
       <h1>A chessboard is worth 64 squares</h1>
-      <p><em>How did we get here?</em></br>a8=0</br>cyphertext="eHFBeR5zS0lRNAFNRDZaTVtoCmxNRhxKVmMCaFxBaD9qckAOW31caB0wX0dGBk5oa1YcZX5jWUZYcHwPQS5Ma0R2E3ZDTV1jZGJyVxRaWVgRYVVLWnRVIV4eQX9pcDQNY1gNTBpiYWBcag9WW3tEczF/emtzYxNSXRZde00yfEFOFmBSGUFQfCdBdHQud2M3RWZXBEVpeVI5L0RWZmI4eGV5ZCdhcBhqX2lCeVFgHyJ0bV8qWXlfcVE2cUlGTxlHVkJSWl8GRVZYRlNDXTtCU1hSWUIOXUoNXWNCU11eRBZaUlZLDkxdWg5JUxlYU1AcT0JUSVJDRkUeSFlCTlBXXlsaQX5SWFAbFl0PKx8hBmQVAB0jExwCBQQxDEZGZhJBWEJWDVVAREhDIFtXQFpMXVUOWBdAR1RGTRgRRlNDUkhWYh8yXGBfa0l6G2ddfVMiVSlBcVdnAmBHMRE0AHdwRzF7dVgpcHkwans0ZnRteG97ciYgbGRibHAwNWhBbUJvDSFdZVdtXjMAaU9sd24lKGhkZm52NChoZ21nbyUhSmV0bUY3GGlXbE9uFSBUZFpsSDg9aHJtam89MTJoZm1lbykwCWhdbV5vEjMNaFltWm8WMjZoYm1hby81L2hgbXhvFDQPaFttWG8LNxBoRG1Hbys2MGhkZG9vOjA0YXlkZ2YwKTE="</p>
+      
+      <div class="info-section">
+        <em>How did we get here?</em>
+        <p><strong>a8=0</strong></p>
+      </div>
 
-      <div style="text-align: center; margin: 20px 0">
+      <div class="chess-board">
         <img
           src="../assets/puzzle_board.png"
-          alt="Chess Board Placeholder"
-          style="max-width: 100%; height: auto"
+          alt="Chess Puzzle Board"
         />
       </div>
 
-      <!-- <div id="caption" class="loading">Loading...</div> -->
+      <div class="ciphertext-section">
+        <label class="ciphertext-label">Ciphertext:</label>
+        <div id="ciphertext" class="loading">Loading ciphertext...</div>
+        <button id="refresh-btn" class="refresh-button" onclick="getCiphertext()">Refresh Ciphertext</button>
+      </div>
     </div>
 
-    <!-- <script>
-      async function getCaption() {
-        const captionDiv = document.getElementById("caption");
-        captionDiv.innerHTML = '<span class="loading">Loading...</span>';
+    <script>
+      async function getCiphertext() {
+        const ciphertextDiv = document.getElementById("ciphertext");
+        const refreshBtn = document.getElementById("refresh-btn");
+        
+        // Set loading state
+        ciphertextDiv.className = "loading";
+        ciphertextDiv.textContent = "Loading ciphertext...";
+        refreshBtn.disabled = true;
+        refreshBtn.textContent = "Loading...";
 
         try {
-          const response = await fetch("/get_caption");
+          const response = await fetch("/get_caption?userId=default_user");
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
           const data = await response.json();
-          captionDiv.innerHTML = data.caption;
-          captionDiv.className = "";
+          
+          // Display the ciphertext with proper formatting
+          ciphertextDiv.className = "";
+          ciphertextDiv.textContent = data.caption;
+          
         } catch (error) {
-          captionDiv.innerHTML = "Error loading caption: " + error.message;
-          captionDiv.className = "";
+          console.error("Error fetching ciphertext:", error);
+          ciphertextDiv.className = "error";
+          ciphertextDiv.textContent = `Error loading ciphertext: ${error.message}`;
+        } finally {
+          // Reset button state
+          refreshBtn.disabled = false;
+          refreshBtn.textContent = "Refresh Ciphertext";
         }
       }
 
-      // Load caption automatically when page loads
-      window.onload = function () {
-        getCaption();
-      };
-    </script> -->
+      // Load ciphertext automatically when page loads
+      window.addEventListener('DOMContentLoaded', function() {
+        getCiphertext();
+      });
+    </script>
   </body>
 </html>

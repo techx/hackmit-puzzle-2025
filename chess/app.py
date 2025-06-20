@@ -66,9 +66,8 @@ def index():
     return render_template('index.html')
 
 @app.route('/get_caption', methods=['GET'])
-def get_caption():
-    data = request.json
-    user_id = data.get("userId", "")
+def get_caption_endpoint():
+    user_id = request.args.get("userId", "default_user")
     caption = get_caption(user_id)
     return jsonify({'caption': caption})
 
