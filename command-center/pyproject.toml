@@ -1,0 +1,26 @@
+[tool.ruff]
+target-version = "py38"
+
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    "W",
+    # Pyflakes
+    "F",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+    # pep8-naming
+    "N",
+    # pydocstyle
+    "D",
+]
+
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"

@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "NYT-Header";
+  src: url("/fonts/karnak-normal-400.ttf");
+}
+
+@font-face {
+  font-family: "NYT-Header-Condensed";
+  src: url("/fonts/karnak-small-normal-400.ttf");
+}
+
+@font-face {
+  font-family: "NYT-stymie";
+  src: url("/fonts/stymie-normal-700.ttf");
+}
+
+@font-face {
+  font-family: "NYT-500";
+  src: url("/fonts/franklin-normal-500.ttf");
+}
+
+@font-face {
+  font-family: "NYT";
+  src: url("/fonts/franklin-normal-600.ttf");
+}
+@font-face {
+  font-family: "NYT-700";
+  src: url("/fonts/franklin-normal-700.ttf");
+}
+
+@font-face {
+  font-family: "NYT-800";
+  src: url("/fonts/franklin-normal-800.ttf");
+}
+
+@font-face {
+  font-family: "NYT-cheltenham";
+  src: url("/fonts/nyt-cheltenham-normal.ttf");
+}
+
+@font-face {
+  font-family: "NYT-cheltenham-bold";
+  src: url("/fonts/nyt-cheltenham-bold.ttf");
+}
