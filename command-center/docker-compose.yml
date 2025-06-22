@@ -11,7 +11,7 @@ services:
     environment:
       FLASK_RUN_PORT: 2000
       DEBUG: "true"
-      DATABASE_URL: postgresql://postgres:pass@db:5432/command_center
+      DATABASE_URL: postgresql://postgres:pass@db:5433/command_center
     depends_on:
       - db
 
@@ -22,7 +22,8 @@ services:
       POSTGRES_PASSWORD: pass
       POSTGRES_DB: command_center
     ports:
-      - "5432:5432"
+      - "5433:5433"
+    command: ["postgres", "-p", "5433"]  
     volumes:
       - db-data:/var/lib/postgresql/data
 

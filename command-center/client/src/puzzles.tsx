@@ -24,20 +24,20 @@ const largeIconStyle = {
 // cards, navbar, footer
 const unshuffledPuzzles: Puzzle[] = [
   {
-    name: "Twister",
+    name: "Papas Cipheria",
     icon: (
       <div style={{ width: "28px", height: "28px" }}>
-        <Image src="/twister.svg" alt="Twister" />
+        <Image src="/twister.svg" alt="Papas Cipheria" />
       </div>
     ),
     largeIcon: (
       <div style={{ width: "64px", height: "64px" }}>
-        <Image src="/twister.svg" alt="Twister" />
+        <Image src="/twister.svg" alt="Papas Cipheria" />
       </div>
     ),
     color: "#F7DA21",
-    url: "https://twister.hackmit.org",
-    description: "Use mental math skills to get to the end.",
+    url: "https://papas-cipheria.hackmit.org",
+    description: "make cipher haha",
   },
   {
     name: "Hexhunt",
