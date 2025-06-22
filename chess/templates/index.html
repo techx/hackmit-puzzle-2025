@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chess</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        background-color: #ffffff;
+        color: #333;
+        line-height: 1.6;
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 40px;
+        font-size: 2em;
+        font-weight: 600;
+        color: #333;
+      }
+      .chess-board {
+        text-align: center;
+        margin: 40px 0;
+      }
+      .chess-board img {
+        max-width: 100%;
+        height: auto;
+        border: 1px solid #ddd;
+      }
+      .chess-caption {
+        text-align: center;
+        margin-top: 8px;
+        font-size: 14px;
+        color: #666;
+        font-style: italic;
+      }
+      .ciphertext-section {
+        margin-top: 50px;
+      }
+      .ciphertext-label {
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 15px;
+        display: block;
+        font-size: 16px;
+      }
+      #ciphertext {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        padding: 20px;
+        border-radius: 4px;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-size: 13px;
+        word-wrap: break-word;
+        word-break: break-all;
+        white-space: pre-wrap;
+        min-height: 100px;
+        max-height: 300px;
+        overflow-y: auto;
+        line-height: 1.5;
+        color: #333;
+      }
+      #ciphertext.loading {
+        color: #999;
+        font-style: italic;
+        text-align: center;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      }
+      #ciphertext.error {
+        color: #d73a49;
+        border-color: #d73a49;
+        background-color: #ffeaea;
+      }
+
+    </style>
+  </head>
+  <body>
+    <h1>A chessboard is worth 64 squares</h1>
+
+    <div class="chess-board">
+      <img
+        src="/assets/puzzle_board.png"
+        alt="Chess Puzzle Board"
+        style="width: 400px;"
+      />
+      <div class="chess-caption">How did we get here? — a8=0</div>
+    </div>
+
+    <div class="ciphertext-section">
+      <label class="ciphertext-label">Ciphertext:</label>
+      <div id="ciphertext" class="loading">Loading ciphertext...</div>
+    </div>
+
+    <script>
+      async function getCiphertext() {
+        const ciphertextDiv = document.getElementById("ciphertext");
+        
+        // Set loading state
+        ciphertextDiv.className = "loading";
+        ciphertextDiv.textContent = "Loading ciphertext...";
+
+        try {
+          const response = await fetch("/get_caption?userId=default_user");
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          
+          // Display the ciphertext with proper formatting
+          ciphertextDiv.className = "";
+          ciphertextDiv.textContent = data.caption;
+          
+        } catch (error) {
+          console.error("Error fetching ciphertext:", error);
+          ciphertextDiv.className = "error";
+          ciphertextDiv.textContent = `Error loading ciphertext: ${error.message}`;
+        }
+      }
+
+      // Load ciphertext automatically when page loads
+      window.addEventListener('DOMContentLoaded', function() {
+        getCiphertext();
+      });
+    </script>
+  </body>
+</html>
