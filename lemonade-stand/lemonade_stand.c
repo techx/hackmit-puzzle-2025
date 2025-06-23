@@ -1,6 +1,5 @@
 // Compiling: 
-// gcc lemonade_stand.c -o lemonade_stand -lm -no-pie -O1 -Wall -Wpedantic
-// strip lemonade_stand
+// gcc lemonade_stand.c -o lemonade_stand -lm -no-pie -O0 -Wall -Wpedantic
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
