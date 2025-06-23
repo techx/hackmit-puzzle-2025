@@ -4,23 +4,43 @@ import styles from "./Game.module.css";
 import MorseBuilding from "./Building";
 import Rules from "./Rules";
 import Flag from "./Flag";
+import MorseFlasher from "./MorseFlasher";
 
 interface Tile {
   id: string;
   x: number;
   y: number;
-  status: number; // 0 = unpicked, 1 = in queue
+  status: number;
   iconName: string;
 }
 
-const CELL_SIZE = 100;
-const ICONS = ["🍀", "🌈", "⚙️", "🐏", "🐯", "🐤", "📚", "🧠", "💻", "🐼"];
-
 const morseMap: Record<string, string> = {
-  A: ".-", B: "-...", C: "-.-.", D: "-..", E: ".", F: "..-.", G: "--.",
-  H: "....", I: "..", J: ".---", K: "-.-", L: ".-..", M: "--", N: "-.",
-  O: "---", P: ".--.", Q: "--.-", R: ".-.", S: "...", T: "-", U: "..-",
-  V: "...-", W: ".--", X: "-..-", Y: "-.--", Z: "--.."
+  A: ".-",
+  B: "-...",
+  C: "-.-.",
+  D: "-..",
+  E: ".",
+  F: "..-.",
+  G: "--.",
+  H: "....",
+  I: "..",
+  J: ".---",
+  K: "-.-",
+  L: ".-..",
+  M: "--",
+  N: "-.",
+  O: "---",
+  P: ".--.",
+  Q: "--.-",
+  R: ".-.",
+  S: "...",
+  T: "-",
+  U: "..-",
+  V: "...-",
+  W: ".--",
+  X: "-..-",
+  Y: "-.--",
+  Z: "--..",
 };
 
 const FLAG = "FORESTTMPL";
@@ -34,7 +54,9 @@ const PuzzleGame: React.FC = () => {
   const [gameOver, setGameOver] = useState(false);
   const [showRules, setShowRules] = useState(true);
   const [showFlagInput, setShowFlagInput] = useState(false);
-  const [flagStatus, setFlagStatus] = useState<"correct" | "incorrect" | null>(null);
+  const [flagStatus, setFlagStatus] = useState<"correct" | "incorrect" | null>(
+    null
+  );
 
   useEffect(() => {
     fetch("/scene.json")
@@ -90,16 +112,18 @@ const PuzzleGame: React.FC = () => {
   const isCovered = (idx: number) => {
     const cur = tiles[idx];
     if (cur.status !== 0) return false;
+    // Each unit = 100% of tile width (one cell)
+    const cellUnits = 100;
     for (let j = idx + 1; j < tiles.length; j++) {
       const other = tiles[j];
       if (other.status !== 0) continue;
-      // bounding‐box overlap?
+      // bounding‐box overlap in tile‐units
       if (
         !(
-          cur.x + CELL_SIZE <= other.x ||
-          other.x + CELL_SIZE <= cur.x ||
-          cur.y + CELL_SIZE <= other.y ||
-          other.y + CELL_SIZE <= cur.y
+          cur.x + cellUnits <= other.x ||
+          other.x + cellUnits <= cur.x ||
+          cur.y + cellUnits <= other.y ||
+          other.y + cellUnits <= cur.y
         )
       ) {
         return true;
@@ -136,6 +160,7 @@ const PuzzleGame: React.FC = () => {
     return `/icons/${iconName}.${extMap[iconName] || "png"}`;
   };
 
+  
 
   return (
     <>
@@ -158,23 +183,90 @@ const PuzzleGame: React.FC = () => {
             </div>
           </div>
         )}
+        {tiles.length === 0 && (
+          <div className={styles.popupOverlay}>
+            <div className={styles.popup}>
+              <h1>You Win! The Flag is: {FLAG}\</h1>
+              <button
+                onClick={() => {
+                  setTiles(initialTiles);
+                  setQueue([]);
+                  setGameOver(false);
+                  setRevealedLetters([]);
+                  setMatchCount(0);
+                }}
+              >
+                Play Again
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className={styles.cityBackground}>
+          <div className={styles.flickerWrapper}>
+            {/* Base layer: always visible unlit buildings */}
+            <img
+              src="/buildings/buildings_unlit.svg"
+              className={styles.staticImg}
+              alt="Unlit city backdrop"
+            />
+
+            {/* Animated layer: lit windows flicker in and out */}
+            <img
+              src="/buildings/buildings_lit.svg"
+              className={styles.flickerImg}
+              alt="Lit city flicker"
+            />
+          </div>
+          {revealedLetters.map((letter, idx) => {
+            const morse = morseMap[letter];
+            const positions = [
+              { top: "14.3%", left: "25.7%" },   // 1st building (F)
+              { top: "10.13%", left: "92.45%" },  // 2nd building (O)
+              { top: "19.6%", left: "44.1%" },  // 3rd building (R)
+              { top: "10.87%", left: "52.05%" },  // 4th building (E)
+              { top: "16.51%", left: "69.4%" },  // 5th building (S)
+              { top: "14.19%", left: "7.0%" },  // 6th building (T)
+              { top: "11.6%", left: "63.2%" },  // 7th building (T)
+              { top: "17.76%", left: "13.72%" },  // 8th building (M)
+              { top: "11.4%", left: "37.31%" },  // 9th building (P)
+              { top: "9.35%", left: "81.1%" },  // 10th building (L)
+            ];
+            const pos = positions[idx] || { top: "42%", left: "0%" };
+
+            return (
+              <div
+                key={idx}
+                style={{
+                  position: "absolute",
+                  top: pos.top,
+                  left: pos.left,
+                  transform: "translate(-50%, -50%)",
+                  zIndex: 2,
+                }}
+              >
+                <MorseFlasher morse={morse} />
+              </div>
+            );
+          })}
+        </div>
+
         {/* Tile board */}
         <div className={styles.tileBoard}>
           {tiles.map((tile, idx) => {
-            // inactive if picked OR if covered by any tile with a higher array-index
             const inactive = tile.status !== 0 || isCovered(idx);
-
             return (
               <div
                 key={tile.id}
                 className={`${styles.tile} ${inactive ? styles.inactive : ""}`}
                 style={{
-                  left: tile.x,
-                  top: tile.y,
-                  zIndex: idx, // ensures later array items actually draw on top
+                  transform: `translateX(${tile.x}%) translateY(${tile.y}%)`,
+                  zIndex: idx,
                 }}
                 onClick={() => {
-                  if (!inactive && queue.length < 7) handleClick(tile);
+                  if (!inactive && queue.length < 7) {
+                    handleClick(tile);
+                  }
                 }}
               >
                 <img
@@ -205,7 +297,14 @@ const PuzzleGame: React.FC = () => {
         </div>
 
         {/* Morse buildings */}
-        <div style={{ display: "flex", justifyContent: "center", gap: "10px", margin: "20px 0" }}>
+        {/* <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "10px",
+            margin: "20px 0",
+          }}
+        >
           {Array.from({ length: FLAG.length }).map((_, idx) => {
             const letter = revealedLetters[idx];
             const morse = letter ? morseMap[letter] : null;
@@ -218,29 +317,68 @@ const PuzzleGame: React.FC = () => {
               />
             );
           })}
-        </div>
+        </div> */}
       </div>
 
       {/* Rules overlay */}
       {showRules && <Rules onClose={() => setShowRules(false)} />}
 
-      {/* Flag button (bottom-right corner) */}
-      <button
-        onClick={() => setShowFlagInput(true)}
-        style={{
-          position: "fixed",
-          bottom: "20px",
-          right: "20px",
-          fontSize: "24px",
-          background: "none",
-          border: "none",
-          color: "white",
-          cursor: "pointer"
-        }}
-        title="Submit Flag"
-      >
-        🚩
-      </button>
+      {/* Export and Flag buttons (bottom-right corner) */}
+      <div style={{
+        position: "fixed",
+        bottom: "20px",
+        right: "20px",
+        display: "flex",
+        gap: "10px"
+      }}>
+        <button
+          onClick={() => {
+            fetch("/scene.json")
+              .then(res => res.json())
+              .then(data => {
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "scene.json";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+              });
+          }}
+          style={{
+            fontSize: "17px",
+            background: "#7A9CFF",
+            border: "none",
+            color: "white",
+            cursor: "pointer",
+            padding: "8px 16px",
+            borderRadius: "8px",
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            fontWeight: "bold",
+          }}
+          title="Export Scene"
+        >
+          <span style={{ fontSize: "20px" }}>💾</span>
+          Export Puzzle
+        </button>
+        <button
+          onClick={() => setShowFlagInput(true)}
+          style={{
+            fontSize: "24px",
+            background: "none",
+            border: "none",
+            color: "white",
+            cursor: "pointer",
+          }}
+          title="Submit Flag"
+        >
+          🚩
+        </button>
+      </div>
 
       {showFlagInput && (
         <Flag
@@ -251,12 +389,20 @@ const PuzzleGame: React.FC = () => {
 
       {/* Optional: Result message */}
       {flagStatus === "correct" && (
-        <div style={{ color: "lightgreen", textAlign: "center", marginTop: "10px" }}>
+        <div
+          style={{
+            color: "lightgreen",
+            textAlign: "center",
+            marginTop: "10px",
+          }}
+        >
           ✅ Correct flag!
         </div>
       )}
       {flagStatus === "incorrect" && (
-        <div style={{ color: "salmon", textAlign: "center", marginTop: "10px" }}>
+        <div
+          style={{ color: "salmon", textAlign: "center", marginTop: "10px" }}
+        >
           ❌ Incorrect. Try again.
         </div>
       )}

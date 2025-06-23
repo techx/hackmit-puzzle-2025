@@ -1,0 +1,7 @@
+.flasher {
+  width: 1.4vw;
+  aspect-ratio:1;
+  background-color: #7A9CFF; /* soft blue */
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
