@@ -1,0 +1,151 @@
+html,
+body,
+p,
+ol,
+ul,
+li,
+dl,
+dt,
+dd,
+blockquote,
+figure,
+fieldset,
+legend,
+textarea,
+pre,
+iframe,
+hr,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+    padding: 0
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-size: 100%;
+    font-weight: normal
+}
+
+ul {
+    list-style: none
+}
+
+button,
+input,
+select {
+    margin: 0
+}
+
+html {
+    box-sizing: border-box
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: inherit
+}
+
+img,
+video {
+    height: auto;
+    max-width: 100%
+}
+
+iframe {
+    border: 0
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0
+}
+
+td,
+th {
+    padding: 0
+}
+
+
+:root {
+    --bs-blue: #0d6efd;
+    --bs-indigo: #6610f2;
+    --bs-black: #000;
+    --bs-white: #fff;
+    --bs-gray: #6c757d;
+    --bs-gray-dark: #343a40;
+    --bs-gray-100: #f8f9fa;
+    --bs-gray-200: #e9ecef;
+    --bs-gray-300: #dee2e6;
+    --bs-gray-400: #ced4da;
+    --bs-gray-500: #adb5bd;
+    --bs-gray-600: #6c757d;
+    --bs-gray-700: #495057;
+    --bs-gray-800: #343a40;
+    --bs-gray-900: #212529;
+    --bs-light: #f8f9fa;
+    --bs-dark: #212529;
+    --bs-font-monospace: "Noto Sans Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --doc-ptsize-max: 11pt;
+    --bs-gutter-x: 0;
+    --bs-gutter-y: 20px;
+
+    --bg: var(--bs-light);
+    --bg2: var(--bs-gray-200);
+    --fg: var(--bs-black);
+}
+
+html {
+    color: var(--fg);
+    background-color: var(--bg);
+}
+
+.container {
+    margin-top: calc(var(--bs-gutter-y));
+    margin-bottom: calc(var(--bs-gutter-y));
+    margin-right: calc(-.5*var(--bs-gutter-x));
+    margin-left: calc(-.5*var(--bs-gutter-x));
+    flex-wrap: wrap;
+    display: flex;
+    line-height: 1.25;
+    justify-content: center;
+    width: 100%;
+    flex: none;
+}
+
+.markup {
+    font-size: min(2vw,var(--doc-ptsize-max));
+    font-family: var(--bs-font-monospace);
+}
+
+a {
+    color: var(--bs-blue);
+    text-decoration: underline;
+}
+
+a:visited {
+    color: var(--bs-indigo);
+}
+
+.h1 {
+    font-weight: 700;
+}
+
+.h2 {
+    font-weight: 600;
+}
+
+span.code {
+    background-color: var(--bg2);
+    padding: 3px 5px;
+    border: 0.2px solid var(--bs-gray-400);
+}
