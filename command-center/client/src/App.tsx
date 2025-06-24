@@ -176,7 +176,6 @@ export default function App() {
                       <Card
                         shadow="sm"
                         key={puzzle.name}
-                        // hover={{ backgroundColor: "#1a2330", transform: "scale(1.02)", transition: "all 0.2s ease" }}
                         // withBorder -- cool math games aint got no border
                         style={{
                           backgroundColor: "#0c1622", // red
