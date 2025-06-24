@@ -24,8 +24,7 @@ import Footer from "./components/Footer";
 import Leaderboard from "./components/Leaderboard";
 import Profile from "./components/Profile";
 import MiniLeaderboard from "./components/MiniLeaderboard";
-import { useNavigate } from "react-router-dom"; 
-
+import { useNavigate } from "react-router-dom";
 
 export default function App() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
@@ -38,7 +37,7 @@ export default function App() {
   const isLeaderboard = url === "/leaderboard";
   const isProfile = url === "/profile";
 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch("/api/auth/whoami").then((res) => {
@@ -92,10 +91,10 @@ export default function App() {
                 </Menu.Target>
                 <Menu.Dropdown>
                   {/* <Menu.Item icon={<IconUser size={16} onClick={handleProfile}/>}> */}
-                    {/* <Anchor href="/profile">
+                  {/* <Anchor href="/profile">
                       Profile
                     </Anchor> */}
-                    {/* <Text>Profile</Text> */}
+                  {/* <Text>Profile</Text> */}
                   {/* </Menu.Item> */}
                   <Menu.Item
                     icon={<IconUser size={16} />}
@@ -103,7 +102,10 @@ export default function App() {
                   >
                     Profile
                   </Menu.Item>
-                  <Menu.Item icon={<IconLogout size={16} />} onClick={handleLogout}>
+                  <Menu.Item
+                    icon={<IconLogout size={16} />}
+                    onClick={handleLogout}
+                  >
                     Log Out
                   </Menu.Item>
                 </Menu.Dropdown>
@@ -152,7 +154,20 @@ export default function App() {
               </Grid.Col>
 
               <Grid.Col span={6}>
-                <Title order={4} style={{ color: "orange", marginBottom: "8px" }}>
+                <Title
+                  order={4}
+                  style={{
+                    backgroundColor: "#ff3c00", // bright red
+                    color: "white",
+                    padding: "8px 16px",
+                    borderRadius: "8px",
+                    fontFamily: "'Fredoka', sans-serif", // in index.css
+                    fontWeight: 700,
+                    fontSize: "24px",
+                    width: "fit-content",
+                    marginBottom: "12px",
+                  }}
+                >
                   TOP GAMES
                 </Title>
                 <ScrollArea h={600}>
@@ -161,10 +176,23 @@ export default function App() {
                       <Card
                         shadow="sm"
                         key={puzzle.name}
-                        withBorder
-                        style={{ backgroundColor: "#1e2a3a", color: "white" }}
+                        // hover={{ backgroundColor: "#1a2330", transform: "scale(1.02)", transition: "all 0.2s ease" }}
+                        // withBorder -- cool math games aint got no border
+                        style={{
+                          backgroundColor: "#0c1622", // red
+                          color: "#FFA500", // orange
+                          border: "none",
+                          borderRadius: "6px",
+                          padding: "12px 16px",
+                        }}
                       >
-                        <Text style={{ color: "white" }}>
+                        <Text
+                          style={{
+                            color: "#FFA500",
+                            fontWeight: 600,
+                            fontFamily: "'Fredoka', sans-serif",
+                          }}
+                        >
                           {idx + 1}. {puzzle.name}
                         </Text>
                       </Card>
@@ -173,7 +201,6 @@ export default function App() {
                 </ScrollArea>
               </Grid.Col>
               <Grid.Col span={3}>
-
                 <MiniLeaderboard username={username} user_id={user_id} />
                 {/* <Leaderboard username={username} user_id={user_id} /> */}
               </Grid.Col>
@@ -183,7 +210,6 @@ export default function App() {
           </>
         )}
       </AppShell.Main>
-
     </AppShell>
   );
 }

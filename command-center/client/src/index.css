@@ -45,3 +45,10 @@
   font-family: "NYT-cheltenham-bold";
   src: url("/fonts/nyt-cheltenham-bold.ttf");
 }
+
+@font-face {
+  font-family: "Fredoka";
+  src: url("/fonts/Fredoka-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
