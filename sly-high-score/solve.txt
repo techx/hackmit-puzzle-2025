@@ -1,0 +1,2 @@
+OPTIND
+x[$(cat /flag)]
