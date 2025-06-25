@@ -29,6 +29,7 @@ To start the client, in a different terminal, run
 ```sh
 cd command-center
 cd client
+npm install
 npm run dev
 ```
 . No need for docker for client.
