@@ -2,7 +2,7 @@ FROM debian:bullseye-slim
 
 # Install dependencies
 RUN apt-get update && \
-    apt-get install -y nginx curl iproute2 && \
+    apt-get install -y nginx websockify && \
     rm -rf /var/lib/apt/lists/*
 
 COPY dist /usr/share/nginx/html
