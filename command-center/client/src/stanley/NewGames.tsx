@@ -1,4 +1,4 @@
-import { puzzles } from "../puzzles";
+import { Puzzle } from "../puzzles";
 
 export default function NewGames() {
   return (
@@ -8,17 +8,20 @@ export default function NewGames() {
       </h1>
       <ul className="flex flex-col gap-1">
         {puzzles.map((puzzle) => (
-          <li key={puzzle.title} className="flex gap-2 items-center h-fit">
+          <li key={puzzle.name} className="flex gap-2 items-center h-fit">
             <div className="w-20 h-12 border border-accent rounded-lg overflow-hidden">
-              <img
+              {/* <img
                 className="w-full h-full object-cover object-center"
-                src={puzzle.image}
-                alt={puzzle.title}
-              />
+                src={puzzle.largeIcon}
+                alt={puzzle.name}
+              /> */}
+              <div className="w-full h-full object-cover object-center">
+                {puzzle.largeIcon}
+              </div>
             </div>
 
             <div className="flex flex-col">
-              <h2 className="font-semibold text-accent">{puzzle.title}</h2>
+              <h2 className="font-semibold text-accent">{puzzle.name}</h2>
               <p className="text-base leading-tight text-white">
                 {puzzle.description}
               </p>

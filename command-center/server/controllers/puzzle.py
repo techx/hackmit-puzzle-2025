@@ -10,7 +10,7 @@ from sqlalchemy import select
 
 from server import db
 from server.config import (
-    EVAN_ADAM_PUZZLE_NAME,
+    # EVAN_ADAM_PUZZLE_NAME,
     PUZZLE_CORRECT_MESSAGES,
     PUZZLE_FAILURE_MESSAGES,
     PUZZLE_TABLE_METADATA,
@@ -198,19 +198,19 @@ def leaderboard():
         }
         for puzzle_user in puzzle_users_by_user_id[user_id]:
             if puzzle_user.is_solved:
-                if puzzle_user.puzzle_name == EVAN_ADAM_PUZZLE_NAME:
-                    puzzle_score = compute_puzzle_value(
-                        -1,
-                        EVAN_ADAM_PUZZLE_NAME,
-                        puzzle_user.evan_adam_score,
-                        [
-                            cast(int, pu.evan_adam_score)
-                            for pu in puzzle_users
-                            if pu.puzzle_name == EVAN_ADAM_PUZZLE_NAME and pu.is_solved
-                        ],
-                    )
-                else:
-                    puzzle_score = puzzle_values[puzzle_user.puzzle_name]
+                # if puzzle_user.puzzle_name == EVAN_ADAM_PUZZLE_NAME:
+                #     puzzle_score = compute_puzzle_value(
+                #         -1,
+                #         EVAN_ADAM_PUZZLE_NAME,
+                #         puzzle_user.evan_adam_score,
+                #         [
+                #             cast(int, pu.evan_adam_score)
+                #             for pu in puzzle_users
+                #             if pu.puzzle_name == EVAN_ADAM_PUZZLE_NAME and pu.is_solved
+                #         ],
+                #     )
+                # else:
+                puzzle_score = puzzle_values[puzzle_user.puzzle_name]
 
                 scores[puzzle_user.puzzle_name] = {
                     **scores[puzzle_user.puzzle_name],

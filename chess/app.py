@@ -12,7 +12,7 @@ CORS(app)
 
 #### command center stuff ####
 
-PUZZLE_SECRET = os.getenv("PUZZLE_SECRET") # TODO: fix these based on true config
+PUZZLE_SECRET = os.getenv("CHESS_PUZZLE_SECRET") # TODO: fix these based on true config
 SECRET_KEY = os.getenv("SECRET_KEY") # TODO: fix these based on true config
 
 def get_flag(user_id):

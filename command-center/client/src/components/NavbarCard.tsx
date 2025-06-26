@@ -27,6 +27,7 @@ const NavbarCard = ({
           ? `4px solid ${puzzle.color}`
           : "4px solid transparent",
       }}
+      
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => {
