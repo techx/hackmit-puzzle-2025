@@ -12,7 +12,7 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.frontend
     depends_on:
       - backend
     ports:

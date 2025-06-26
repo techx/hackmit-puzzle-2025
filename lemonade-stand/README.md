@@ -149,10 +149,10 @@ Adjust this in the `docker-compose.yml` if needed (e.g. to run behind another re
 
 The challenge is designed for `glibc` version `2.31` **only**.
 Different `glibc` versions will have different mitigations that can **significantly affect the difficulty or even make the puzzle impossible!**
-To build the binary, the `Dockerfile.build` can be used:
+To build the binary, the `Dockerfile.buildenv` can be used:
 
 ```sh
-docker build -f Dockerfile.build -t glibc231 . --load
+docker build -f Dockerfile.buildenv -t glibc231 . --load
 ```
 
 (make sure you don't have any huge files in the current directory first so as to not explode the build context.)
