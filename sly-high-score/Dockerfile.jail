@@ -2,7 +2,9 @@ FROM pwnred-jail-custom:latest
 
 COPY --from=ubuntu@sha256:b59d21599a2b151e23eea5f6602f4af4d7d31c4e236d22bf0b62b86d2e386b8f / /srv
 
-COPY ./challenge.sh /srv/app/challenge.sh
-COPY ./flag /srv/flag
+COPY ./challenge.sh ./wrapper.sh /srv/app/
+RUN chmod +x /srv/app/wrapper.sh /srv/app/challenge.sh
 
-RUN ln -s /app/challenge.sh /srv/app/run
+RUN ln -s /app/wrapper.sh /srv/app/run
+
+ENV JAIL_TMP_SIZE=2048
