@@ -8,6 +8,8 @@ services:
       - "5000"
     networks:
       - internal
+    environment:
+      - JAIL_ENV_PUZZLE_SECRET=${PUZZLE_SECRET}
 
   frontend:
     build:
@@ -23,3 +25,7 @@ services:
 networks:
   internal:
     driver: bridge
+
+secrets:
+  puzzle_secret:
+    file: ./puzzle_secret.txt
