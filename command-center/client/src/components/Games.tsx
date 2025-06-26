@@ -18,12 +18,10 @@ export default function Games({
       maw="100vw"
       p="0"
       pb="xl"
-      mt={isSmallScreen ? "0" : "xl"}
     >
       <Stack justify="center" align="center">
         <Group
           justify="center"
-          mt="24px"
           style={{
             fontFamily: "NYT-700",
           }}
@@ -50,7 +48,7 @@ export default function Games({
           </Text>
         </Group>
         <Stack spacing="md" px="lg" w="100%" maw={1000} mx="auto">
-          <h2 className="bg-[#e14603] px-3 py-2 rounded text-white font-bold text-sm uppercase">
+          <h2 className="bg-[#e14603] text-xl px-2 py-1 rounded-lg font-semibold uppercase tracking-wider">
             Top Games
           </h2>
           {puzzles.map((puzzle) => (
@@ -61,7 +59,10 @@ export default function Games({
               user_id={user_id}
             />
           ))}
-          <button className="uppercase w-fit text-accent underline font-semibold">
+          <button
+            onClick={() => window.open("https://www.coolmathgames.com", "_blank")}
+            className="uppercase w-fit text-accent underline font-semibold"
+          >
             more new games &gt;
           </button>
         </Stack>

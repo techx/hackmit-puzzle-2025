@@ -1,7 +1,7 @@
 import NewGames from "./stanley/NewGames";
 import TrendingGames from "./stanley/HotGames";
-import StanLeaderboard from "./stanley/Leaderboard";
-import Conditions from "./stanley/Conditions";
+import StanLeaderboard from "./components/MiniLeaderboard";
+import Conditions from "./components/Conditions";
 import {
   AppShell,
   Group,
@@ -27,11 +27,8 @@ import NavbarCard from "./components/NavbarCard";
 import Footer from "./components/Footer";
 import Leaderboard from "./components/Leaderboard";
 import Profile from "./components/Profile";
-import MiniLeaderboard from "./components/MiniLeaderboard";
 import { useNavigate } from "react-router-dom"; 
-import GameCard from "./components/GameCard";
 import Games from "./components/Games";
-
 
 export default function App() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
@@ -66,207 +63,78 @@ export default function App() {
     window.location.href = "/api/auth/logout";
   };
 
+  const handleHome = () => {
+    window.location.href = "/";
+  };
+
   return (
     <>
-    <div className="min-h-screen bg-primary text-white flex flex-col px-6 pt-2 pb-8">
-      {/* Top Bar: Logo left + Profile right */}
-      <nav className="flex justify-between items-center w-full mb-4">
-        <img
-          className="h-10"
-          src="https://www.coolmathgames.com/themes/custom/coolmath/assets/images/logo-mobile.svg"
-          alt="CoolMathGames"
-        />
-        {loggedIn ? (
-          <Menu shadow="md" width={180} position="bottom-end">
-            <Menu.Target>
-              <UnstyledButton>
-                <Avatar
-                  src={`https://github.com/${username}.png`}
-                  alt="User"
-                  radius="xl"
-                />
-              </UnstyledButton>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Item icon={<IconUser size={16} />} onClick={() => navigate("/profile")}>
-                Profile
-              </Menu.Item>
-              <Menu.Item icon={<IconLogout size={16} />} onClick={handleLogout}>
-                Log Out
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        ) : (
-          <Button onClick={handleLogin}>Log in</Button>
-        )}
-      </nav>
+      <div className="min-h-screen bg-primary text-white flex flex-col px-0 pt-0 pb-8">
+        <nav className="flex bg-secondary justify-between items-center w-full mb-4 px-6 py-2">
+          <img className="h-10" src="/coolmathlogo.svg" alt="CoolMathGames" onClick={handleHome}/>
+          {loggedIn ? (
+            <Menu shadow="md" width={180} position="bottom-end">
+              <Menu.Target>
+                <UnstyledButton>
+                  <Avatar src={`https://github.com/${username}.png`} alt="User" radius="xl" />
+                </UnstyledButton>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item icon={<IconUser size={16} />} onClick={() => navigate("/profile")}>
+                  Profile
+                </Menu.Item>
+                <Menu.Item icon={<IconLogout size={16} />} onClick={handleLogout}>
+                  Log Out
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          ) : (
+            <Button onClick={handleLogin}>Log in</Button>
+          )}
+        </nav>
 
-      {/* Grid: 3-column layout */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-7xl mx-auto w-full">
-        {/* Column 1: Games + navbar buttons */}
-        <div className="flex flex-col">
-          <Stack p="0" gap="0" w="100%">
-            <h1 className="text-xl px-2 py-1 bg-secondary rounded-lg font-semibold uppercase tracking-wider">
-              New Games
-            </h1>
-            {puzzles.map((puzzle) => (
-              <NavbarCard
-                key={puzzle.name}
-                puzzle={puzzle}
-                user_id={user_id}
-                isLoggedIn={loggedIn}
-              />
-            ))}
-            <div className="h-6" /> {/* Add space between sections */}
-            <h1 className="text-xl px-2 py-1 bg-secondary rounded-lg font-semibold uppercase tracking-wider">
-              Popular Categories
-            </h1>
-            <div className="mt-3">
-              <NavbarCard
-                key={home.name}
-                puzzle={home}
-                user_id={user_id}
-                isLoggedIn={true}
-              />
+        {isLeaderboard && <Leaderboard username={username} user_id={user_id} />}
+        {isProfile && <Profile />}
+
+        {!isLeaderboard && !isProfile && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-7xl mx-auto w-full px-6">
+            <div className="flex flex-col">
+              <Stack p="0" gap="0" w="100%">
+                <h1 className="text-xl px-2 py-1 bg-secondary rounded-lg font-semibold uppercase tracking-wider">
+                  New Games
+                </h1>
+                {puzzles.map((puzzle) => (
+                  <NavbarCard
+                    key={puzzle.name}
+                    puzzle={puzzle}
+                    user_id={user_id}
+                    isLoggedIn={loggedIn}
+                  />
+                ))}
+                <div className="h-6" /> 
+                <h1 className="text-xl px-2 py-1 bg-secondary rounded-lg font-semibold uppercase tracking-wider">
+                  Popular Categories
+                </h1>
+                <div className="mt-3">
+                  <NavbarCard key={home.name} puzzle={home} user_id={user_id} isLoggedIn={true} />
+                </div>
+                <NavbarCard key={discord.name} puzzle={discord} user_id={user_id} isLoggedIn={true} />
+                <NavbarCard key={leaderboard.name} puzzle={leaderboard} user_id={user_id} isLoggedIn={true} />
+              </Stack>
             </div>
-            <NavbarCard
-              key={discord.name}
-              puzzle={discord}
-              user_id={user_id}
-              isLoggedIn={true}
-            />
-            <NavbarCard
-              key={leaderboard.name}
-              puzzle={leaderboard}
-              user_id={user_id}
-              isLoggedIn={true}
-            />
-          </Stack>
-        </div>
 
-        {/* Column 2: Top Games */}
-        <div className="flex flex-col gap-4">
-          {!isLeaderboard && <Games loggedIn={loggedIn} user_id={user_id} />}
-        </div>
+            <div className="flex flex-col gap-4">
+              <Games loggedIn={loggedIn} user_id={user_id} />
+            </div>
 
-        {/* Column 3: Conditions + Leaderboard */}
-        <div className="flex flex-col gap-6 max-w-[300px]">
-          <Conditions />
-          <StanLeaderboard />
-        </div>
-      </div>
-
-      {/* Page routing */}
-      {isLeaderboard && <Leaderboard username={username} user_id={user_id} />}
-      {isProfile && <Profile />}
-    </div>
-    {/*
-    <AppShell
-      padding="md"
-      header={{ height: 60 }}
-      style={{ backgroundColor: "#16202c", color: "white" }}
-    >
-      <AppShell.Header style={{ backgroundColor: "#16202c", color: "white" }}>
-        <Group h="100%" justify="space-between" px="md">
-          <Title order={2} style={{ color: "white" }}>
-            CoolHackGames
-          </Title>
-          <Group>
-            {!loggedIn ? (
-              <Button onClick={handleLogin}>Log in</Button>
-            ) : (
-              <Menu shadow="md" width={180} position="bottom-end">
-                <Menu.Target>
-                  <UnstyledButton>
-                    <Avatar
-                      src={`https://github.com/${username}.png`}
-                      alt="User"
-                      radius="xl"
-                    />
-                  </UnstyledButton>
-                </Menu.Target>
-                <Menu.Dropdown>
-                  <Menu.Item
-                    icon={<IconUser size={16} />}
-                    onClick={() => navigate("/profile")}
-                  >
-                    Profile
-                  </Menu.Item>
-                  <Menu.Item icon={<IconLogout size={16} />} onClick={handleLogout}>
-                    Log Out
-                  </Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
-            )}
-          </Group>
-        </Group>
-      </AppShell.Header>
-
-      <AppShell.Main>
-        {isLeaderboard ? (
-          <Leaderboard username={username} user_id={user_id} />
-        ) : isProfile ? (
-          <Profile />
-        ) : (
-          <>
-            <Grid>
-              <Grid.Col span={3}>
-                <Stack>
-                  <Title order={4} style={{ color: "white" }}>
-                    NEW GAMES
-                  </Title>
-                  {puzzles.slice(0, 5).map((puzzle) => (
-                    <NavbarCard
-                      key={puzzle.name}
-                      puzzle={puzzle}
-                      user_id={user_id}
-                      isLoggedIn={loggedIn}
-                    />
-                  ))}
-                  <Divider my="sm" />
-                  <Stack>
-                    {[home, discord, leaderboard].map((item) => (
-                      <NavbarCard
-                        key={item.name}
-                        puzzle={item}
-                        user_id={user_id}
-                        isLoggedIn={true}
-                      />
-                    ))}
-                  </Stack>
-                </Stack>
-              </Grid.Col>
-
-              <Grid.Col span={6}>
-                <Title order={4} style={{ color: "orange", marginBottom: "8px" }}>
-                  TOP GAMES
-                </Title>
-                <ScrollArea h={600}>
-                  <Stack>
-                    {puzzles.map((puzzle, idx) => (
-                      <Card
-                        shadow="sm"
-                        key={puzzle.name}
-                        withBorder
-                        style={{ backgroundColor: "#1e2a3a", color: "white" }}
-                      >
-                        <Text style={{ color: "white" }}>
-                          {idx + 1}. {puzzle.name}
-                        </Text>
-                      </Card>
-                    ))}
-                  </Stack>
-                </ScrollArea>
-              </Grid.Col>
-
-              <Grid.Col span={3}>
-                <MiniLeaderboard username={username} user_id={user_id} />
-              </Grid.Col>
-            </Grid>
-          </>
+            <div className="flex flex-col gap-6 max-w-[300px]">
+              <Conditions />
+              <StanLeaderboard />
+            </div>
+          </div>
         )}
-      </AppShell.Main>
-    </AppShell>
-    */}
-  </>
-)};
+      </div>
+      <Footer loggedIn={loggedIn} user_id={user_id} />
+    </>
+  );
+}

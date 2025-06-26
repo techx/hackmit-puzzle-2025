@@ -18,7 +18,7 @@ const Footer = ({
       maw="100vw"
       p="0"
       pb="xl"
-      style={{ backgroundColor: "#f8f8f8" }}
+      className="bg-secondary"
     >
       <Group w="100%" justify="center">
         <Grid w="80vw" mt="24px">
@@ -29,6 +29,7 @@ const Footer = ({
                 style={{
                   fontSize: "14px",
                   fontFamily: "NYT-700",
+                  color: "white"
                 }}
               >
                 ABOUT COOLHACKGAMES GAMES
@@ -37,12 +38,13 @@ const Footer = ({
                 style={{
                   fontFamily: "NYT-cheltenham",
                   fontSize: "20px",
+                  color: "white"
                 }}
               >
-                Since the launch of HackMIT in 2013, COOLHACKGAMES has captivated
-                solvers by providing engaging word and logic puzzles. In 2022,
-                we introduced HackScope — followed by bakery, VMHack, and
-                HackxGPT. In early 2023, we proudly added Xd to our collection.
+                Since the launch of HackMIT in 2013, CoolHackGames has been the most
+                popular gaming site for hackers both young and old. In 2022,
+                we introduced HackScope — followed by bakery, VMHack,
+                HackxGPT, and HackTimes. In early 2023, we proudly added Xd to our collection.
                 We strive to offer puzzles for all skill levels that everyone
                 can enjoy playing every day.
               </Text>
@@ -55,6 +57,7 @@ const Footer = ({
                 style={{
                   fontSize: "14px",
                   fontFamily: "NYT-700",
+                  color: "white"
                 }}
               >
                 COOLHACKGAMES
@@ -68,6 +71,7 @@ const Footer = ({
                       ml={-4}
                       style={{
                         fontFamily: "NYT-500",
+                        color: "white"
                       }}
                     >
                       {loggedIn ? (
@@ -93,6 +97,7 @@ const Footer = ({
                 style={{
                   fontSize: "14px",
                   fontFamily: "NYT-700",
+                  color: "white"
                 }}
               >
                 ABOUT COOLHACKGAMES
@@ -101,12 +106,13 @@ const Footer = ({
                 style={{
                   fontFamily: "NYT-cheltenham",
                   fontSize: "20px",
+                  color: "white"
                 }}
               >
-                Since the launch of HackMIT in 2013, HackTimes has captivated
-                solvers by providing engaging word and logic puzzles. In 2022,
-                we introduced HackScope — followed by bakery, VMHack, and
-                HackxGPT. In early 2023, we proudly added Xd to our collection.
+                Since the launch of HackMIT in 2013, CoolHackGames has been the most
+                popular gaming site for hackers both young and old. In 2022,
+                we introduced HackScope — followed by bakery, VMHack,
+                HackxGPT, and HackTimes. In early 2023, we proudly added Xd to our collection.
                 We strive to offer puzzles for all skill levels that everyone
                 can enjoy playing every day.
               </Text>
@@ -116,6 +122,7 @@ const Footer = ({
                 style={{
                   fontSize: "14px",
                   fontFamily: "NYT-700",
+                  color: "white"
                 }}
               >
                 COOLHACKGAMES

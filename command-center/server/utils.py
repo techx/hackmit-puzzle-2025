@@ -126,6 +126,11 @@ def get_puzzle_values(puzzle_users: List[PuzzleUser]) -> Dict[str, int]:
         for puzzle_name in puzzle_names
     }
 
+def get_user_solved_puzzles(puzzle_users: List[PuzzleUser]) -> []:
+    puzzles = []
+    for puzzle_user in puzzle_users:
+        puzzles.append(puzzle_user.puzzle_name)
+    return puzzles
 
 def validate_user_submission(user_id: str, puzzle_name: str, submission: str) -> bool:
     """Validate a user submission."""

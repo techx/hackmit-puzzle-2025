@@ -22,6 +22,7 @@ from server.utils import (
     compute_puzzle_value,
     get_puzzle_answer_from_submission_evan_adam,
     get_puzzle_values,
+    get_user_solved_puzzles,
     get_username_from_user_id,
     send_discord_embed,
     sus_detector,
@@ -288,6 +289,24 @@ def leaderboard():
             "personal_user_score": personal_user_score,
         }
     )
+
+@puzzle.get("/solved")
+def get_puzzles_solved():
+    """Get puzzles solved from a user"""
+    if not session.get("user"):
+        return jsonify({"success": False, "message": "User not logged in"}), 401
+    print("ses", session["user"]["login"])
+    puzzle_users = (
+        db.session.execute(
+            select(PuzzleUser).where(PuzzleUser.user_id == session["user"]["login"])
+        )
+        .scalars()
+        .all()
+    )
+    puzzles = get_user_solved_puzzles(puzzle_users)
+    if not puzzles:
+        return jsonify({"success": False, "message": "No puzzles completed"}), 404
+    return jsonify({"success": True, "solved_puzzles": puzzles})
 
 
 @puzzle.get("/email")
