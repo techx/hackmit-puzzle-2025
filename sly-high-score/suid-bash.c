@@ -11,7 +11,7 @@
 #define ERROR_ARGC 1          // Must have argv[1] be script path
 #define ERROR_NOT_FOUND 2     // Resolved script path must exist
 #define ERROR_PATH 3          // Resolved script path must be in a known-good location (SECURITY: prevent symlink races during further analysis and invocation)
-#define ERROR_NOT_ROOT 4      // Resolved script path must be owned by root (we're running root suid!)
+#define ERROR_NOT_FLAGUSER 4  // Resolved script path must be owned by flaguser (the user we're suiding to)
 #define ERROR_NOT_SUID 5      // Resolved script path must be suid (we're running root suid!)
 #define ERROR_BAD_SHEBANG 6   // Resolved script must indicate it's desire to be run with THIS interpreter (SECURITY: prevent weird-behavior due to running incorrect interpreter via non-shebang forced invocation)
 #define ERROR_BAD_ENV 7       // Resolved script which indicates a clear environment must have a cleared environment (SECURITY: prevent weird-behavior due to running interpreter with environment via non-shebang forced invocation)
@@ -26,13 +26,13 @@ int main(int argc, char **argv, char **envp)
     if (!path)
         return ERROR_NOT_FOUND;
 
-    if (strcmp("/challenge/run", path) != 0)
+    if (strcmp("/app/challenge.sh", path) != 0)
         return ERROR_PATH;
 
     struct stat stat = { 0 };
     lstat(path, &stat);
-    if (stat.st_uid != 0)
-        return ERROR_NOT_ROOT;
+    if (stat.st_uid != 1037)
+        return ERROR_NOT_FLAGUSER;
     if (!(stat.st_mode & S_ISUID))
         return ERROR_NOT_SUID;
 

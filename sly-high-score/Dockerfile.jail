@@ -9,12 +9,25 @@ RUN mkdir /app && \
   gcc -o /app/suid-bash /tmp/suid-bash.c && \
   rm -f /tmp/suid-bash.c
 
-FROM pwn.red/jail
+# RUN groupadd --gid 1037 flaguser && \
+#   useradd --uid 1037 --gid 1037 --no-create-home --shell /usr/sbin/nologin flaguser
+
+FROM pwnred-jail-custom:latest
 
 COPY --from=builder / /srv
 
-COPY ./challenge.sh /srv/app/run
+COPY ./challenge.sh /srv/app/challenge.sh
 COPY ./flag /srv/flag
-RUN chmod +x /srv/app/run && chmod 0400 /srv/flag && chmod u+s /srv/app/suid-bash
 
-RUN ln -s /proc/self/fd /srv/dev/fd
+# we're not taking any changes with these permissions :sweat_smile:
+RUN chown 1037:1037 /srv/app && \
+  chmod 0755 /srv/app && \
+  chown 1037:1037 /srv/app/challenge.sh && \
+  chmod 4755 /srv/app/challenge.sh && \
+  chown 1037:1037 /srv/flag && \
+  chmod 0400 /srv/flag && \
+  chown 1037:1037 /srv/app/suid-bash && \
+  chmod 4755 /srv/app/suid-bash
+
+RUN printf '#!/bin/sh\nid\nexec setpriv --reuid=1000 --regid=1000 --clear-groups /app/challenge.sh' > /srv/app/run && \
+  chmod 755 /srv/app/run

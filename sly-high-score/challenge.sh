@@ -1,6 +1,4 @@
-#!/usr/bin/env -iS bash
-
-ln -s /proc/self/fd /dev/fd
+#!/usr/bin/env -iS //app/suid-bash
 
 high_score_run3=10000
 high_score_papas_freezeria=20000
