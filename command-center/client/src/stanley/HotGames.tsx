@@ -1,15 +1,15 @@
 import { puzzles } from "../puzzles";
 
-export default function NewGames() {
+export default function HotGames() {
   return (
     <section className="flex flex-col w-full gap-2 h-auto">
-      <h1 className="text-xl px-2 py-1 bg-secondary rounded-lg font-semibold uppercase tracking-wider">
-        new games
+      <h1 className="text-xl px-4 py-1 bg-[#e14603] rounded-lg font-semibold uppercase tracking-wider">
+        top 10 games
       </h1>
-      <ul className="flex flex-col gap-1">
+      <ul className="flex flex-col">
         {puzzles.map((puzzle) => (
           <li key={puzzle.title} className="flex gap-2 items-center h-fit">
-            <div className="w-20 h-12 border border-accent rounded-lg overflow-hidden">
+            <div className="w-20 h-12 border border-[#e14603] rounded-lg overflow-hidden">
               <img
                 className="w-full h-full object-cover object-center"
                 src={puzzle.image}
@@ -18,7 +18,7 @@ export default function NewGames() {
             </div>
 
             <div className="flex flex-col">
-              <h2 className="font-semibold text-accent">{puzzle.title}</h2>
+              <h2 className="font-semibold text-[#ffaa23]">{puzzle.title}</h2>
               <p className="text-base leading-tight text-white">
                 {puzzle.description}
               </p>
@@ -26,9 +26,6 @@ export default function NewGames() {
           </li>
         ))}
       </ul>
-      <button className="uppercase w-fit text-accent underline font-semibold">
-        more new games &gt;
-      </button>
     </section>
   );
 }
