@@ -19,6 +19,9 @@ function isDefined<T>(val: T | undefined | null): val is T {
 
 const PROMPT = "enter command: ";
 
+// TODO: make dynamic
+const USER_ID = "default_user";
+
 type ConnectionState = "OPENING" | "OPEN" | "CLOSED";
 
 const App = () => {
@@ -50,53 +53,7 @@ const App = () => {
     wsRef.current = socket;
     socket.binaryType = "arraybuffer";
 
-    socket.onopen = () => {
-      setConnectionState("OPEN");
-      // reset state
-      setStands([]);
-      setShowCreateForm(false);
-      setCreateName("");
-      setEditing(null);
-      setErrors({});
-      setStandErrors({});
-      setCreateNameError("");
-      simBufferRef.current = "";
-      awaitingSimRef.current = false;
-      // don't reset these so user has time to read the error if any
-      // setShowModal(false);
-      // setOutput("");
-    };
-
-    socket.onclose = () => {
-      // if the server closed mid-simulation flush what we have so far
-      if (awaitingSimRef.current && simBufferRef.current) {
-        setOutput(simBufferRef.current.trim());
-        setShowModal(true);
-      }
-      // existing reconnection logic …
-      setTimeout(
-        () =>
-          setConnectionState((state) => {
-            if (state === "OPEN") {
-              connectWebSocket();
-              return "OPENING";
-            }
-            return state;
-          }),
-        10,
-      );
-    };
-
-    socket.onerror = () => {
-      // same defensive flush – you may prefer to surface an explicit error UI
-      if (awaitingSimRef.current && simBufferRef.current) {
-        setOutput(simBufferRef.current.trim());
-        setShowModal(true);
-      }
-      setConnectionState("CLOSED");
-    };
-
-    socket.onmessage = (event) => {
+    const onMessage = (event: MessageEvent) => {
       let text: string;
       if (typeof event.data === "string") {
         text = event.data;
@@ -134,6 +91,105 @@ const App = () => {
       });
     };
 
+    const onOpen = () => {
+      setConnectionState("OPEN");
+      // TODO: ensure USER_ID doesn't have bad characters?
+
+      // reset state
+      setStands([]);
+      setShowCreateForm(false);
+      setCreateName("");
+      setEditing(null);
+      setErrors({});
+      setStandErrors({});
+      setCreateNameError("");
+      simBufferRef.current = "";
+      awaitingSimRef.current = false;
+      // don't reset these so user has time to read the error if any
+      // setShowModal(false);
+      // setOutput("");
+    };
+
+    const performHandshake = (event: MessageEvent) => {
+      clearTimeout(
+        (socket as unknown as Record<string, number>).handshakeTimeout,
+      );
+
+      let text: string;
+      if (typeof event.data === "string") {
+        text = event.data;
+      } else {
+        try {
+          text = new TextDecoder().decode(event.data);
+        } catch {
+          console.error("initial message failed to decode, reconnecting");
+          socket.onclose = () => {};
+          socket.close();
+          setTimeout(() => connectWebSocket(), 1000);
+          return;
+        }
+      }
+
+      if (text.trim() != "user ID:") {
+        console.error("got wrong handshake, reconnecting...");
+        socket.onclose = () => {};
+        socket.close();
+        setTimeout(() => connectWebSocket(), 1000);
+      }
+
+      socket.send(new TextEncoder().encode(USER_ID + "\n"));
+      socket.removeEventListener("message", performHandshake);
+      socket.onmessage = onMessage;
+      onOpen();
+    };
+
+    socket.onopen = () => {
+      (socket as unknown as Record<string, number>).handshakeTimeout =
+        setTimeout(() => {
+          console.error("didn't receive handshake in time");
+          socket.onclose = () => {};
+          socket.close();
+          setTimeout(() => connectWebSocket(), 10);
+        }, 5000);
+      socket.addEventListener("message", performHandshake);
+    };
+
+    socket.onclose = (evt) => {
+      console.error(
+        "socket closed",
+        socket.readyState,
+        evt.wasClean,
+        evt.code,
+        evt.reason,
+      );
+      // if the server closed mid-simulation flush what we have so far
+      if (awaitingSimRef.current && simBufferRef.current) {
+        setOutput(simBufferRef.current.trim());
+        setShowModal(true);
+      }
+      // existing reconnection logic …
+      setTimeout(
+        () =>
+          setConnectionState((state) => {
+            if (state === "OPEN") {
+              setTimeout(() => connectWebSocket(), 3000);
+              return "OPENING";
+            }
+            return state;
+          }),
+        10,
+      );
+    };
+
+    socket.onerror = () => {
+      // same defensive flush – you may prefer to surface an explicit error UI
+      if (awaitingSimRef.current && simBufferRef.current) {
+        setOutput(simBufferRef.current.trim());
+        setShowModal(true);
+      }
+      setConnectionState("CLOSED");
+    };
+
     return () => socket.close();
   }, []);
 
@@ -148,7 +204,7 @@ const App = () => {
         awaitingSimRef.current = true; // begin accumulation
         simBufferRef.current = ""; // reset buffer
       }
-      wsRef.current!.send(cmd + "\n");
+      wsRef.current!.send(new TextEncoder().encode(cmd + "\n"));
     }
   };
 

