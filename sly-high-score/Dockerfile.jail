@@ -1,20 +1,8 @@
-FROM ubuntu@sha256:b59d21599a2b151e23eea5f6602f4af4d7d31c4e236d22bf0b62b86d2e386b8f AS builder
+FROM pwnred-jail-custom:latest
 
-RUN apt-get update && \
-    apt-get install -y gcc && \
-    rm -rf /var/lib/apt/lists/*
+COPY --from=ubuntu@sha256:b59d21599a2b151e23eea5f6602f4af4d7d31c4e236d22bf0b62b86d2e386b8f / /srv
 
-COPY ./suid-bash.c /tmp/suid-bash.c
-RUN mkdir /app && \
-  gcc -o /app/suid-bash /tmp/suid-bash.c && \
-  rm -f /tmp/suid-bash.c
-
-FROM pwn.red/jail
-
-COPY --from=builder / /srv
-
-COPY ./challenge.sh /srv/app/run
+COPY ./challenge.sh /srv/app/challenge.sh
 COPY ./flag /srv/flag
-RUN chmod +x /srv/app/run && chmod 0400 /srv/flag && chmod u+s /srv/app/suid-bash
 
-RUN ln -s /proc/self/fd /srv/dev/fd
+RUN ln -s /app/challenge.sh /srv/app/run
