@@ -1,13 +1,34 @@
 import { useEffect, useState } from "react";
-import { Stack, Title, Group, Text, Card, Anchor } from "@mantine/core";
+import { Group, Stack, Text } from "@mantine/core";
 
-type LeaderboardEntry = {
+const LeaderboardItem = ({
+  rank,
+  username,
+  score,
+  index,
+}: {
+  rank: number;
   username: string;
-  total_score: number | null;
+  score: number;
+  index: number;
+}) => {
+  return (
+    <li
+      className={`w-full px-3 py-4 flex items-center justify-between rounded-xl ${
+        index % 2 === 0 ? "bg-[#1e2a3a]" : ""
+      }`}
+    >
+      <div className="flex items-center gap-2">
+        <span className="text-xl font-bold">{rank}.</span>
+        <span>{username}</span>
+      </div>
+      <span className="text-[#fee506] text-xl font-bold">{score}</span>
+    </li>
+  );
 };
 
-const MiniLeaderboard = () => {
-  const [users, setUsers] = useState<LeaderboardEntry[]>([]);
+export default function Leaderboard() {
+  const [entries, setEntries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,23 +36,34 @@ const MiniLeaderboard = () => {
       .then((res) => res.json())
       .then((data) => {
         if (data && Array.isArray(data.leaderboard)) {
-          let topUsers: LeaderboardEntry[] = data.leaderboard
+          let topUsers = data.leaderboard
             .filter((entry: any) => entry.username && entry.total_score !== null)
-            .slice(0, 5)
-            .map((entry: any) => ({
+            .map((entry: any, idx: number) => ({
+              rank: idx + 1,
               username: entry.username ?? "(unknown)",
-              total_score: entry.total_score ?? 0,
+              score: entry.total_score ?? 0,
+              isPersonal: false,
             }));
 
-          // Insert personal user score if available
-          if (data.personal_user_score?.username) {
-            topUsers.unshift({
-              username: data.personal_user_score.username,
-              total_score: data.personal_user_score.total_score ?? 0,
-            });
+          const personal = data.personal_user_score;
+          if (personal?.username) {
+            const personalEntry = {
+              rank: personal.rank ?? topUsers.length + 1,
+              username: personal.username,
+              score: personal.total_score ?? 0,
+              isPersonal: true,
+            };
+            const exists = topUsers.find(
+              (u: any) => u.username === personalEntry.username
+            );
+            if (!exists) {
+              topUsers.push(personalEntry);
+              topUsers.sort((a, b) => a.rank - b.rank);
+            }
           }
 
-          setUsers(topUsers);
+          const finalEntries = topUsers.slice(0, 3);
+          setEntries(finalEntries);
         }
         setLoading(false);
       })
@@ -44,43 +76,25 @@ const MiniLeaderboard = () => {
   if (loading) return <Text>Loading leaderboard...</Text>;
 
   return (
-    <Stack spacing="xs">
-      <Group w="100%" justify="center">
-        <Title order={1} pb="xs">
-          Conditions
-        </Title>
-      </Group>
-      <Title order={3} fz="18px">
-        The top ~50 eligible puzzle solvers are automatically admitted to
-        HackMIT. To be eligible for this, we ask that you still submit an
-        application, and that you also enter the email that you used to
-        apply for HackMIT in your profile card on the{" "}
-        <Anchor href="/" fz="18px">
-          front page
-        </Anchor>
-        .
-      </Title>
-      <Title order={4} c="white">
-        LEADERBOARDS
-      </Title>
-      {users.map((user, idx) => (
-        <Card
-          key={idx}
-          shadow="sm"
-          padding="sm"
-          withBorder
-          style={{ backgroundColor: "#1e2a3a", color: "white" }}
-        >
-          <Group justify="space-between">
-            <Text>
-              {idx + 1}. {user.username}
-            </Text>
-            <Text>{user.total_score}</Text>
-          </Group>
-        </Card>
-      ))}
-    </Stack>
+    <section className="flex flex-col w-full gap-4 h-auto">
+      <h1 className="text-xl font-semibold uppercase tracking-wider text-white">
+        Leaderboards
+      </h1>
+      {entries.length === 0 ? (
+        <Text className="text-white">No leaderboard data available.</Text>
+      ) : (
+        <ul>
+          {entries.map((user, index) => (
+            <LeaderboardItem
+              key={user.username + index}
+              rank={user.rank}
+              username={user.username}
+              score={user.score}
+              index={index}
+            />
+          ))}
+        </ul>
+      )}
+    </section>
   );
-};
-
-export default MiniLeaderboard;
+}

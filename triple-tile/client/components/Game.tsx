@@ -43,7 +43,7 @@ const morseMap: Record<string, string> = {
   Z: "--..",
 };
 
-const FLAG = "FORESTTMPL";
+const FLAG = "_t1le_tr1p_";
 
 const PuzzleGame: React.FC = () => {
   const [tiles, setTiles] = useState<Tile[]>([]);

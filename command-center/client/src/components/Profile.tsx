@@ -1,7 +1,16 @@
 import { useState, useEffect } from "react";
-import { Container, Button, Stack, Text, Image } from "@mantine/core";
+import {
+  Container,
+  Button,
+  Stack,
+  Text,
+  Image,
+  Group,
+  SimpleGrid,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Modal, TextInput } from "@mantine/core";
+import CoolGameCard from "../components/CoolGameCard";
 
 const ProfileCard = ({
   loggedIn,
@@ -19,6 +28,7 @@ const ProfileCard = ({
   const [submitting, setSubmitting] = useState(false);
   const [correctMessage, setCorrectMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [solvedPuzzles, setSolvedPuzzles] = useState([]);
 
   useEffect(() => {
     setCorrectMessage("");
@@ -31,6 +41,16 @@ const ProfileCard = ({
       .then((data) => {
         if (data.success) {
           setResponse(data.email);
+        }
+      });
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/puzzle/solved")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setSolvedPuzzles(data.solved_puzzles);
         }
       });
   }, []);
@@ -103,69 +123,41 @@ const ProfileCard = ({
           {submitting ? "Saving..." : "Save"}
         </Button>
       </Modal>
-      <Container
-        h="180px"
-        maw="400px"
-        style={{
-          borderRadius: "12px 12px 0px 0px",
-          background: "white",
-          opacity: loggedIn ? 1 : 0.3,
-        }}
-      >
-        <Stack justify="center" align="center" h="100%">
+
+      <Stack spacing="xl">
+        <Group justify="flex-start" align="center">
           <Image
-            src="/spelling-bee-card-icon.svg"
+            src={`https://github.com/${username}.png`}
             alt="pfp"
-            style={{ width: "120px", height: "120px" }}
+            style={{ width: "100px", height: "100px", borderRadius: "50%" }}
           />
-          <Text
-            fz={22}
-            ta="center"
-            style={{
-              fontFamily: "NYT-Header-Condensed",
-              lineHeight: "1",
-            }}
-          >
-            {"Profile"}
-          </Text>
-        </Stack>
-      </Container>
-      <Container
-        h="auto"
-        maw="400px"
-        style={{
-          background: "white",
-          borderRadius: "0px 0px 12px 12px",
-          opacity: loggedIn ? 1 : 0.3,
-        }}
-      >
-        <Stack justify="center" align="center" gap="12px" pb="md" px="xs">
-          <Text
-            ta="center"
-            c="black"
-            pb="sm"
-            style={{
-              fontFamily: "NYT-500",
-              lineHeight: "1.2",
-            }}
-          >
-            {username !== undefined
-              ? "You are logged in as " + username
-              : "You are not logged in."}
-          </Text>
-          {loggedIn && (
-            <Button
-              fullWidth
-              radius="xl"
-              variant="outline"
-              color="black"
-              onClick={open}
-            >
-              Edit
-            </Button>
+          <Stack align="flex-start" gap="xs">
+            <Text fz={24} fw={700} style={{ color: "white" }}>
+              {username}
+            </Text>
+            {loggedIn && (
+              <Button radius="xl" variant="outline" color="white" onClick={open}>
+                Edit
+              </Button>
+            )}
+          </Stack>
+        </Group>
+
+        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
+          {solvedPuzzles.length > 0 ? (
+            solvedPuzzles.map((puzzle) => (
+              <CoolGameCard
+                key={puzzle.name}
+                puzzle={puzzle}
+                loggedIn={loggedIn}
+                user_id={user_id}
+              />
+            ))
+          ) : (
+            <Text c="white">No puzzles solved yet.</Text>
           )}
-        </Stack>
-      </Container>
+        </SimpleGrid>
+      </Stack>
     </>
   );
 };
@@ -188,7 +180,7 @@ const Profile = () => {
   }, []);
 
   return (
-    <Container maw="100vw" p="40px" style={{ background: "#4d88f9" }}>
+    <Container maw="100vw" p="40px" style={{ background: "#0f172a" }}>
       <ProfileCard
         loggedIn={loggedIn}
         username={username}

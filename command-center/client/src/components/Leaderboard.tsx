@@ -73,16 +73,14 @@ const Leaderboard = ({
 
   const mapEltToRow = (
     element: leaderboardDataType,
-    idx: number,
-    isPersonal: boolean = false
+    idx: number
   ) => {
     return (
       <Table.Tr
         key={idx}
         style={{
-          backgroundColor: element.username === username ? "#FFFFBF" : "white",
-          borderTop: isPersonal ? "2px solid black" : "",
-          borderBottom: isPersonal ? "2px solid black" : "",
+          backgroundColor: idx % 2 === 0 ? "#1e2a3a" : "#111827",
+          color: "white",
         }}
       >
         <Table.Td>
@@ -94,7 +92,7 @@ const Leaderboard = ({
                   fontFamily: "NYT-Header-Condensed",
                 }}
               >
-                {isPersonal ? element.rank : idx + 1}
+                {element.rank ?? idx + 1}
               </Text>
             </Group>
             <Text
@@ -110,7 +108,7 @@ const Leaderboard = ({
         </Table.Td>
         <Table.Td w={scoreColumnWidth}>
           <Group justify="center">
-            <Text fz={20}>{element.total_score}</Text>
+            <Text fz={20} c="#fee506" fw={700}>{element.total_score}</Text>
           </Group>
         </Table.Td>
         <Table.Td w={penaltyColumnWidth}>
@@ -132,15 +130,15 @@ const Leaderboard = ({
     );
   };
 
-  const trows = typedLeaderboard.map((element, idx) =>
-    mapEltToRow(element, idx)
-  );
+  const trows: JSX.Element[] = [];
 
   if (typedLeaderboardData.personal_user_score) {
-    trows.unshift(
-      mapEltToRow(typedLeaderboardData.personal_user_score, -1, true)
-    );
+    trows.push(mapEltToRow(typedLeaderboardData.personal_user_score, 0));
   }
+
+  typedLeaderboard.forEach((element, index) => {
+    trows.push(mapEltToRow(element, typedLeaderboardData.personal_user_score ? index + 1 : index));
+  });
 
   return (
     <Container w="100%" maw="100vw" mih="100vh" p="0" pb="xl" mt="0">

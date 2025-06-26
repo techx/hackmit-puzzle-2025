@@ -36,11 +36,11 @@ const unshuffledPuzzles: Puzzle[] = [
       </div>
     ),
     color: "#F7DA21",
-    url: "https://papas-cipheria.hackmit.org",
-    description: "make cipher haha",
+    url: "https://papas.hackmit.org",
+    description: "Learn to operate your brand new cipheria!",
   },
   {
-    name: "Hexhunt",
+    name: "Chess",
     icon: (
       <div style={{ width: "28px", height: "28px" }}>
         <Image src="/hexhunt.svg" alt="Hexhunt" />
@@ -52,11 +52,11 @@ const unshuffledPuzzles: Puzzle[] = [
       </div>
     ),
     color: "#B5E352",
-    url: "https://hexhunt.hackmit.org",
-    description: "Explore Novel Arrangements By Linking Elements 1-by-1.",
+    url: "https://chess.hackmit.org",
+    description: "Play chess with the best!",
   },
   {
-    name: "Library",
+    name: "Lemonade Stand",
     icon: (
       <div style={{ width: "28px", height: "28px" }}>
         <Image src="/library.svg" alt="Library" />
@@ -68,11 +68,11 @@ const unshuffledPuzzles: Puzzle[] = [
       </div>
     ),
     color: "#00A2B3",
-    url: "https://library.hackmit.org",
-    description: "Rank your favorite and least favorite books.",
+    url: "https://lemonadestand.hackmit.org",
+    description: "Got any grapes?",
   },
   {
-    name: "Wodou",
+    name: "Triple Tile",
     icon: (
       <div style={{ width: "28px", height: "28px" }}>
         <Image src="/wodou.svg" alt="Wodou" />
@@ -84,12 +84,12 @@ const unshuffledPuzzles: Puzzle[] = [
       </div>
     ),
     color: "#E3E3E1",
-    url: "https://wodou.hackmit.org",
-    description: "Wodou.",
+    url: "https://tripletile.hackmit.org",
+    description: "Triple the fun!",
     annieURL: true,
   },
   {
-    name: "Curseword",
+    name: "Sly High",
     icon: (
       <div style={{ width: "28px", height: "28px" }}>
         <Image src="/curseword.svg" alt="Curseword" />
@@ -101,11 +101,11 @@ const unshuffledPuzzles: Puzzle[] = [
       </div>
     ),
     color: "#FB9B00",
-    url: "https://curseword.hackmit.org",
-    description: "Find hidden words and uncover the day's theme.",
+    url: "https://slyhigh.hackmit.org",
+    description: "Sly high",
   },
   {
-    name: "😈 Connections 😈",
+    name: "ROM Hack",
     icon: (
       <div style={{ width: "28px", height: "28px" }}>
         <Image src="/connections.svg" alt="Connections" />
@@ -117,8 +117,8 @@ const unshuffledPuzzles: Puzzle[] = [
       </div>
     ),
     color: "#B4A8FF",
-    url: "https://connections.hackmit.org",
-    description: "Evil Connections.",
+    url: "https://romhack.hackmit.org",
+    description: "Gotta catch them all!",
     vishyURL: true,
   },
 ];
