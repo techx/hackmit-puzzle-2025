@@ -7,7 +7,7 @@ import faker
 from flask import Blueprint
 
 from server import db
-from server.config import EVAN_ADAM_PUZZLE_NAME, PUZZLE_TABLE_METADATA
+from server.config import PUZZLE_TABLE_METADATA
 from server.models.Puzzle import PuzzleUser
 from server.utils import generate_user_id
 
@@ -51,8 +51,6 @@ def leaderboard():
                     earliest_correct_time=generate_random_future_date(),
                     last_submission_time=generate_random_future_date(),
                 )
-                if puzzle_name == EVAN_ADAM_PUZZLE_NAME:
-                    n_p_u.evan_adam_score = random.randint(2100, 4300)
                 db.session.add(n_p_u)
                 db.session.commit()
 

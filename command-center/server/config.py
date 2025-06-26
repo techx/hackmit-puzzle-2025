@@ -60,84 +60,58 @@ DISCORD_WEBHOOK = cast(str, _get_config_option("DISCORD_WEBHOOK"))
 # puzzle config
 # this should have been done with a class-level config but it's fine
 
-EVAN_ADAM_PUZZLE_NAME = "Hexhunt"
+# EVAN_ADAM_PUZZLE_NAME = "Hexhunt"
 
 IS_VERCEL = {
-    "Twister": False,
-    "Hexhunt": False,
-    "Library": False,
-    "Wodou": True,
-    "😈 Connections 😈": True,
-    "Curseword": False,
-    "PapasCipheria": False,
+    "Chess": False,
+    "LemonadeStand": False,
+    "Romhack": True,
+    "SlyHigh": False,
+    "TripleTile": True,
+    "PapasCipheria": True,
 }
 
 PUZZLE_SECRETS = {
-    "Twister": cast(str, _get_config_option("TWISTER_PUZZLE_SECRET")),
-    "Hexhunt": cast(str, _get_config_option("HEXHUNT_PUZZLE_SECRET")),
-    "Library": cast(str, _get_config_option("LIBRARY_PUZZLE_SECRET")),
-    "Wodou": cast(str, _get_config_option("WODOU_PUZZLE_SECRET")),
-    "😈 Connections 😈": cast(str, _get_config_option("CONNECTIONS_PUZZLE_SECRET")),
-    "Curseword": cast(str, _get_config_option("CURSEWORD_PUZZLE_SECRET")),
+    "Chess": cast(str, _get_config_option("CHESS_PUZZLE_SECRET")),
+    "LemonadeStand": cast(str, _get_config_option("LEMON_PUZZLE_SECRET")),
+    "Romhack": cast(str, _get_config_option("ROMHACK_PUZZLE_SECRET")),
+    "SlyHigh": cast(str, _get_config_option("SLY_PUZZLE_SECRET")),
+    "TripleTile": cast(str, _get_config_option("TRIPLE_PUZZLE_SECRET")),
     "PapasCipheria": cast(str, _get_config_option("PAPAS_PUZZLE_SECRET")),
 }
 
 PUZZLE_TABLE_METADATA = {
-    "Twister": {"abbrv": "Tw", "url": "https://twister.hackmit.org"},
-    "Hexhunt": {"abbrv": "Hx", "url": "https://hexhunt.hackmit.org"},
-    "Library": {
-        "abbrv": "Lib",
-        "url": "https://library.hackmit.org",
+    "Chess": {"abbrv": "Ch", "url": "https://chess.hackmit.org"},
+    "LemonadeStand": {"abbrv": "Ls", "url": "https://lemonadestand.hackmit.org"},
+    "Romhack": {
+        "abbrv": "Rh",
+        "url": "https://romhack.hackmit.org",
     },
-    "Wodou": {
-        "abbrv": "Wo",
-        "url": "https://wodou.hackmit.org",
+    "SlyHigh": {
+        "abbrv": "Sh",
+        "url": "https://slyhigh.hackmit.org",
     },
-    "😈 Connections 😈": {"abbrv": "Con", "url": "https://connections.hackmit.org"},
-    "Curseword": {
-        "abbrv": "Crw",
-        "url": "https://curseword.hackmit.org",
+    "TripleTile": {
+        "abbrv": "Tt",
+        "url": "https://tripletile.hackmit.org",
     },
-    "PapasCipheria": {"abbrv": "Pc", "url": "https://papas-cipheria.hackmit.org"},
-
+    "PapasCipheria": {"abbrv": "Pc", "url": "https://papas.hackmit.org"},
 }
 
 PUZZLE_FAILURE_MESSAGES = {
-    "Twister": [
-        "wrong 🐦",
-        "did you try answering every question? 🤔",
-    ],
-    "Hexhunt": ["Incorrect"],
-    "Library": ["Incorrect"],
-    "Wodou": ["Press Enter to restart"],
-    "😈 Connections 😈": [
-        "😈😈😈😈😈😈😈😈",
-        "tomorrow is always a new day 🥱",
-        "one fish two fish four fish eight fish",
-    ],
-    "Curseword": [
-        "Incorrect flag",
-        "Did you try Googling?",
-        "Some answers are easier than others",
-    ],
-    "PapasCipheria": [
-        "wrong 🐦",
-        "did you try answering every question? 🤔",
-    ],
+    "Chess": ["Incorrect"],
+    "LemonadeStand": ["Incorrect"],
+    "Romhack": ["Incorrect"],
+    "SlyHigh": ["Incorrect"],
+    "TripleTile": ["Incorrect"],
+    "PapasCipheria": ["Incorrect"],
 }
 
 PUZZLE_CORRECT_MESSAGES = {
-    "Twister": ["Correct!"],
-    "Hexhunt": [
-        "Correct!! However, the challenge might not be over yet. "
-        "The number of points you receive depends on the number of "
-        "people who match or beat your result. We encourage you to keep "
-        "refining your solution and aim for the highest possible score. "
-        "Feel free to resubmit to improve your ranking. Best of luck!"
-    ],
-    "Library": ["Correct!"],
-    "Wodou": ["Correct!"],
-    "😈 Connections 😈": ["🤑🤑🤑🤑nice one 🤑🤑🤑🤑"],
-    "Curseword": ["Correct!"],
+    "Chess": ["Correct!"],
+    "LemonadeStand": ["Correct! Have some lemonade to go with your victory!"],
+    "Romhack": ["Correct!"],
+    "SlyHigh": ["Correct!"],
+    "TripleTile": ["Correct!"],
     "PapasCipheria": ["Correct!"],
 }

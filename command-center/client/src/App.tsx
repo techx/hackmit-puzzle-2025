@@ -25,6 +25,7 @@ import Leaderboard from "./components/Leaderboard";
 import Profile from "./components/Profile";
 import MiniLeaderboard from "./components/MiniLeaderboard";
 import { useNavigate } from "react-router-dom"; 
+import GameCard from "./components/GameCard";
 
 
 export default function App() {
@@ -133,6 +134,8 @@ export default function App() {
                       user_id={user_id}
                       isLoggedIn={loggedIn}
                     />
+                    // <GameCard puzzle={puzzle} loggedIn={loggedIn} user_id={user_id} />
+
                   ))}
                   <Divider my="sm" />
                   {/* <Title order={4} style={{ color: "white" }}>
@@ -173,7 +176,6 @@ export default function App() {
                 </ScrollArea>
               </Grid.Col>
               <Grid.Col span={3}>
-
                 <MiniLeaderboard username={username} user_id={user_id} />
                 {/* <Leaderboard username={username} user_id={user_id} /> */}
               </Grid.Col>

@@ -691,7 +691,7 @@ export default function App() {
           setTimeout(() => setFeedback(''), 3000);
         } else if (gameState === 'final_challenge_second_freezer') {
           setScore(prevScore => prevScore + 2000);
-          setFeedback('Congratulations! You have completed the game!');
+          setFeedback('Congratulations! You have completed the game! Submit the flag [test] to the command center.');
           setGameState('game_over');
         }
       } else {
