@@ -77,20 +77,7 @@ func (c *Config) SetConfig(msg *nsjail.NsJailConfig) error {
 		Dst:    proto.String("/"),
 		IsBind: proto.Bool(true),
 		Nodev:  proto.Bool(true),
-		// Nosuid: proto.Bool(true),
-		Nosuid: proto.Bool(false),
-	}}
-	msg.DisableNoNewPrivs = proto.Bool(true)
-	msg.Uidmap = []*nsjail.IdMap{{
-		InsideId:  proto.String("0"),
-		OutsideId: proto.String("1037"),
-		Count:     proto.Uint32(1),
-	}}
-	// msg.Gidmap = make([]*nsjail.IdMap, 0)
-	msg.Gidmap = []*nsjail.IdMap{{
-		InsideId:  proto.String("0"),
-		OutsideId: proto.String("1037"),
-		Count:     proto.Uint32(1),
+		Nosuid: proto.Bool(true),
 	}}
 	msg.Hostname = proto.String("app")
 	msg.Cwd = proto.String("/app")

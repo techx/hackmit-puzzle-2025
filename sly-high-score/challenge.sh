@@ -1,4 +1,4 @@
-#!/usr/bin/env -iS //app/suid-bash
+#!/usr/bin/env -iS bash
 
 high_score_run3=10000
 high_score_papas_freezeria=20000

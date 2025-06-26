@@ -6,7 +6,7 @@ import (
 	"os/exec"
 
 	"github.com/redpwn/jail/internal/config"
-	// "github.com/redpwn/jail/internal/privs"
+	"github.com/redpwn/jail/internal/privs"
 	"golang.org/x/sys/unix"
 )
 
@@ -22,9 +22,9 @@ func runNsjailChild(errCh chan<- error) {
 }
 
 func execNsjail(cfg *config.Config) error {
-	// if err := privs.DropPrivs(cfg); err != nil {
-	// 	return err
-	// }
+	if err := privs.DropPrivs(cfg); err != nil {
+		return err
+	}
 	if err := unix.Exec(nsjailPath, []string{nsjailPath, "-C", config.NsjailConfigPath}, os.Environ()); err != nil {
 		return fmt.Errorf("exec nsjail: %w", err)
 	}
