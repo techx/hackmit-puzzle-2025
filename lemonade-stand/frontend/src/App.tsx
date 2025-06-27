@@ -42,7 +42,7 @@ const App = () => {
   const [editValue, setEditValue] = useState<string | null>(null);
   const [savedRecipes, setSavedRecipes] = useState<Record<number, Recipe>>({});
 
-  const DEBUGGING = true; // don't got access to server LOL
+  const DEBUGGING = false; // don't got access to server LOL
 
   const connectWebSocket = useCallback(() => {
     setConnectionState("OPENING");
@@ -435,15 +435,17 @@ const App = () => {
             </div>
           </form>
         ) : (
-          <div className="mt-[-0.5rem] mb-8 flex justify-center">
-            <button
-              className="cursor-pointer rounded-lg bg-yellow-400 px-6 py-3 text-lg font-bold text-white shadow-lg transition-transform hover:scale-105 hover:bg-yellow-500 disabled:opacity-50"
-              onClick={() => setShowCreateForm(true)}
-              disabled={connectionState !== "OPEN" || stands.length >= 16}
-            >
-              Add Stand
-            </button>
-          </div>
+          connectionState == "OPEN" && (
+            <div className="mt-[-0.5rem] mb-8 flex justify-center">
+              <button
+                className="cursor-pointer rounded-lg bg-yellow-400 px-6 py-3 text-lg font-bold text-white shadow-lg transition-transform hover:scale-105 hover:bg-yellow-500 disabled:opacity-50"
+                onClick={() => setShowCreateForm(true)}
+                disabled={stands.length >= 16}
+              >
+                Add Stand
+              </button>
+            </div>
+          )
         )}
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
