@@ -1,5 +1,3 @@
-import NewGames from "./stanley/NewGames";
-import TrendingGames from "./stanley/HotGames";
 import StanLeaderboard from "./components/MiniLeaderboard";
 import Conditions from "./components/Conditions";
 import {
@@ -71,7 +69,7 @@ export default function App() {
     <>
       <div className="min-h-screen bg-primary text-white flex flex-col px-0 pt-0 pb-8">
         <nav className="flex bg-secondary justify-between items-center w-full mb-4 px-6 py-2">
-          <img className="h-10" src="/coolmathlogo.svg" alt="CoolMathGames" onClick={handleHome}/>
+          <img className="h-10" src="/coolhackgames.svg" alt="CoolHackGames" onClick={handleHome}/>
           {loggedIn ? (
             <Menu shadow="md" width={180} position="bottom-end">
               <Menu.Target>
