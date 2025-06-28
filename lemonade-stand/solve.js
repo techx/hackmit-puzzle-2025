@@ -1,5 +1,7 @@
 // ws = new WebSocket("ws://127.0.0.1:4300");
-ws = new WebSocket("ws://" + location.host + "/ws/");
+ws = new WebSocket(
+  (location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws/"
+);
 USER_ID = "bob";
 
 const onOpen = async () => {
