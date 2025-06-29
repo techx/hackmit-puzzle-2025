@@ -163,9 +163,9 @@ const PuzzleGame: React.FC = () => {
 
   useEffect(() => {
     if (flagStatus === "correct" && !hashedFlag) {
-      const userId = "ashley_eb5f1f25"; // fake valid ID
+      const userId = window.location.href.substring(window.location.href.lastIndexOf("/") + 1);
 
-      fetch("http://localhost:2000/get_triple_flag", {
+      fetch("/api/getFlag", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId }),
