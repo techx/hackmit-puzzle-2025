@@ -42,8 +42,6 @@ const App = () => {
   const [editValue, setEditValue] = useState<string | null>(null);
   const [savedRecipes, setSavedRecipes] = useState<Record<number, Recipe>>({});
 
-  const DEBUGGING = false; // don't got access to server LOL
-
   const connectWebSocket = useCallback(() => {
     setConnectionState("OPENING");
 
@@ -143,58 +141,19 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    if (DEBUGGING) {
-      setConnectionState("OPEN");
-      return;
-    }
     const cleanup = connectWebSocket();
     return cleanup;
   }, [connectWebSocket]);
 
-  // const send = (cmd: string) => {
-  //   if (connectionState === "OPEN") {
-  //     if (cmd.startsWith("simulate")) {
-  //       awaitingSimRef.current = true; // begin accumulation
-  //       simBufferRef.current = ""; // reset buffer
-  //     }
-  //     wsRef.current!.send(cmd + "\n");
-  //   }
-  // };
-  let send: (cmd: string) => void;
-  if (DEBUGGING) {
-    // intercept, delete later
-    send = (cmd: string) => {
-      console.log("[DEBUG] Intercepted:", cmd);
-
+  const send = (cmd: string) => {
+    if (connectionState === "OPEN") {
       if (cmd.startsWith("simulate")) {
-        const index = cmd.split(" ")[1];
-        const fakeOutput = [
-          `Simulating stand ${index}...`,
-          `Customers served: ${Math.floor(Math.random() * 50 + 20)}`,
-          `Revenue: $${(Math.random() * 100 + 20).toFixed(2)}`,
-          `Expenses: $${(Math.random() * 30 + 10).toFixed(2)}`,
-          `Profit: $${(Math.random() * 70 + 5).toFixed(2)}`,
-        ].join("\n");
-
-        setTimeout(() => {
-          setOutput(fakeOutput);
-          setShowModal(true);
-        }, 300);
-      } else {
-        setOutput((prev) => prev + `> ${cmd}\n`);
+        awaitingSimRef.current = true; // begin accumulation
+        simBufferRef.current = ""; // reset buffer
       }
-    };
-  } else {
-    send = (cmd: string) => {
-      if (connectionState === "OPEN") {
-        if (cmd.startsWith("simulate")) {
-          awaitingSimRef.current = true;
-          simBufferRef.current = "";
-        }
-        wsRef.current!.send(cmd + "\n");
-      }
-    };
-  }
+      wsRef.current!.send(cmd + "\n");
+    }
+  };
 
   const allocateIndex = () => {
     const used = new Set(stands.map((s) => s.index));
@@ -466,10 +425,10 @@ const App = () => {
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="lucide lucide-x-icon lucide-x"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-x-icon lucide-x"
                   >
                     <path d="M18 6 6 18" />
                     <path d="m6 6 12 12" />
@@ -537,8 +496,6 @@ const App = () => {
                           const icePct = (i / total) * 100;
                           const sugarPct = (s / total) * 100;
                           const lemonPct = (l / total) * 100;
-
-                          let currentBottom = 0;
 
                           return (
                             <>
@@ -677,7 +634,7 @@ const App = () => {
                         }`}
                         onClick={() => {
                           if (isDirty) {
-                            setRecipe(index, recipe, true);
+                            setRecipe(index, recipe);
                           } else {
                             simulate(index);
                           }
