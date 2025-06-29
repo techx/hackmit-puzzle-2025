@@ -57,6 +57,7 @@ const PuzzleGame: React.FC = () => {
   const [flagStatus, setFlagStatus] = useState<"correct" | "incorrect" | null>(
     null
   );
+  const [hashedFlag, setHashedFlag] = useState(null);
 
   useEffect(() => {
     fetch("/scene.json")
@@ -160,7 +161,23 @@ const PuzzleGame: React.FC = () => {
     return `/icons/${iconName}.${extMap[iconName] || "png"}`;
   };
 
-  
+  useEffect(() => {
+    if (flagStatus === "correct" && !hashedFlag) {
+      const userId = "ashley_eb5f1f25"; // fake valid ID
+
+      fetch("http://localhost:2000/get_triple_flag", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("Flag response:", data);
+          setHashedFlag(data.flag);
+        })
+        .catch((err) => console.error("Fetch error:", err));
+    }
+  }, [flagStatus, hashedFlag]);
 
   return (
     <>
@@ -189,7 +206,12 @@ const PuzzleGame: React.FC = () => {
         {tiles.length === 0 && (
           <div className={styles.popupOverlay}>
             <div className={styles.popup}>
-              <h1>You Win! The Flag is: {FLAG}</h1>
+              {hashedFlag && (
+                <div style={{ marginTop: "0.5em" }}>
+                  You Win!
+                  🔐 Your hashed flag: <code>{hashedFlag}</code>
+                </div>
+              )}
               <button
                 onClick={() => {
                   setTiles(initialTiles);
@@ -300,28 +322,7 @@ const PuzzleGame: React.FC = () => {
           ))}
         </div>
 
-        {/* Morse buildings */}
-        {/* <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "10px",
-            margin: "20px 0",
-          }}
-        >
-          {Array.from({ length: FLAG.length }).map((_, idx) => {
-            const letter = revealedLetters[idx];
-            const morse = letter ? morseMap[letter] : null;
-
-            return (
-              <MorseBuilding
-                key={idx}
-                morseCode={morse}
-                triggerKey={idx} // this ensures each building re-renders only when unlocked
-              />
-            );
-          })}
-        </div> */}
+       
       </div>
 
       {/* Rules overlay */}
@@ -369,19 +370,21 @@ const PuzzleGame: React.FC = () => {
           <span style={{ fontSize: "20px" }}>💾</span>
           Export Puzzle
         </button>
-        <button
-          onClick={() => setShowFlagInput(true)}
-          style={{
-            fontSize: "24px",
-            background: "none",
-            border: "none",
-            color: "white",
-            cursor: "pointer",
-          }}
-          title="Submit Flag"
-        >
-          🚩
-        </button>
+        {matchCount >= 35 && (
+          <button
+            onClick={() => setShowFlagInput(true)}
+            style={{
+              fontSize: "24px",
+              background: "none",
+              border: "none",
+              color: "white",
+              cursor: "pointer",
+            }}
+            title="Submit Flag"
+          >
+            🚩
+          </button>
+        )}
       </div>
 
       {showFlagInput && (
@@ -401,6 +404,11 @@ const PuzzleGame: React.FC = () => {
           }}
         >
           ✅ Correct flag!
+          {hashedFlag && (
+            <div style={{ marginTop: "0.5em" }}>
+              🔐 Your hashed flag: <code>{hashedFlag}</code>
+            </div>
+          )}
         </div>
       )}
       {flagStatus === "incorrect" && (
