@@ -48,9 +48,17 @@ def get_caption(user_id):
 def index():
     return render_template('index.html')
 
+@app.route('/u/<user_id>')
+def user_index(user_id):
+    return render_template('index.html')
+
 @app.route('/get_caption', methods=['GET'])
 def get_caption_endpoint():
-    user_id = request.args.get("userId", "default_user")
+    user_id = request.args.get("userId")
+
+    if not user_id or not verify_username(user_id):
+        return jsonify({"error": "invalid_user"}), 403
+
     caption = get_caption(user_id)
     return jsonify({'caption': caption})
 
