@@ -32,7 +32,7 @@ cd client
 npm install
 npm run dev
 ```
-. No need for docker for client.
+No need for docker for client.
 
 To stop, run 
 ```sh
