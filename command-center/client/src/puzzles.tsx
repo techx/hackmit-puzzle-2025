@@ -11,7 +11,7 @@ export type Puzzle = {
   color: string;
   url: string;
   description: string | React.ReactNode;
-  vishyURL?: boolean;
+  // vishyURL?: boolean;
   annieURL?: boolean;
 };
 
@@ -68,7 +68,7 @@ const unshuffledPuzzles: Puzzle[] = [
       </div>
     ),
     color: "#00A2B3",
-    url: "https://lemonadestand.hackmit.org",
+    url: "https://lemonade.hackmit.org",
     description: "Got any grapes?",
   },
   {
@@ -119,16 +119,15 @@ const unshuffledPuzzles: Puzzle[] = [
     color: "#B4A8FF",
     url: "https://romhack.hackmit.org",
     description: "Gotta catch them all!",
-    vishyURL: true,
   },
 ];
 
 export const puzzles = unshuffledPuzzles.sort(() => Math.random() - 0.5);
 
 export const getURLFromPuzzle = (puzzle: Puzzle, user_id: string) => {
-  if (puzzle.vishyURL) {
-    return `${puzzle.url}/?u=${user_id}`;
-  }
+  // if (puzzle.vishyURL) {
+  //   return `${puzzle.url}/?u=${user_id}`;
+  // }
   if (puzzle.annieURL) {
     return `${puzzle.url}/${user_id}`;
   }
