@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import "./App.css";
+import { CopyStyleButton } from "./CopyButton";
 
 type Recipe = { lemons?: number; sugar?: number; ice?: number; price?: number };
 type ValidationErrors = {
@@ -41,6 +42,8 @@ const App = () => {
   const simBufferRef = useRef<string>("");
   const awaitingSimRef = useRef(false);
   const [output, setOutput] = useState("");
+  const [editValue, setEditValue] = useState<string | null>(null);
+  const [savedRecipes, setSavedRecipes] = useState<Record<number, Recipe>>({});
 
   const connectWebSocket = useCallback(() => {
     setConnectionState("OPENING");
@@ -239,6 +242,7 @@ const App = () => {
 
     const encodedName = encodeURIComponent(name);
     send(`stand_create ${index} ${encodedName.length} ${encodedName}`);
+
     setStands((prev) => [...prev, { index, name: encodedName, recipe: {} }]);
     setCreateName("");
     setCreateNameError("");
@@ -275,7 +279,7 @@ const App = () => {
     if (
       !(isDefined(recipe.price) && recipe.price >= 0.1 && recipe.price <= 5.0)
     ) {
-      newErrors.price = "Price must be between $0.10 and $5.00";
+      newErrors.price = "Must be between $0.10 and $5.00";
     }
     return newErrors;
   };
@@ -286,9 +290,12 @@ const App = () => {
       setErrors((prev) => ({ ...prev, [index]: validationErrors }));
       return;
     }
+
     setErrors((prev) => ({ ...prev, [index]: {} }));
     const { lemons, sugar, ice, price } = recipe;
     send(`set_recipe ${index} ${lemons} ${sugar} ${ice} ${price!.toFixed(2)}`);
+    setSavedRecipes((prev) => ({ ...prev, [index]: recipe }));
+
     setStands((prev) =>
       prev.map((s) => (s.index === index ? { ...s, recipe } : s)),
     );
@@ -306,16 +313,21 @@ const App = () => {
     const newIndex = allocateIndex();
     if (newIndex === -1) return;
 
-    // Decode the source name, add " Copy", then encode the new name
-    const decodedSourceName = decodeURIComponent(sourceName);
-    const newName = `${decodedSourceName} Copy`;
-    const nameError = validateStandName(newName);
-    if (nameError) {
-      // Could show an error here, but for now just silently fail
-      return;
+    const decodedName = decodeURIComponent(sourceName);
+    const baseName = decodedName;
+
+    const existingNames = new Set(
+      stands.map((s) => decodeURIComponent(s.name)),
+    );
+    let suffix = 1;
+    let candidateName = `${baseName} (${suffix})`;
+
+    while (existingNames.has(candidateName)) {
+      suffix++;
+      candidateName = `${baseName} (${suffix})`;
     }
 
-    const encodedNewName = encodeURIComponent(newName);
+    const encodedNewName = encodeURIComponent(candidateName);
     send(`stand_create ${newIndex} ${encodedNewName.length} ${encodedNewName}`);
     send(`copy_recipe ${sourceIndex} ${newIndex}`);
 
@@ -325,219 +337,411 @@ const App = () => {
     ]);
   };
 
-  return (
-    <div className="space-y-6 p-6" aria-disabled={connectionState != "OPEN"}>
-      <h1 className="text-2xl font-bold">Lemonade Stand Simulator</h1>
-      {connectionState == "OPENING" && (
-        <p className="text-blue-500">Connecting to server...</p>
-      )}
-      {connectionState == "CLOSED" && (
-        <div className="text-red-500">
-          <p>Failed to connect to server</p>
-          <button
-            className="mt-2 rounded bg-blue-600 px-3 py-1 text-white"
-            onClick={connectWebSocket}
-          >
-            Retry Connection
-          </button>
-        </div>
-      )}
+  // if recipes are same
+  const isRecipeEqual = (a: Recipe | undefined, b: Recipe | undefined) => {
+    if (!a || !b) return false;
+    return (
+      a.lemons === b.lemons &&
+      a.sugar === b.sugar &&
+      a.ice === b.ice &&
+      a.price === b.price
+    );
+  };
 
-      {showCreateForm ? (
-        <form
-          className="flex items-center gap-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (createName) createStand(createName);
-          }}
-        >
-          <div className="flex flex-col">
+  return (
+    <div
+      className="flex min-h-screen flex-col bg-gradient-to-b from-yellow-100 via-sky-100 to-green-50"
+      aria-disabled={connectionState != "OPEN"}
+    >
+      <div className={showModal ? "dimmed" : ""} style={{ flexGrow: 1 }}>
+        <div className="relative mx-auto w-full max-w-2xl">
+          <img
+            src="/images/wooden-title.png"
+            alt="Title Background"
+            className="h-auto w-full object-contain"
+          />
+          <div
+            className="absolute inset-0 flex items-center justify-center"
+            style={{ marginTop: "-0.75rem" }}
+          >
+            <h1 className="title w-[100%] text-center text-[clamp(1.5rem,3.5vw,6rem)] leading-tight text-white drop-shadow-[0_3px_3px_rgba(0,0,0,0.7)]">
+              Lemonade Stand Simulator
+            </h1>
+          </div>
+        </div>
+
+        {connectionState == "OPENING" && (
+          <div className="mx-auto flex max-w-sm items-center justify-center gap-2 rounded-lg border-2 border-yellow-300 bg-yellow-50 p-3 text-center shadow">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-citrus-icon"
+            >
+              <path d="M21.66 17.67a1.08 1.08 0 0 1-.04 1.6A12 12 0 0 1 4.73 2.38a1.1 1.1 0 0 1 1.61-.04z" />
+              <path d="M19.65 15.66A8 8 0 0 1 8.35 4.34" />
+              <path d="m14 10-5.5 5.5" />
+              <path d="M14 17.85V10H6.15" />
+            </svg>
+            <p className="font-bold text-yellow-700">Connecting to server...</p>
+          </div>
+        )}
+
+        {connectionState == "CLOSED" && (
+          <div className="mx-auto max-w-sm rounded-lg border-2 border-red-300 bg-red-50 p-4 text-center shadow-lg">
+            <p className="mb-3 text-lg font-bold text-red-600">
+              Failed to connect to server
+            </p>
+            <button
+              className="cursor-pointer rounded-lg bg-red-500 px-4 py-2 font-bold text-white shadow transition-transform hover:scale-105 hover:bg-red-600"
+              onClick={connectWebSocket}
+            >
+              Retry Connection
+            </button>
+          </div>
+        )}
+
+        {showCreateForm ? (
+          <form
+            className="mx-auto mt-[-1rem] flex max-w-lg animate-[fadeIn_0.3s_ease-out] flex-col items-center gap-4 rounded-xl border-4 border-yellow-400 bg-yellow-50 p-6 shadow-2xl"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (createName) createStand(createName);
+            }}
+          >
             <input
               type="text"
-              placeholder="Stand name"
+              placeholder="Your stand's name"
               value={createName}
               onChange={(e) => {
                 setCreateName(e.target.value);
                 setCreateNameError("");
               }}
-              className="border p-2"
+              className="w-full rounded-lg border-2 border-yellow-300 bg-white p-4 text-xl shadow-inner focus:border-yellow-500 focus:ring-4 focus:ring-yellow-300"
             />
             {createNameError && (
-              <p className="mt-1 text-sm text-red-500">{createNameError}</p>
+              <p className="text-sm font-semibold text-red-500">
+                {createNameError}
+              </p>
             )}
-          </div>
-          <button
-            className="rounded bg-green-600 px-3 py-1 text-white"
-            type="submit"
-          >
-            Create
-          </button>
-          <button
-            className="text-gray-500"
-            type="button"
-            onClick={() => {
-              setShowCreateForm(false);
-              setCreateNameError("");
-            }}
-          >
-            Cancel
-          </button>
-        </form>
-      ) : (
-        <button
-          className="btn rounded bg-blue-600 p-2 text-white disabled:opacity-50"
-          onClick={() => setShowCreateForm(true)}
-          disabled={connectionState != "OPEN" || stands.length >= 16}
-        >
-          + Add Stand
-        </button>
-      )}
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {stands.map(({ index, name, recipe }) => (
-          <div key={index} className="rounded-xl border p-4 opacity-100 shadow">
-            {editing === index ? (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const newName = (
-                    (e.target as HTMLFormElement).elements.namedItem(
-                      `rename-${index}`,
-                    ) as HTMLInputElement
-                  ).value;
-                  renameStand(index, newName);
+            <div className="flex gap-3">
+              <button
+                className="cursor-pointer rounded-lg bg-yellow-400 px-6 py-3 text-lg font-bold text-white shadow-lg transition-transform hover:scale-105 hover:bg-yellow-500"
+                type="submit"
+              >
+                Create
+              </button>
+              <button
+                className="cursor-pointer rounded-lg border border-gray-300 bg-white px-6 py-3 text-lg text-gray-600 shadow hover:bg-gray-100"
+                type="button"
+                onClick={() => {
+                  setShowCreateForm(false);
+                  setCreateNameError("");
                 }}
               >
-                <input
-                  name={`rename-${index}`}
-                  type="text"
-                  defaultValue={decodeURIComponent(name)}
-                  className="input mt-2 block w-full border p-1"
-                />
-                {standErrors[index]?.name && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {standErrors[index].name}
-                  </p>
-                )}
-                <div className="mt-1 flex gap-2">
-                  <button
-                    type="submit"
-                    className="rounded bg-blue-500 px-2 py-1 text-white"
-                  >
-                    Save
-                  </button>
-                  <button
-                    type="button"
-                    className="text-gray-500"
-                    onClick={() => {
-                      setEditing(null);
-                      setStandErrors((prev) => ({ ...prev, [index]: {} }));
-                    }}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold">
-                  {decodeURIComponent(name)}
-                </h2>
+                Cancel
+              </button>
+            </div>
+          </form>
+        ) : (
+          connectionState == "OPEN" && (
+            <div className="mt-[-0.5rem] mb-8 flex justify-center">
+              <button
+                className="cursor-pointer rounded-lg bg-yellow-400 px-6 py-3 text-lg font-bold text-white shadow-lg transition-transform hover:scale-105 hover:bg-yellow-500 disabled:opacity-50"
+                onClick={() => setShowCreateForm(true)}
+                disabled={stands.length >= 16}
+              >
+                Add Stand
+              </button>
+            </div>
+          )
+        )}
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {stands.map(({ index, name, recipe }) => {
+            const savedRecipe = savedRecipes[index];
+            const isDirty = !isRecipeEqual(recipe, savedRecipe);
+            return (
+              <div className="relative p-4" key={index}>
                 <button
-                  onClick={() => setEditing(index)}
-                  className="text-blue-600"
+                  onClick={() => deleteStand(index)}
+                  className="absolute top-2 right-2 z-3 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border bg-white hover:bg-red-300"
+                  title="Delete Stand"
                 >
-                  ✏️
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-x-icon lucide-x"
+                  >
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                  </svg>
                 </button>
-              </div>
-            )}
-
-            <div className="mt-2">
-              <label className="block font-medium">Recipe:</label>
-              {(["lemons", "sugar", "ice", "price"] as const).map((key) => (
-                <div key={key} className="mb-1">
-                  <input
-                    type="number"
-                    placeholder={key}
-                    step={key === "price" ? "0.01" : "1"}
-                    className="input w-full border p-1"
-                    defaultValue={recipe[key]}
-                    onChange={(e) => {
-                      setStands((prev) =>
-                        prev.map((s) =>
-                          s.index === index
-                            ? {
-                                ...s,
-                                recipe: {
-                                  ...s.recipe,
-                                  [key]:
-                                    key === "price"
-                                      ? parseFloat(e.target.value)
-                                      : +e.target.value,
-                                },
-                              }
-                            : s,
-                        ),
-                      );
-                    }}
-                  />
-                  {errors[index]?.[key] && (
-                    <p className="text-sm text-red-500">{errors[index][key]}</p>
+                <div className="card border p-4 text-2xl opacity-100 shadow">
+                  {editing === index ? (
+                    <input
+                      autoFocus
+                      name={`rename-${index}`}
+                      type="text"
+                      value={editValue ?? decodeURIComponent(name)}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onBlur={() => {
+                        // Save on blur
+                        if (editValue !== null) renameStand(index, editValue);
+                        setEditing(null);
+                        setEditValue(null);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          if (editValue !== null) renameStand(index, editValue);
+                          setEditing(null);
+                          setEditValue(null);
+                        }
+                        if (e.key === "Escape") {
+                          setEditing(null);
+                          setEditValue(null);
+                          setStandErrors((prev) => ({ ...prev, [index]: {} }));
+                        }
+                      }}
+                      className="input mt-2 block w-full border p-1"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <h2
+                        className="w-full cursor-pointer rounded border border-transparent px-1 text-2xl font-bold transition hover:border-gray-400 hover:bg-gray-50"
+                        onClick={() => {
+                          setEditing(index);
+                          setEditValue(decodeURIComponent(name));
+                        }}
+                        title="rename title"
+                      >
+                        {decodeURIComponent(name)}
+                      </h2>
+                    </div>
                   )}
-                </div>
-              ))}
-              <button
-                className="btn rounded bg-blue-500 p-1 px-3 text-white"
-                onClick={() => setRecipe(index, recipe)}
-              >
-                Save
-              </button>
-            </div>
-            <div className="mt-2 flex gap-2">
-              <button
-                className="btn rounded bg-green-500 p-1 px-3 text-white"
-                onClick={() => simulate(index)}
-              >
-                Simulate
-              </button>
-              <button
-                className="btn rounded bg-blue-400 p-1 px-3 text-white"
-                onClick={() => duplicateStand(index, name, recipe)}
-                disabled={
-                  stands.length >= 16 ||
-                  validateStandName(decodeURIComponent(name) + " Copy") != null
-                }
-                title="Duplicate stand"
-              >
-                📋
-              </button>
-              <button
-                className="btn rounded bg-red-500 p-1 px-3 text-white"
-                onClick={() => deleteStand(index)}
-              >
-                🗑️
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
 
+                  <div className="mt-2">
+                    <label className="mb-1 block text-center text-lg font-semibold underline">
+                      Recipe
+                    </label>
+                    <div className="flex w-full gap-6">
+                      <div className="border-grey-300 relative h-48 w-[40%] min-w-[120px] shrink-0 overflow-hidden border-r-2 border-b-2 border-l-2 bg-white shadow-inner">
+                        {(() => {
+                          const l = recipe.lemons ?? 0;
+                          const s = recipe.sugar ?? 0;
+                          const i = recipe.ice ?? 0;
+                          const total = l + s + i || 1;
+
+                          const icePct = (i / total) * 100;
+                          const sugarPct = (s / total) * 100;
+                          const lemonPct = (l / total) * 100;
+
+                          return (
+                            <>
+                              {l + s + i === 0 ? (
+                                <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-xs text-gray-400">
+                                  empty
+                                </div>
+                              ) : (
+                                (() => {
+                                  let currentBottom = 0;
+
+                                  const layers = [
+                                    {
+                                      height: sugarPct,
+                                      color: "#ffffff", // sugar
+                                    },
+                                    {
+                                      height: lemonPct,
+                                      color: "#ffe066", // lemon
+                                    },
+                                    {
+                                      height: icePct,
+                                      color: "#d0f0ff", // ice
+                                    },
+                                  ];
+
+                                  return layers.map(({ height, color }, i) => {
+                                    const style = {
+                                      bottom: `${currentBottom}%`,
+                                      height: `${height}%`,
+                                      backgroundColor: color,
+                                    };
+                                    currentBottom += height;
+
+                                    return (
+                                      <div
+                                        key={i}
+                                        className="absolute left-0 w-full transition-all duration-300"
+                                        style={style}
+                                      />
+                                    );
+                                  });
+                                })()
+                              )}
+                            </>
+                          );
+                        })()}
+                      </div>
+
+                      <div className="flex w-full flex-col gap-3 text-sm">
+                        {(["ice", "lemons", "sugar", "price"] as const).map(
+                          (key) => {
+                            const isPrice = key === "price";
+                            const error = errors[index]?.[key];
+                            const labelMap: Record<string, string> = {
+                              lemons: "Lemons",
+                              sugar: "Sugar",
+                              ice: "Ice",
+                              price: "Price ($)",
+                            };
+
+                            return (
+                              <div key={key}>
+                                <div className="flex items-center gap-3">
+                                  <label
+                                    htmlFor={`${key}-${index}`}
+                                    className="w-24 font-medium text-black"
+                                  >
+                                    {labelMap[key]}
+                                  </label>
+                                  <input
+                                    id={`${key}-${index}`}
+                                    type="number"
+                                    step={isPrice ? "0.01" : "1"}
+                                    placeholder={key}
+                                    value={recipe[key] ?? ""}
+                                    className={`w-full max-w-[100px] rounded border p-2 ${error ? "border-red-500 text-red-600" : "border-gray-200"}`}
+                                    onChange={(e) => {
+                                      const raw = e.target.value;
+                                      setStands((prev) =>
+                                        prev.map((s) =>
+                                          s.index === index
+                                            ? {
+                                                ...s,
+                                                recipe: {
+                                                  ...s.recipe,
+                                                  [key]:
+                                                    raw === ""
+                                                      ? undefined
+                                                      : isPrice
+                                                        ? parseFloat(raw)
+                                                        : parseInt(raw),
+                                                },
+                                              }
+                                            : s,
+                                        ),
+                                      );
+                                    }}
+                                    onBlur={(e) => {
+                                      const raw = e.target.value;
+                                      if (raw === "") {
+                                        setStands((prev) =>
+                                          prev.map((s) =>
+                                            s.index === index
+                                              ? {
+                                                  ...s,
+                                                  recipe: {
+                                                    ...s.recipe,
+                                                    [key]: 0,
+                                                  },
+                                                }
+                                              : s,
+                                          ),
+                                        );
+                                      }
+                                    }}
+                                  />
+                                </div>
+                                <div className="pl-19 text-xs text-red-500">
+                                  {isPrice && error}
+                                </div>
+                              </div>
+                            );
+                          },
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex flex-col gap-3">
+                    <div className="flex justify-center">
+                      <button
+                        className={`cursor-pointer rounded px-4 py-2 text-white transition ${
+                          isDirty
+                            ? "bg-red-500 hover:bg-red-600"
+                            : "bg-green-600 hover:bg-green-700"
+                        }`}
+                        onClick={() => {
+                          if (isDirty) {
+                            setRecipe(index, recipe);
+                          } else {
+                            simulate(index);
+                          }
+                        }}
+                      >
+                        {isDirty ? "Save" : "Simulate"}
+                      </button>
+                    </div>
+
+                    <div className="flex justify-end">
+                      <CopyStyleButton
+                        onClick={() => duplicateStand(index, name, recipe)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
       {showModal && (
-        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">
-          <div className="w-full max-w-xl rounded-lg bg-white p-6 shadow-xl">
-            <h2 className="mb-2 text-lg font-bold">Simulation Output</h2>
-            <pre className="mb-4 max-h-96 overflow-y-auto text-sm whitespace-pre-wrap">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ flexGrow: 1 }}
+        >
+          <div className="relative z-10 flex h-[50%] w-[30%] max-w-2xl flex-col rounded-lg border-4 border-yellow-400 bg-yellow-50 p-6 shadow-2xl">
+            <h2 className="mb-2 text-center text-2xl font-bold text-yellow-700">
+              Simulation Results
+            </h2>
+            <pre className="flex-1 overflow-y-auto rounded bg-white p-4 whitespace-pre-wrap shadow-inner">
               {output}
             </pre>
-            <button
-              className="btn rounded bg-gray-800 px-4 py-2 text-white"
-              onClick={() => setShowModal(false)}
-            >
-              Close
-            </button>
+            <div className="mt-4 flex justify-center">
+              <button
+                className="cursor-pointer rounded-lg bg-yellow-400 px-6 py-3 font-bold text-white shadow transition-transform hover:scale-105 hover:bg-yellow-500"
+                onClick={() => setShowModal(false)}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
+      <div className={showModal ? "dimmed" : ""}>
+        <div className="relative w-full">
+          <img
+            src="/images/grass.png"
+            alt="Grass"
+            className="w-full object-cover"
+            style={{ display: "block" }}
+          />
+        </div>
+      </div>
     </div>
   );
 };
