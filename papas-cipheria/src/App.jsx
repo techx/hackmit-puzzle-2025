@@ -8,101 +8,108 @@ import { LockedFreezer } from './LockedFreezer'
 const CUSTOMERS = [
   { 
     id: 1,
-    name: 'Shrey',
-    cipherText: "woljueqjbljbbfkcfpch",
+    cipherText: "kopdieudplnvpkgzhpgb",
     answer: "stationary",
     difficulty: 3,
-    hint: ""
+    hint: "Have fun 'hack'-ing this one!",
+    len: "10",
+    pic: ""
   },
   { 
     id: 2,
-    name: 'Puzzles',
-    cipherText: "ktqeygyiztkzlkql",
+    cipherText: "vkdetwzvntkgndvg",
     answer: "star",
     difficulty: 2,
-    hint: ""
+    len: 4,
+    hint: "Let them eat cake! - Marie, Hack 2024",
+    pic: ""
   },
   { 
     id: 3,
-    name: 'Master',
     cipherText: "pgjjgywgadbdaqhgdbn",
     answer: "north",
     difficulty: 4,
-    hint: ""
+    len: 5,
+    hint: "This might give you some direction!",
+    pic: "/affine.png"
   },
+  // {
+  //   id: 4,
+  //   name: 'The',
+  //   cipherText: "{[]}n|_'/^|=o°|_\\'o|_|here∂?|e|/-/£!2†lm30/\\/t}{iŝ",
+  //   answer: "unsolvable",
+  //   difficulty: 0,
+  //   hint: "This one's just for fun! Maybe try another customer..."
+  // },
+  // {
+  //   id: 4,
+  //   cipherText: "baaba baaaa aaaaa ababa aaaaa ababa aabaa baaaa abbab baaba baaaa aaaaa ababa aaaaa ababa aaaaa abaaa baaab aaaab aabaa baaba baaba aabaa baaaa baaba aabbb",
+  //   answer: "tralalero tralala is better than tung tung tung tung tung tung tung tung sahur",
+  //   difficulty: 0,
+  //   len: 16,
+  //   hint: "A little brainrotted."
+  // },
   {
     id: 4,
-    name: 'Bob',
-    cipherText: "{[]}n|_'/^|=o°|_\\'o|_|here∂?|e|/-/£!2†lm30/\\/t}{iŝ",
-    answer: "unsolvable",
+    cipherText: "bwibgtzludigop",
+    answer: "trolls",
     difficulty: 0,
-    hint: "This one's just for fun! Maybe try another customer..."
+    len: 6,
+    hint: "MIT movie night?"
   },
   {
     id: 5,
-    name: 'Wise',
-    cipherText: "baaba baaaa aaaaa ababa aaaaa ababa aabaa baaaa abbab baaba baaaa aaaaa ababa aaaaa ababa aaaaa abaaa baaab aaaab aabaa baaba baaba aabaa baaaa baaba aabbb",
-    answer: "unsolvable",
-    difficulty: 0,
-    hint: "A very long Baconian message... maybe try another customer?"
-  },
-  {
-    id: 6,
-    name: 'Final Challenge',
+    name: 'Final',
     cipherText: "Find the key word to unlock the freezer",
     answer: "polaris",
     difficulty: 5,
+    len: 7,
     hint: "Think about your previous ciphers...."
   }
 ]
 
 const PHASE_TWO_CUSTOMERS = [
   {
-    id: 7,
-    name: 'Rick',
+    id: 6,
     cipherText: "zqhqdsazzmsuhqkaggb",
-    answer: "nevergonnagiveyouup",
+    answer: "rickroll",
     difficulty: 0,
-    hint: "Caesar shifted 12"
+    len: 8,
+    hint: "Gaius Suetonius Tranquillus"
+  },
+  {
+    id: 7,
+    cipherText: "buklyaolzlh",
+    answer: "sea",
+    difficulty: 4,
+    len: 3,
+    hint: "",
+    pic: "/caesar.jpg"
   },
   {
     id: 8,
-    name: 'Branch',
-    cipherText: "bwibgtzludigop",
-    answer: "poppyandbranch",
-    difficulty: 0,
-    hint: "MIT"
-  },
-  {
-    id: 9,
-    name: 'Troll',
-    cipherText: "I want 3 orders of 173 fries and 179 mcnuggets. I don't care that you're an ice cream shop.",
-    answer: "underthesea",
-    difficulty: 4,
-    hint: "[9261,2744,64,125,5832,8000,512,125,6859,125,1]"
-  },
-  {
-    id: 10,
-    name: 'Joker',
     cipherText: "YptrYmWmVwFGV",
     answer: "hack",
     difficulty: 2,
-    hint: "The key lies in this years theme"
+    len: 4,
+    hint: "Check out our theme at hackmit.org!",
+    pic: "/lock.png"
   },
   {
-    id: 11,
-    name: 'dk',
-    cipherText: "QFDZLKHZQPMXZULBKH",
+    id: 9,
+    cipherText: "LRZPIHREJAHNEIHQZ",
     answer: "archive",
     difficulty: 3,
-    hint: "Of the internet"
+    len: 7,
+    hint: "Of the internet - Queen Elizabeth"
   },
   {
-    id: 12,
+    id: 10,
     name: 'Final',
     cipherText: "Use the ciphers from this phase to find the key word to unlock the freezer",
     answer: "2022",
     difficulty: 5,
+    len: 4,
     hint: "HackMIT :)"
   }
 ]
@@ -127,10 +134,9 @@ class ErrorBoundary extends React.Component {
     return this.props.children
   }
 }
-
 function Customer({ position, customerData, isLeaving }) {
   const groupRef = useRef()
-  
+
   useFrame((state, delta) => {
     if (groupRef.current) {
       groupRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 2) * 0.1
@@ -150,10 +156,9 @@ function Customer({ position, customerData, isLeaving }) {
           metalness={0.3}
         />
       </mesh>
-      
+
       {/* Head */}
       <group position={[0, 1.2, 0]}>
-        {/* Base head */}
         <mesh castShadow>
           <sphereGeometry args={[0.4, 32, 32]} />
           <meshStandardMaterial 
@@ -162,7 +167,7 @@ function Customer({ position, customerData, isLeaving }) {
             metalness={0.1}
           />
         </mesh>
-        
+
         {/* Eyes */}
         <group position={[0, 0, 0.3]}>
           <mesh position={[-0.15, 0, 0]}>
@@ -208,9 +213,12 @@ function Customer({ position, customerData, isLeaving }) {
             color="white"
             font="/Inter-Bold.woff"
             anchorY="middle"
+            userSelect="text"
+            style={{ pointerEvents: 'auto' }}
           >
             {customerData.cipherText}
           </Text>
+
           {isSolvable && customerData.hint && (
             <Text
               position={[0, -0.3, 0.06]}
@@ -220,8 +228,12 @@ function Customer({ position, customerData, isLeaving }) {
               color="#ffd700"
               font="/Inter-Medium.woff"
               anchorY="middle"
+              userSelect="text"
+              style={{ pointerEvents: 'auto' }}
             >
-              Hint: {customerData.hint}
+              Hint: {customerData.hint} 
+              {'\n\n'}  
+              {'_ '.repeat(customerData.len)}
             </Text>
           )}
         </group>
@@ -520,6 +532,7 @@ export default function App() {
   const [showSecondFreezer, setShowSecondFreezer] = useState(false)
   const [isSecondFreezerLocked, setIsSecondFreezerLocked] = useState(true)
   const [showWelcome, setShowWelcome] = useState(true)
+  const [showImagePopup, setShowImagePopup] = useState(false)
 
   // Update word display when final word changes
   useEffect(() => {
@@ -566,9 +579,9 @@ export default function App() {
           currentCustomers = PHASE_TWO_CUSTOMERS.slice(0, 5);
         }
         
-        const availableCustomers = currentCustomers.filter(
-          customer => !solvedCustomers.has(customer.id) && !skippedCustomers.includes(customer.id)
-        )
+        const availableCustomers = currentCustomers
+          .filter(c => !solvedCustomers.has(c.id) && !skippedCustomers.includes(c.id))
+          .sort((a, b) => a.id - b.id)
         
         let nextCustomer;
         if (availableCustomers.length > 0) {
@@ -593,6 +606,7 @@ export default function App() {
         
         setCurrentCustomer(nextCustomer);
         setGameState('entering')
+        setCustomerPosition([0, -0.5, -8])
         
         let pos = -8
         const enterInterval = setInterval(() => {
@@ -625,7 +639,7 @@ export default function App() {
         setUserInput('')
         setIsLeaving(false)
         setGameState('waiting')
-        setCustomerPosition([0, -0.5, -3])
+        setCustomerPosition([0, -0.5, -8])
         setTimeout(() => setFeedback(''), 2000)
       } else {
         pos -= 0.2
@@ -708,7 +722,8 @@ export default function App() {
     if (userInput.toLowerCase() === currentCustomer.answer) {
       const points = currentCustomer.difficulty * 100
       setScore(prevScore => prevScore + points)
-      setFeedback(`Correct! +${points} points`)
+      // flag style
+      setFeedback(`Correct! +${points} dollars`)
       setSolvedCustomers(prev => new Set([...prev, currentCustomer.id]))
       
       // Check for Rick Roll
@@ -777,8 +792,46 @@ export default function App() {
       
       <div className="game-ui">
         <h1>Papa's Cipheria</h1>
-        <div className="score">Score: {score}</div>
+        <div className="score">Money: {score}</div>
         <div className="phase-indicator">Phase: {currentPhase}</div>
+        {currentCustomer && (
+          <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+            {gameState === 'serving' && (
+              <button 
+                className="copy-btn"
+                onClick={() => {
+                  navigator.clipboard.writeText(currentCustomer.cipherText);
+                }}
+              >
+                Copy Text
+              </button>
+            )}
+            {currentCustomer.pic && (
+              <>
+                <button 
+                  className="copy-btn"
+                  onClick={() => setShowImagePopup(true)}
+                >
+                  Show Image
+                </button>
+
+                {showImagePopup && (
+                  <div className="popup-overlay" onClick={() => setShowImagePopup(false)}>
+                    <div className="popup-content" onClick={(e) => e.stopPropagation()}>
+                      <img
+                        src={currentCustomer.pic}
+                        alt="Puzzle hint"
+                        style={{ maxWidth: '60vw', maxHeight: '60vh' }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+
+
       </div>
       {feedback && <div className="feedback">{feedback}</div>}
       

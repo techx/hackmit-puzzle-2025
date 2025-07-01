@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chess</title>
+    <link rel="icon" href="/assets/puzzle_board.png" type="image/png" />
     <style>
       body {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
@@ -83,10 +84,10 @@
     <div class="chess-board">
       <img
         src="/assets/puzzle_board.png"
-        alt="Chess Puzzle Board"
+        alt="Chessboard"
         style="width: 400px;"
       />
-      <div class="chess-caption">How did we get here? — a8=0</div>
+      <div class="chess-caption">How did we get here?</div>
     </div>
 
     <div class="ciphertext-section">
@@ -97,28 +98,31 @@
     <script>
       async function getCiphertext() {
         const ciphertextDiv = document.getElementById("ciphertext");
+
+        const m = window.location.pathname.match(/\/u\/([^/]+)/);
+        const userId = m ? m[1] : null;
         
         // Set loading state
         ciphertextDiv.className = "loading";
         ciphertextDiv.textContent = "Loading ciphertext...";
 
         try {
-          const response = await fetch("/get_caption?userId=default_user");
-          
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+          const url = `/get_caption?userId=${encodeURIComponent(userId ?? "")}`;
+          const res = await fetch(url);
+          const data = await res.json();
+
+          if (!res.ok || data.error) {
+            throw new Error("not_logged_in");
           }
-          
-          const data = await response.json();
-          
-          // Display the ciphertext with proper formatting
+
           ciphertextDiv.className = "";
           ciphertextDiv.textContent = data.caption;
-          
-        } catch (error) {
-          console.error("Error fetching ciphertext:", error);
-          ciphertextDiv.className = "error";
-          ciphertextDiv.textContent = `Error loading ciphertext: ${error.message}`;
+        } catch (err) {
+          ciphertextDiv.className = "";
+          ciphertextDiv.textContent =
+            err.message === "not_logged_in"
+              ? "Please log in first."
+              : `Error loading ciphertext: ${err}`;
         }
       }
 

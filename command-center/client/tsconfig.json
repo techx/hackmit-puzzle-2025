@@ -17,6 +17,6 @@
     "types": ["vite-plugin-svgr/client"],
     "plugins": [{ "name": "typescript-plugin-css-modules" }]
   },
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["**/*.ts", "**/*.tsx", "src/components/CoolGameCard"],
   "exclude": ["node_modules"]
 }

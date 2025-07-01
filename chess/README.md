@@ -36,6 +36,10 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+3. Environment
+
+Put `CHESS_PUZZLE_SECRET` and `SECRET_KEY` in `.env` in `chess/`
+
 ### Running the Application
 
 1. Make sure your virtual environment is activated:
@@ -55,7 +59,7 @@ python app.py
 3. Open your browser and navigate to:
 
 ```
-http://localhost:5000
+http://localhost:5003
 ```
 
 The caption will load automatically when the page opens.

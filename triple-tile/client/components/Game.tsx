@@ -57,6 +57,7 @@ const PuzzleGame: React.FC = () => {
   const [flagStatus, setFlagStatus] = useState<"correct" | "incorrect" | null>(
     null
   );
+  const [hashedFlag, setHashedFlag] = useState(null);
 
   useEffect(() => {
     fetch("/scene.json")
@@ -160,10 +161,29 @@ const PuzzleGame: React.FC = () => {
     return `/icons/${iconName}.${extMap[iconName] || "png"}`;
   };
 
-  
+  useEffect(() => {
+    if (flagStatus === "correct" && !hashedFlag) {
+      const userId = window.location.href.substring(window.location.href.lastIndexOf("/") + 1);
+
+      fetch("/api/getFlag", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("Flag response:", data);
+          setHashedFlag(data.flag);
+        })
+        .catch((err) => console.error("Fetch error:", err));
+    }
+  }, [flagStatus, hashedFlag]);
 
   return (
     <>
+      <div className={styles.starsWrapper}>
+        <img src="/buildings/stars.svg" className={styles.starsImg} alt="Stars" />
+      </div>
       <div className={styles.gameContainer}>
         {gameOver && (
           <div className={styles.popupOverlay}>
@@ -186,7 +206,12 @@ const PuzzleGame: React.FC = () => {
         {tiles.length === 0 && (
           <div className={styles.popupOverlay}>
             <div className={styles.popup}>
-              <h1>You Win! The Flag is: {FLAG}\</h1>
+              {hashedFlag && (
+                <div style={{ marginTop: "0.5em" }}>
+                  You Win!
+                  🔐 Your hashed flag: <code>{hashedFlag}</code>
+                </div>
+              )}
               <button
                 onClick={() => {
                   setTiles(initialTiles);
@@ -202,18 +227,19 @@ const PuzzleGame: React.FC = () => {
           </div>
         )}
 
+        
         <div className={styles.cityBackground}>
           <div className={styles.flickerWrapper}>
             {/* Base layer: always visible unlit buildings */}
             <img
-              src="/buildings/buildings_unlit.svg"
+              src="/buildings/final_buildings_unlit.svg"
               className={styles.staticImg}
               alt="Unlit city backdrop"
             />
 
             {/* Animated layer: lit windows flicker in and out */}
             <img
-              src="/buildings/buildings_lit.svg"
+              src="/buildings/final_buildings_lit.svg"
               className={styles.flickerImg}
               alt="Lit city flicker"
             />
@@ -221,16 +247,16 @@ const PuzzleGame: React.FC = () => {
           {revealedLetters.map((letter, idx) => {
             const morse = morseMap[letter];
             const positions = [
-              { top: "14.3%", left: "25.7%" },   // 1st building (F)
-              { top: "10.13%", left: "92.45%" },  // 2nd building (O)
-              { top: "19.6%", left: "44.1%" },  // 3rd building (R)
-              { top: "10.87%", left: "52.05%" },  // 4th building (E)
-              { top: "16.51%", left: "69.4%" },  // 5th building (S)
-              { top: "14.19%", left: "7.0%" },  // 6th building (T)
-              { top: "11.6%", left: "63.2%" },  // 7th building (T)
-              { top: "17.76%", left: "13.72%" },  // 8th building (M)
-              { top: "11.4%", left: "37.31%" },  // 9th building (P)
-              { top: "9.35%", left: "81.1%" },  // 10th building (L)
+              { top: "20.87%", left: "25.7%" },   // 1st building (F)
+              { top: "14.73%", left: "92.45%" },  // 2nd building (O)
+              { top: "28.6%", left: "44.1%" },  // 3rd building (R)
+              { top: "15.8%", left: "52.05%" },  // 4th building (E)
+              { top: "24.05%", left: "69.4%" },  // 5th building (S)
+              { top: "20.69%", left: "7.0%" },  // 6th building (T)
+              { top: "16.9%", left: "63.2%" },  // 7th building (T)
+              { top: "25.9%", left: "13.72%" },  // 8th building (M)
+              { top: "16.64%", left: "37.31%" },  // 9th building (P)
+              { top: "13.675%", left: "81.1%" },  // 10th building (L)
             ];
             const pos = positions[idx] || { top: "42%", left: "0%" };
 
@@ -296,28 +322,7 @@ const PuzzleGame: React.FC = () => {
           ))}
         </div>
 
-        {/* Morse buildings */}
-        {/* <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "10px",
-            margin: "20px 0",
-          }}
-        >
-          {Array.from({ length: FLAG.length }).map((_, idx) => {
-            const letter = revealedLetters[idx];
-            const morse = letter ? morseMap[letter] : null;
-
-            return (
-              <MorseBuilding
-                key={idx}
-                morseCode={morse}
-                triggerKey={idx} // this ensures each building re-renders only when unlocked
-              />
-            );
-          })}
-        </div> */}
+       
       </div>
 
       {/* Rules overlay */}
@@ -365,19 +370,21 @@ const PuzzleGame: React.FC = () => {
           <span style={{ fontSize: "20px" }}>💾</span>
           Export Puzzle
         </button>
-        <button
-          onClick={() => setShowFlagInput(true)}
-          style={{
-            fontSize: "24px",
-            background: "none",
-            border: "none",
-            color: "white",
-            cursor: "pointer",
-          }}
-          title="Submit Flag"
-        >
-          🚩
-        </button>
+        {matchCount >= 35 && (
+          <button
+            onClick={() => setShowFlagInput(true)}
+            style={{
+              fontSize: "24px",
+              background: "none",
+              border: "none",
+              color: "white",
+              cursor: "pointer",
+            }}
+            title="Submit Flag"
+          >
+            🚩
+          </button>
+        )}
       </div>
 
       {showFlagInput && (
@@ -397,6 +404,11 @@ const PuzzleGame: React.FC = () => {
           }}
         >
           ✅ Correct flag!
+          {hashedFlag && (
+            <div style={{ marginTop: "0.5em" }}>
+              🔐 Your hashed flag: <code>{hashedFlag}</code>
+            </div>
+          )}
         </div>
       )}
       {flagStatus === "incorrect" && (

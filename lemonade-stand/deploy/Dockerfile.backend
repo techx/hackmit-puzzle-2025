@@ -4,7 +4,9 @@ FROM pwn.red/jail
 COPY --from=ubuntu:20.04@sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214 / /srv
 
 RUN mkdir /srv/app
-COPY ./lemonade_stand /srv/app/run
-COPY flag /srv/app/flag
+COPY ./lemonade_stand /srv/app/lemonade_stand
+COPY ./backend-entrypoint.sh /srv/app/run
+RUN chmod +x /srv/app/run
 
 ENV JAIL_TIME=120
+ENV JAIL_TMP_SIZE=2048

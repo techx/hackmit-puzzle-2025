@@ -10,7 +10,7 @@ from sqlalchemy import select
 
 from server import db
 from server.config import (
-    EVAN_ADAM_PUZZLE_NAME,
+    # EVAN_ADAM_PUZZLE_NAME,
     PUZZLE_CORRECT_MESSAGES,
     PUZZLE_FAILURE_MESSAGES,
     PUZZLE_TABLE_METADATA,
@@ -22,6 +22,7 @@ from server.utils import (
     compute_puzzle_value,
     get_puzzle_answer_from_submission_evan_adam,
     get_puzzle_values,
+    get_user_solved_puzzles,
     get_username_from_user_id,
     send_discord_embed,
     sus_detector,
@@ -198,19 +199,19 @@ def leaderboard():
         }
         for puzzle_user in puzzle_users_by_user_id[user_id]:
             if puzzle_user.is_solved:
-                if puzzle_user.puzzle_name == EVAN_ADAM_PUZZLE_NAME:
-                    puzzle_score = compute_puzzle_value(
-                        -1,
-                        EVAN_ADAM_PUZZLE_NAME,
-                        puzzle_user.evan_adam_score,
-                        [
-                            cast(int, pu.evan_adam_score)
-                            for pu in puzzle_users
-                            if pu.puzzle_name == EVAN_ADAM_PUZZLE_NAME and pu.is_solved
-                        ],
-                    )
-                else:
-                    puzzle_score = puzzle_values[puzzle_user.puzzle_name]
+                # if puzzle_user.puzzle_name == EVAN_ADAM_PUZZLE_NAME:
+                #     puzzle_score = compute_puzzle_value(
+                #         -1,
+                #         EVAN_ADAM_PUZZLE_NAME,
+                #         puzzle_user.evan_adam_score,
+                #         [
+                #             cast(int, pu.evan_adam_score)
+                #             for pu in puzzle_users
+                #             if pu.puzzle_name == EVAN_ADAM_PUZZLE_NAME and pu.is_solved
+                #         ],
+                #     )
+                # else:
+                puzzle_score = puzzle_values[puzzle_user.puzzle_name]
 
                 scores[puzzle_user.puzzle_name] = {
                     **scores[puzzle_user.puzzle_name],
@@ -288,6 +289,24 @@ def leaderboard():
             "personal_user_score": personal_user_score,
         }
     )
+
+@puzzle.get("/solved")
+def get_puzzles_solved():
+    """Get puzzles solved from a user"""
+    if not session.get("user"):
+        return jsonify({"success": False, "message": "User not logged in"}), 401
+    print("ses", session["user"]["login"])
+    puzzle_users = (
+        db.session.execute(
+            select(PuzzleUser).where(PuzzleUser.user_id == session["user"]["login"])
+        )
+        .scalars()
+        .all()
+    )
+    puzzles = get_user_solved_puzzles(puzzle_users)
+    if not puzzles:
+        return jsonify({"success": False, "message": "No puzzles completed"}), 404
+    return jsonify({"success": True, "solved_puzzles": puzzles})
 
 
 @puzzle.get("/email")

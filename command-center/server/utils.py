@@ -9,7 +9,6 @@ from sqlalchemy import select
 
 from server.config import (
     DISCORD_WEBHOOK,
-    EVAN_ADAM_PUZZLE_NAME,
     IS_VERCEL,
     PUZZLE_SECRETS,
     SECRET_KEY,
@@ -97,11 +96,11 @@ def compute_puzzle_value(
     """Compute the dynamic puzzle score given the number of solves."""
     if solves == 0:
         return 2750
-    if puzzle_name == EVAN_ADAM_PUZZLE_NAME:
-        if user_score is None or all_scores is None:
-            return 2750
-        n = sum(1 for score in all_scores if score >= user_score) - 1
-        return int(2250 ** (1 - n / 200)) + 500
+    # if puzzle_name == EVAN_ADAM_PUZZLE_NAME:
+    #     if user_score is None or all_scores is None:
+    #         return 2750
+    #     n = sum(1 for score in all_scores if score >= user_score) - 1
+    #     return int(2250 ** (1 - n / 200)) + 500
     return 1750 + 250 * max(4 - math.floor(2 * math.log(solves)), -5)
 
 
@@ -114,8 +113,8 @@ def get_puzzle_values(puzzle_users: List[PuzzleUser]) -> Dict[str, int]:
     for puzzle_user in puzzle_users:
         if puzzle_user.is_solved:
             solves[puzzle_user.puzzle_name] += 1
-            if puzzle_user.puzzle_name == EVAN_ADAM_PUZZLE_NAME:
-                scores[puzzle_user.puzzle_name].append(puzzle_user.evan_adam_score)
+            # if puzzle_user.puzzle_name == EVAN_ADAM_PUZZLE_NAME:
+            #     scores[puzzle_user.puzzle_name].append(puzzle_user.evan_adam_score)
 
     return {
         puzzle_name: compute_puzzle_value(
@@ -127,12 +126,17 @@ def get_puzzle_values(puzzle_users: List[PuzzleUser]) -> Dict[str, int]:
         for puzzle_name in puzzle_names
     }
 
+def get_user_solved_puzzles(puzzle_users: List[PuzzleUser]) -> []:
+    puzzles = []
+    for puzzle_user in puzzle_users:
+        puzzles.append(puzzle_user.puzzle_name)
+    return puzzles
 
 def validate_user_submission(user_id: str, puzzle_name: str, submission: str) -> bool:
     """Validate a user submission."""
-    if puzzle_name == EVAN_ADAM_PUZZLE_NAME:
-        is_valid, _ = get_puzzle_answer_from_submission_evan_adam(
-            submission, user_id, puzzle_name
-        )
-        return is_valid
+    # if puzzle_name == EVAN_ADAM_PUZZLE_NAME:
+    #     is_valid, _ = get_puzzle_answer_from_submission_evan_adam(
+    #         submission, user_id, puzzle_name
+    #     )
+    #     return is_valid
     return submission == get_puzzle_answer(user_id, puzzle_name)

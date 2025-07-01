@@ -11,7 +11,7 @@ export type Puzzle = {
   color: string;
   url: string;
   description: string | React.ReactNode;
-  vishyURL?: boolean;
+  // vishyURL?: boolean;
   annieURL?: boolean;
 };
 
@@ -27,108 +27,107 @@ const unshuffledPuzzles: Puzzle[] = [
     name: "Papas Cipheria",
     icon: (
       <div style={{ width: "28px", height: "28px" }}>
-        <Image src="/twister.svg" alt="Papas Cipheria" />
+        <Image src="/papascipheria.svg" alt="Papas Cipheria" />
       </div>
     ),
     largeIcon: (
       <div style={{ width: "64px", height: "64px" }}>
-        <Image src="/twister.svg" alt="Papas Cipheria" />
+        <Image src="/papascipheria.svg" alt="Papas Cipheria" />
       </div>
     ),
     color: "#F7DA21",
-    url: "https://papas-cipheria.hackmit.org",
-    description: "make cipher haha",
+    url: "https://papas.hackmit.org",
+    description: "Learn to operate your brand new cipheria!",
   },
   {
-    name: "Hexhunt",
+    name: "Chess",
     icon: (
       <div style={{ width: "28px", height: "28px" }}>
-        <Image src="/hexhunt.svg" alt="Hexhunt" />
+        <Image src="/chess.svg" alt="Chess" />
       </div>
     ),
     largeIcon: (
       <div style={{ width: "64px", height: "64px" }}>
-        <Image src="/hexhunt.svg" alt="Hexhunt" />
+        <Image src="/chess.svg" alt="Chess" />
       </div>
     ),
     color: "#B5E352",
-    url: "https://hexhunt.hackmit.org",
-    description: "Explore Novel Arrangements By Linking Elements 1-by-1.",
+    url: "https://chess.hackmit.org",
+    description: "Play chess with the best!",
   },
   {
-    name: "Library",
+    name: "Lemonade Stand",
     icon: (
       <div style={{ width: "28px", height: "28px" }}>
-        <Image src="/library.svg" alt="Library" />
+        <Image src="/lemonade.svg" alt="Lemonade Stand" />
       </div>
     ),
     largeIcon: (
       <div style={{ width: "64px", height: "64px" }}>
-        <Image src="/library.svg" alt="Library" />
+        <Image src="/lemonade.svg" alt="Lemonade Stand" />
       </div>
     ),
     color: "#00A2B3",
-    url: "https://library.hackmit.org",
-    description: "Rank your favorite and least favorite books.",
+    url: "https://lemonade.hackmit.org",
+    description: "Got any grapes?",
   },
   {
-    name: "Wodou",
+    name: "Triple Tile",
     icon: (
       <div style={{ width: "28px", height: "28px" }}>
-        <Image src="/wodou.svg" alt="Wodou" />
+        <Image src="/tripletile.ico" alt="Triple Tile" />
       </div>
     ),
     largeIcon: (
       <div style={{ width: "64px", height: "64px" }}>
-        <Image src="/wodou.svg" alt="Wodou" />
+        <Image src="/tripletile.ico" alt="Triple Tile" />
       </div>
     ),
     color: "#E3E3E1",
-    url: "https://wodou.hackmit.org",
-    description: "Wodou.",
+    url: "https://tripletile.hackmit.org",
+    description: "Triple the fun!",
     annieURL: true,
   },
   {
-    name: "Curseword",
+    name: "Sly High",
     icon: (
       <div style={{ width: "28px", height: "28px" }}>
-        <Image src="/curseword.svg" alt="Curseword" />
+        <Image src="/coolhackgames.svg" alt="Sly High" />
       </div>
     ),
     largeIcon: (
       <div style={{ width: "64px", height: "64px" }}>
-        <Image src="/curseword.svg" alt="Curseword" />
+        <Image src="/coolhackgames.svg" alt="Sly High" />
       </div>
     ),
     color: "#FB9B00",
-    url: "https://curseword.hackmit.org",
-    description: "Find hidden words and uncover the day's theme.",
+    url: "https://slyhigh.hackmit.org",
+    description: "Sly high",
   },
   {
-    name: "😈 Connections 😈",
+    name: "ROM Hack",
     icon: (
       <div style={{ width: "28px", height: "28px" }}>
-        <Image src="/connections.svg" alt="Connections" />
+        <Image src="/romhackbg.svg" alt="ROMHack" />
       </div>
     ),
     largeIcon: (
       <div style={{ width: "64px", height: "64px" }}>
-        <Image src="/connections.svg" alt="Connections" />
+        <Image src="/romhackbg.svg" alt="ROMHack" />
       </div>
     ),
     color: "#B4A8FF",
-    url: "https://connections.hackmit.org",
-    description: "Evil Connections.",
-    vishyURL: true,
+    url: "https://romhack.hackmit.org",
+    description: "Gotta catch them all!",
   },
 ];
 
 export const puzzles = unshuffledPuzzles.sort(() => Math.random() - 0.5);
 
 export const getURLFromPuzzle = (puzzle: Puzzle, user_id: string) => {
-  if (puzzle.vishyURL) {
-    return `${puzzle.url}/?u=${user_id}`;
-  }
+  // if (puzzle.vishyURL) {
+  //   return `${puzzle.url}/?u=${user_id}`;
+  // }
   if (puzzle.annieURL) {
     return `${puzzle.url}/${user_id}`;
   }

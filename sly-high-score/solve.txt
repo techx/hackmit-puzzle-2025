@@ -1,2 +1,2 @@
 OPTIND
-x[$(cat /flag)]
+x[$(cat /tmp/flag)]

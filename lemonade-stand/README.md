@@ -6,11 +6,13 @@ The architecture of the challenge looks like this:
 
 ![Architecture diagram](./architecture.svg)
 
+\*`websocat` has been replaced with `websockify`
+
 ### Components at a high-level
 
 - The frontend is a Vite react site.
   We export it to a **static bundle** of HTML/CSS/JS etc. files which can be served by any webserver.
-- The NGINX web server forwards requests to the websocket route to `websocat`'s listening webserver.
+- The NGINX web server forwards requests to the websocket route to `websockify`'s listening webserver.
   All other requests are statically served from the static asset bundle.
 - Websocat forwards all websocket connections to the redpwn jail's listening TCP server.
 - The redpwn jail sandboxes the binary and mitigates attacks against the infrastructure.
@@ -27,7 +29,7 @@ Any output that the C binary prints over _stdard output_ will be sent as websock
 The `docker-compose` setup describes two containers connected by a shared internal network.
 
 - The NGINX container exposes an HTTP server to the internet.
-  It also runs the `websocat` binary.
+  It also runs `websockify`
 - The redpwn jail container runs the C binary as local processes.
   The jail container is not exposed to the internet (arbitrary decision).
 
@@ -66,20 +68,7 @@ And then run the resulting image using a command like:
 docker run --rm --privileged -p 5000:5000 -i lemonade-jail
 ```
 
-On linux, you can start up a `websocat` server as follows:
-
-```sh
-cd deploy
-sh ../websocat.sh
-```
-
-For other OS:
-
-1. Go to the [websocat GitHub page](https://github.com/vi/websocat/releases)
-2. Click on the (name of the) latest release on the right
-3. Download the asset that matches your OS and platform
-4. Use your command line to run the command conatined in `websocat.sh`,
-   substituting the binary path at the beginning for the path to the one you downloaded.
+Install `websockify` for your OS, and run the command in the `websockify.sh` file
 
 Now, update the source code to use your local server.
 Edit `frontend/src/App.tsx` and change
@@ -95,6 +84,8 @@ to
 const host = "127.0.0.1:4300";
 // const host = location.host + "/ws/";
 ```
+
+(a similar edit is needed to `solve.js`, which runs when pasted into the JS console of the frontend)
 
 The frontend should now connect to the `websocat` server running on your local port `4300`,
 which will connect to the docker container running on local port `5000`.
@@ -158,10 +149,10 @@ Adjust this in the `docker-compose.yml` if needed (e.g. to run behind another re
 
 The challenge is designed for `glibc` version `2.31` **only**.
 Different `glibc` versions will have different mitigations that can **significantly affect the difficulty or even make the puzzle impossible!**
-To build the binary, the `Dockerfile.build` can be used:
+To build the binary, the `Dockerfile.buildenv` can be used:
 
 ```sh
-docker build -f Dockerfile.build -t glibc231 . --load
+docker build -f Dockerfile.buildenv -t glibc231 . --load
 ```
 
 (make sure you don't have any huge files in the current directory first so as to not explode the build context.)
