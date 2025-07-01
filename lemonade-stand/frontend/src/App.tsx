@@ -412,7 +412,7 @@ const App = () => {
             const savedRecipe = savedRecipes[index];
             const isDirty = !isRecipeEqual(recipe, savedRecipe);
             return (
-              <div className="relative p-4">
+              <div className="relative p-4" key={index}>
                 <button
                   onClick={() => deleteStand(index)}
                   className="absolute top-2 right-2 z-3 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border bg-white hover:bg-red-300"
@@ -434,10 +434,7 @@ const App = () => {
                     <path d="m6 6 12 12" />
                   </svg>
                 </button>
-                <div
-                  key={index}
-                  className="card border p-4 text-2xl opacity-100 shadow"
-                >
+                <div className="card border p-4 text-2xl opacity-100 shadow">
                   {editing === index ? (
                     <input
                       autoFocus
