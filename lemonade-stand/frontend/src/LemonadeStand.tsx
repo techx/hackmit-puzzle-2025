@@ -22,12 +22,9 @@ function isDefined<T>(val: T | undefined | null): val is T {
 
 const PROMPT = "enter command: ";
 
-// TODO: make dynamic
-const USER_ID = "default_user";
-
 type ConnectionState = "OPENING" | "OPEN" | "CLOSED";
 
-const LemonadeStand = () => {
+const LemonadeStand = ({ userId }: { userId: string }) => {
   const wsRef = useRef<WebSocket | null>(null);
   const [connectionState, setConnectionState] =
     useState<ConnectionState>("OPENING");
@@ -142,7 +139,7 @@ const LemonadeStand = () => {
         setTimeout(() => connectWebSocket(), 1000);
       }
 
-      socket.send(new TextEncoder().encode(USER_ID + "\n"));
+      socket.send(new TextEncoder().encode(userId + "\n"));
       socket.removeEventListener("message", performHandshake);
       socket.onmessage = onMessage;
       onOpen();
@@ -196,7 +193,7 @@ const LemonadeStand = () => {
     };
 
     return () => socket.close();
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     const cleanup = connectWebSocket();
@@ -355,6 +352,7 @@ const LemonadeStand = () => {
       className="flex min-h-screen flex-col bg-gradient-to-b from-yellow-100 via-sky-100 to-green-50"
       aria-disabled={connectionState != "OPEN"}
     >
+      <div className="absolute px-2 py-1 text-xl">Logged in as {userId}</div>
       <div className={showModal ? "dimmed" : ""} style={{ flexGrow: 1 }}>
         <div className="relative mx-auto w-full max-w-2xl py-2">
           <img
