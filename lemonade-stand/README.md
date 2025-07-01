@@ -106,14 +106,16 @@ To include them, first:
 ```sh
 cd frontend
 pnpm build
+rm -rf ../deploy/dist/
 mv dist/ ../deploy/
 ```
 
-Then you can package deploy into a distributable tarball:
+Then you can package deploy into a distributable tarball, and make it available for download:
 
 ```sh
 cd deploy/
 tar czv . -f ../lemonade_stand.tar.gz
+cp ../lemonade_stand.tar.gz ./dist
 ```
 
 (Doing it from inside the `deploy` directory ensures that the files are at the root of the tar archive.
