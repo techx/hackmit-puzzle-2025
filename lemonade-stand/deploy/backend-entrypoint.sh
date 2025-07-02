@@ -8,4 +8,4 @@ read -r USER_ID
 flag_inner="$(printf '%s_%s' "$USER_ID" "$PUZZLE_SECRET" | sha256sum - | awk '{print $1}')"
 printf 'hack{%s}\n' "$flag_inner" > ./flag
 
-exec /app/lemonade_stand
+exec /app/lemonade_stand 2>&1
