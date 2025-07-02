@@ -11,7 +11,7 @@ export type Puzzle = {
   color: string;
   url: string;
   description: string | React.ReactNode;
-  // vishyURL?: boolean;
+  kosiURL?: boolean;
   annieURL?: boolean;
 };
 
@@ -38,6 +38,7 @@ const unshuffledPuzzles: Puzzle[] = [
     color: "#F7DA21",
     url: "https://papas.hackmit.org",
     description: "Learn to operate your brand new cipheria!",
+    annieURL: false,
   },
   {
     name: "Chess",
@@ -54,6 +55,7 @@ const unshuffledPuzzles: Puzzle[] = [
     color: "#B5E352",
     url: "https://chess.hackmit.org",
     description: "Play chess with the best!",
+    annieURL: false,
   },
   {
     name: "Lemonade Stand",
@@ -70,6 +72,7 @@ const unshuffledPuzzles: Puzzle[] = [
     color: "#00A2B3",
     url: "https://lemonade.hackmit.org",
     description: "Got any grapes?",
+    annieURL: false,
   },
   {
     name: "Triple Tile",
@@ -89,20 +92,21 @@ const unshuffledPuzzles: Puzzle[] = [
     annieURL: true,
   },
   {
-    name: "Sly High",
+    name: "Jailbreak",
     icon: (
       <div style={{ width: "28px", height: "28px" }}>
-        <Image src="/coolhackgames.svg" alt="Sly High" />
+        <Image src="/jailbreak.svg" alt="Jailbreak" />
       </div>
     ),
     largeIcon: (
       <div style={{ width: "64px", height: "64px" }}>
-        <Image src="/coolhackgames.svg" alt="Sly High" />
+        <Image src="/jailbreak.svg" alt="Jailbreak" />
       </div>
     ),
     color: "#FB9B00",
-    url: "https://slyhigh.hackmit.org",
-    description: "Sly high",
+    url: "https://jailbreak.hackmit.org",
+    description: "Jailbreak",
+    annieURL: false,
   },
   {
     name: "ROM Hack",
@@ -119,15 +123,17 @@ const unshuffledPuzzles: Puzzle[] = [
     color: "#B4A8FF",
     url: "https://romhack.hackmit.org",
     description: "Gotta catch them all!",
+    annieURL: false,
+    kosiURL: true
   },
 ];
 
 export const puzzles = unshuffledPuzzles.sort(() => Math.random() - 0.5);
 
 export const getURLFromPuzzle = (puzzle: Puzzle, user_id: string) => {
-  // if (puzzle.vishyURL) {
-  //   return `${puzzle.url}/?u=${user_id}`;
-  // }
+  if (puzzle.kosiURL) {
+    return `${puzzle.url}`;
+  }
   if (puzzle.annieURL) {
     return `${puzzle.url}/${user_id}`;
   }

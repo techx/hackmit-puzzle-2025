@@ -43,8 +43,6 @@ const morseMap: Record<string, string> = {
   Z: "--..",
 };
 
-const FLAG = "FORESTTMPL";
-
 const PuzzleGame: React.FC = () => {
   const [tiles, setTiles] = useState<Tile[]>([]);
   const [initialTiles, setInitialTiles] = useState<Tile[]>([]);
@@ -58,6 +56,7 @@ const PuzzleGame: React.FC = () => {
     null
   );
   const [hashedFlag, setHashedFlag] = useState(null);
+  const [word, setWord] = useState<string>("");
 
   useEffect(() => {
     fetch("/scene.json")
@@ -66,6 +65,21 @@ const PuzzleGame: React.FC = () => {
         setTiles(data);
         setInitialTiles(data);
       });
+  }, []);
+
+  useEffect(() => {
+    const userId = window.location.href.substring(window.location.href.lastIndexOf("/") + 1);
+
+    fetch("/get_triple_flag", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.flag) setWord(data.flag.toUpperCase());
+      })
+      .catch((err) => console.error("Failed to load flag word:", err));
   }, []);
 
   // Tile click handler
@@ -85,8 +99,8 @@ const PuzzleGame: React.FC = () => {
       const newCount = matchCount + 1;
       setMatchCount(newCount);
 
-      if (newCount % 5 === 0 && revealedLetters.length < FLAG.length) {
-        const currentLetter = FLAG[revealedLetters.length];
+      if (newCount % 5 === 0 && revealedLetters.length < word.length) {
+        const currentLetter = word[revealedLetters.length];
         setRevealedLetters((prev) => [...prev, currentLetter]);
       }
     } else {
@@ -133,14 +147,32 @@ const PuzzleGame: React.FC = () => {
     return false;
   };
 
-  // Flag guess submission logic
+    // Flag guess submission logic
   const handleFlagSubmit = (guess: string) => {
-    const cleaned = guess.trim().toUpperCase();
-    if (cleaned === FLAG) {
-      setFlagStatus("correct");
-    } else {
-      setFlagStatus("incorrect");
-    }
+    const cleaned = guess.trim().toLowerCase();
+    const userId = window.location.href.substring(
+      window.location.href.lastIndexOf("/") + 1
+    );
+
+    fetch("/api/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user: userId, flag: cleaned }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.solved) {
+          setFlagStatus("correct");
+          setHashedFlag(data.message); // dynamic backend message with hashed flag
+        } else {
+          setFlagStatus("incorrect");
+        }
+      })
+      .catch((err) => {
+        console.error("Submission error:", err);
+        setFlagStatus("incorrect");
+      });
+
     setShowFlagInput(false);
   };
 
@@ -161,23 +193,23 @@ const PuzzleGame: React.FC = () => {
     return `/icons/${iconName}.${extMap[iconName] || "png"}`;
   };
 
-  useEffect(() => {
-    if (flagStatus === "correct" && !hashedFlag) {
-      const userId = window.location.href.substring(window.location.href.lastIndexOf("/") + 1);
+  // useEffect(() => {
+  //   if (flagStatus === "correct" && !hashedFlag) {
+  //     const userId = window.location.href.substring(window.location.href.lastIndexOf("/") + 1);
 
-      fetch("/api/getFlag", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          console.log("Flag response:", data);
-          setHashedFlag(data.flag);
-        })
-        .catch((err) => console.error("Fetch error:", err));
-    }
-  }, [flagStatus, hashedFlag]);
+  //     fetch("/api/getFlag", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ userId }),
+  //     })
+  //       .then((res) => res.json())
+  //       .then((data) => {
+  //         console.log("Flag response:", data);
+  //         setHashedFlag(data.flag);
+  //       })
+  //       .catch((err) => console.error("Fetch error:", err));
+  //   }
+  // }, [flagStatus, hashedFlag]);
 
   return (
     <>
@@ -208,8 +240,7 @@ const PuzzleGame: React.FC = () => {
             <div className={styles.popup}>
               {hashedFlag && (
                 <div style={{ marginTop: "0.5em" }}>
-                  You Win!
-                  🔐 Your hashed flag: <code>{hashedFlag}</code>
+                  <span dangerouslySetInnerHTML={{ __html: hashedFlag }} />
                 </div>
               )}
               <button
@@ -370,7 +401,7 @@ const PuzzleGame: React.FC = () => {
           <span style={{ fontSize: "20px" }}>💾</span>
           Export Puzzle
         </button>
-        {matchCount >= 35 && (
+        {/* {matchCount >= 0 && ( */}
           <button
             onClick={() => setShowFlagInput(true)}
             style={{
@@ -384,7 +415,7 @@ const PuzzleGame: React.FC = () => {
           >
             🚩
           </button>
-        )}
+        {/* )} */}
       </div>
 
       {showFlagInput && (
@@ -403,7 +434,7 @@ const PuzzleGame: React.FC = () => {
             marginTop: "10px",
           }}
         >
-          ✅ Correct flag!
+          Correct flag!
           {hashedFlag && (
             <div style={{ marginTop: "0.5em" }}>
               🔐 Your hashed flag: <code>{hashedFlag}</code>

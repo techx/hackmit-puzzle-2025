@@ -1,148 +1,94 @@
 import hashlib
 import os
-from flask import Flask, jsonify, request
+from pathlib import Path
+from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
+load_dotenv(Path(__file__).parent.parent / ".env")
 
 app = Flask(__name__)
 CORS(app)
 
-# Game configuration from environment variables
-ANSWER_PHASE1 = os.environ.get("ANSWER_PHASE1", "polaris")
-ANSWER_PHASE2 = os.environ.get("ANSWER_PHASE2", "2022")
-ANSWER_FINAL = os.environ.get("ANSWER_FINAL", "kirsten carthew")
-PUZZLE_SECRET = os.environ.get("PUZZLE_SECRET", "default_secret_key")
+#### command center stuff ####
 
-# Store user progress (in production, use a database)
-user_progress = {}
+PUZZLE_SECRET = os.getenv("PAPAS_PUZZLE_SECRET")
+SECRET_KEY = os.getenv("SECRET_KEY")
 
-def get_user_id():
-    """Extract user ID from request headers or query parameters"""
-    # Try to get from headers first
-    user_id = request.headers.get('X-User-ID')
-    if user_id:
-        return user_id
-    
-    # Fall back to query parameter
-    user_id = request.args.get('userId')
-    if user_id:
-        return user_id
-    
-    # Generate a default user ID if none provided
-    return "default_user"
+ANSWERS = {
+    "1": os.getenv("ANSWER_1", ""),
+    "2": os.getenv("ANSWER_2", ""),
+    "3": os.getenv("ANSWER_3", ""),
+    "4": os.getenv("ANSWER_4", ""),
+    "5": os.getenv("ANSWER_PHASE1", ""),  
+    "6": os.getenv("ANSWER_6", ""),
+    "7": os.getenv("ANSWER_7", ""),
+    "8": os.getenv("ANSWER_8", ""),
+    "9": os.getenv("ANSWER_9", ""),
+    "10": os.getenv("ANSWER_PHASE2", ""), 
+    "FINAL": os.getenv("ANSWER_FINAL", "") 
+}
 
-def generate_flag(user_id):
-    """Generate a unique flag for a user who completes the game"""
-    flag_data = f"{user_id}_{PUZZLE_SECRET}_papas_cipheria_complete"
-    return hashlib.sha256(flag_data.encode("utf-8")).hexdigest()
+def get_flag(user_id):
+    return hashlib.sha256(
+        f"{user_id}_{PUZZLE_SECRET}".encode("utf-8")
+    ).hexdigest()
 
-def verify_answer(user_answer, correct_answer):
-    """Verify if user's answer matches the correct answer (case insensitive)"""
-    return user_answer.lower().strip() == correct_answer.lower().strip()
 
-@app.route('/api/verify-phase1', methods=['POST'])
-def verify_phase1():
-    """Verify Phase 1 final challenge answer"""
-    user_id = get_user_id()
-    data = request.get_json()
-    user_answer = data.get('answer', '')
+def verify_username(uname):
+    if not uname:
+        return False
+    if '_' not in uname:
+        return False
+    parts = uname.split("_")
+    if len(parts) != 2:
+        return False
+    return hashlib.sha256(
+        f"{parts[0]}_{SECRET_KEY}".encode("utf-8")
+    ).hexdigest()[:8] == parts[1]
     
-    if verify_answer(user_answer, ANSWER_PHASE1):
-        # Initialize user progress if not exists
-        if user_id not in user_progress:
-            user_progress[user_id] = {'phase1_complete': False, 'phase2_complete': False, 'game_complete': False}
-        
-        user_progress[user_id]['phase1_complete'] = True
-        return jsonify({
-            'success': True,
-            'message': 'Phase 1 completed!',
-            'phase1_complete': True
-        })
-    else:
-        return jsonify({
-            'success': False,
-            'message': 'Incorrect answer. Try again!'
-        }), 400
 
-@app.route('/api/verify-phase2', methods=['POST'])
-def verify_phase2():
-    """Verify Phase 2 final challenge answer"""
-    user_id = get_user_id()
-    data = request.get_json()
-    user_answer = data.get('answer', '')
-    
-    # Check if user completed phase 1
-    if user_id not in user_progress or not user_progress[user_id].get('phase1_complete'):
-        return jsonify({
-            'success': False,
-            'message': 'Complete Phase 1 first!'
-        }), 400
-    
-    if verify_answer(user_answer, ANSWER_PHASE2):
-        user_progress[user_id]['phase2_complete'] = True
-        return jsonify({
-            'success': True,
-            'message': 'Phase 2 completed!',
-            'phase2_complete': True
-        })
-    else:
-        return jsonify({
-            'success': False,
-            'message': 'Incorrect answer. Try again!'
-        }), 400
+#### api ####
+@app.route("/api/answers", methods=["GET"])
+def get_answers():
+    return jsonify(ANSWERS)
 
-@app.route('/api/verify-final', methods=['POST'])
-def verify_final():
-    """Verify final challenge answer and generate flag"""
-    user_id = get_user_id()
-    data = request.get_json()
-    user_answer = data.get('answer', '')
-    
-    # Check if user completed both phases
-    if user_id not in user_progress or not user_progress[user_id].get('phase1_complete') or not user_progress[user_id].get('phase2_complete'):
-        return jsonify({
-            'success': False,
-            'message': 'Complete both phases first!'
-        }), 400
-    
-    if verify_answer(user_answer, ANSWER_FINAL):
-        user_progress[user_id]['game_complete'] = True
-        flag = generate_flag(user_id)
-        return jsonify({
-            'success': True,
-            'message': 'Congratulations! You completed the game!',
-            'game_complete': True,
-            'flag': flag
-        })
-    else:
-        return jsonify({
-            'success': False,
-            'message': 'Incorrect answer. Try again!'
-        }), 400
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-@app.route('/api/progress', methods=['GET'])
-def get_progress():
-    """Get user's current progress"""
-    user_id = get_user_id()
-    
-    if user_id not in user_progress:
-        user_progress[user_id] = {'phase1_complete': False, 'phase2_complete': False, 'game_complete': False}
-    
-    return jsonify({
-        'user_id': user_id,
-        'progress': user_progress[user_id]
-    })
+@app.route('/u/<user_id>')
+def user_index(user_id):
+    return render_template('index.html')
 
-@app.route('/api/health', methods=['GET'])
-def health_check():
-    """Health check endpoint"""
-    return jsonify({
-        'status': 'healthy',
-        'message': 'Papa\'s Cipheria Backend is running!'
-    })
+@app.route('/api/submit', methods=['POST'])
+def submit_puzzle():
+    """Submit endpoint."""
+    print("submitting", user_id)
+    body = request.get_json(force=True)
+    print("body", body)
+    if body is None:
+        return jsonify({"solved": False, "message": "Invalid request"}), 400
+
+    user_id = body.get("user", None)
+    flag = body.get("flag", None)
+    print("flag", flag, ANSWERS["FINAL"])
+    if user_id is None or flag is None:
+        return jsonify({"solved": False, "message": "Invalid request"}), 400
+
+    print("herro", flag.strip().lower(), ANSWERS["FINAL"].strip().lower())
+    if flag.strip().lower() == ANSWERS["FINAL"].strip().lower():
+        print("yay in here")
+        return jsonify(
+            {
+                "solved": True,
+                "message": f"congrats! submit this code to the command center to "
+                f"collect your points: {get_flag(user_id)}",
+            }
+        ), 200
+
+    return jsonify({"solved": False, "message": "wrong"}), 400
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5003) 
+    app.run(debug=True, host='0.0.0.0', port=5103) 

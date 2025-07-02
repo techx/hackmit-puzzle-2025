@@ -66,7 +66,7 @@ IS_VERCEL = {
     "Chess": False,
     "LemonadeStand": False,
     "Romhack": True,
-    "SlyHigh": False,
+    "Jailbreak": False,
     "TripleTile": True,
     "PapasCipheria": True,
 }
@@ -75,21 +75,21 @@ PUZZLE_SECRETS = {
     "Chess": cast(str, _get_config_option("CHESS_PUZZLE_SECRET")),
     "LemonadeStand": cast(str, _get_config_option("LEMON_PUZZLE_SECRET")),
     "Romhack": cast(str, _get_config_option("ROMHACK_PUZZLE_SECRET")),
-    "SlyHigh": cast(str, _get_config_option("SLY_PUZZLE_SECRET")),
+    "Jailbreak": cast(str, _get_config_option("JAILBREAK_PUZZLE_SECRET")),
     "TripleTile": cast(str, _get_config_option("TRIPLE_PUZZLE_SECRET")),
     "PapasCipheria": cast(str, _get_config_option("PAPAS_PUZZLE_SECRET")),
 }
 
 PUZZLE_TABLE_METADATA = {
     "Chess": {"abbrv": "Ch", "url": "https://chess.hackmit.org"},
-    "LemonadeStand": {"abbrv": "Ls", "url": "https://lemonadestand.hackmit.org"},
+    "LemonadeStand": {"abbrv": "Ls", "url": "https://lemonade.hackmit.org"},
     "Romhack": {
         "abbrv": "Rh",
         "url": "https://romhack.hackmit.org",
     },
-    "SlyHigh": {
-        "abbrv": "Sh",
-        "url": "https://slyhigh.hackmit.org",
+    "Jailbreak": {
+        "abbrv": "Jb",
+        "url": "https://jailbreak.hackmit.org",
     },
     "TripleTile": {
         "abbrv": "Tt",
@@ -102,7 +102,7 @@ PUZZLE_FAILURE_MESSAGES = {
     "Chess": ["Incorrect"],
     "LemonadeStand": ["Incorrect"],
     "Romhack": ["Incorrect"],
-    "SlyHigh": ["Incorrect"],
+    "Jailbreak": ["Incorrect"],
     "TripleTile": ["Incorrect"],
     "PapasCipheria": ["Incorrect"],
 }
@@ -111,7 +111,7 @@ PUZZLE_CORRECT_MESSAGES = {
     "Chess": ["Correct!"],
     "LemonadeStand": ["Correct! Have some lemonade to go with your victory!"],
     "Romhack": ["Correct!"],
-    "SlyHigh": ["Correct!"],
+    "Jailbreak": ["Correct!"],
     "TripleTile": ["Correct!"],
     "PapasCipheria": ["Correct!"],
 }

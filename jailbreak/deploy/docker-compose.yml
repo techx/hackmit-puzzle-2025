@@ -1,8 +1,8 @@
 services:
   backend:
-    # ensure more performant libc version is used
     build:
       context: .
+      # see Dockerfile.backend for instructions on how to build base image
       dockerfile: Dockerfile.backend
     privileged: true
     expose:
@@ -19,7 +19,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "4300:80"
+      - "80:80"
     networks:
       - internal
 

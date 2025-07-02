@@ -5,11 +5,11 @@ import * as THREE from 'three'
 import './App.css'
 import { LockedFreezer } from './LockedFreezer'
 
+
 const CUSTOMERS = [
   { 
     id: 1,
     cipherText: "kopdieudplnvpkgzhpgb",
-    answer: "stationary",
     difficulty: 3,
     hint: "Have fun 'hack'-ing this one!",
     len: "10",
@@ -18,7 +18,6 @@ const CUSTOMERS = [
   { 
     id: 2,
     cipherText: "vkdetwzvntkgndvg",
-    answer: "star",
     difficulty: 2,
     len: 4,
     hint: "Let them eat cake! - Marie, Hack 2024",
@@ -27,32 +26,14 @@ const CUSTOMERS = [
   { 
     id: 3,
     cipherText: "pgjjgywgadbdaqhgdbn",
-    answer: "north",
     difficulty: 4,
     len: 5,
     hint: "This might give you some direction!",
     pic: "/affine.png"
   },
-  // {
-  //   id: 4,
-  //   name: 'The',
-  //   cipherText: "{[]}n|_'/^|=o°|_\\'o|_|here∂?|e|/-/£!2†lm30/\\/t}{iŝ",
-  //   answer: "unsolvable",
-  //   difficulty: 0,
-  //   hint: "This one's just for fun! Maybe try another customer..."
-  // },
-  // {
-  //   id: 4,
-  //   cipherText: "baaba baaaa aaaaa ababa aaaaa ababa aabaa baaaa abbab baaba baaaa aaaaa ababa aaaaa ababa aaaaa abaaa baaab aaaab aabaa baaba baaba aabaa baaaa baaba aabbb",
-  //   answer: "tralalero tralala is better than tung tung tung tung tung tung tung tung sahur",
-  //   difficulty: 0,
-  //   len: 16,
-  //   hint: "A little brainrotted."
-  // },
   {
     id: 4,
     cipherText: "bwibgtzludigop",
-    answer: "trolls",
     difficulty: 0,
     len: 6,
     hint: "MIT movie night?"
@@ -61,7 +42,6 @@ const CUSTOMERS = [
     id: 5,
     name: 'Final',
     cipherText: "Find the key word to unlock the freezer",
-    answer: "polaris",
     difficulty: 5,
     len: 7,
     hint: "Think about your previous ciphers...."
@@ -72,7 +52,6 @@ const PHASE_TWO_CUSTOMERS = [
   {
     id: 6,
     cipherText: "zqhqdsazzmsuhqkaggb",
-    answer: "rickroll",
     difficulty: 0,
     len: 8,
     hint: "Gaius Suetonius Tranquillus"
@@ -80,16 +59,14 @@ const PHASE_TWO_CUSTOMERS = [
   {
     id: 7,
     cipherText: "buklyaolzlh",
-    answer: "sea",
     difficulty: 4,
     len: 3,
-    hint: "",
+    hint: "I love pizza!",
     pic: "/caesar.jpg"
   },
   {
     id: 8,
     cipherText: "YptrYmWmVwFGV",
-    answer: "hack",
     difficulty: 2,
     len: 4,
     hint: "Check out our theme at hackmit.org!",
@@ -98,7 +75,6 @@ const PHASE_TWO_CUSTOMERS = [
   {
     id: 9,
     cipherText: "LRZPIHREJAHNEIHQZ",
-    answer: "archive",
     difficulty: 3,
     len: 7,
     hint: "Of the internet - Queen Elizabeth"
@@ -107,7 +83,6 @@ const PHASE_TWO_CUSTOMERS = [
     id: 10,
     name: 'Final',
     cipherText: "Use the ciphers from this phase to find the key word to unlock the freezer",
-    answer: "2022",
     difficulty: 5,
     len: 4,
     hint: "HackMIT :)"
@@ -115,7 +90,6 @@ const PHASE_TWO_CUSTOMERS = [
 ]
 
 const PART_ONE_CUSTOMERS = CUSTOMERS.slice(0, 5);
-const FINAL_CHALLENGE = CUSTOMERS[5];
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -143,7 +117,7 @@ function Customer({ position, customerData, isLeaving }) {
     }
   })
 
-  const isSolvable = customerData.answer !== 'unsolvable'
+  // const isSolvable = customerData.answer !== 'unsolvable'
 
   return (
     <group ref={groupRef} position={position}>
@@ -219,7 +193,7 @@ function Customer({ position, customerData, isLeaving }) {
             {customerData.cipherText}
           </Text>
 
-          {isSolvable && customerData.hint && (
+          {customerData.hint && (
             <Text
               position={[0, -0.3, 0.06]}
               fontSize={0.12}
@@ -533,6 +507,18 @@ export default function App() {
   const [isSecondFreezerLocked, setIsSecondFreezerLocked] = useState(true)
   const [showWelcome, setShowWelcome] = useState(true)
   const [showImagePopup, setShowImagePopup] = useState(false)
+  const userId = window.location.pathname.includes("/u/")
+    ? window.location.pathname.split("/u/")[1]
+    : undefined;
+
+  const [ANSWERS, setANSWERS] = useState({})
+
+  useEffect(() => {
+    fetch('/api/answers') // or just '/api/answers' if using proxy
+      .then(res => res.json())
+      .then(data => setANSWERS(data))
+      .catch(err => console.error("Failed to fetch answers", err))
+  }, [])
 
   // Update word display when final word changes
   useEffect(() => {
@@ -545,82 +531,97 @@ export default function App() {
     }
   }, [finalWord])
 
-  useEffect(() => {
-    if (currentPhase === 1) {
-      const currentCustomers = PART_ONE_CUSTOMERS;
-      const nonTrollCustomers = currentCustomers.filter(customer => customer.answer !== 'unsolvable');
-      const allNonTrollSolved = nonTrollCustomers.every(customer => solvedCustomers.has(customer.id));
+  // useEffect(() => {
+  //   if (currentPhase === 1) {
+  //     const requiredCustomers = [1, 2, 3];
+  //     const allRequiredSolved = requiredCustomers.every(id => solvedCustomers.has(id));
 
-      if (allNonTrollSolved && isFreezerLocked) {
-        setIsFreezerLocked(false)
-        setFeedback(`Phase 1 ciphers solved! Freezer unlocked.`)
-      }
-    } else if (currentPhase === 2) {
-      // For phase 2, specifically check if customers 9, 10, 11 are solved
-      const requiredCustomers = [9, 10, 11];
-      const allRequiredSolved = requiredCustomers.every(id => solvedCustomers.has(id));
+  //     if (allRequiredSolved && isFreezerLocked) {
+  //       setIsFreezerLocked(false)
+  //       setFeedback(`Phase 1 ciphers solved! Freezer unlocked.`)
+  //     }
+  //   } else if (currentPhase === 2) {
+  //     // For phase 2, specifically check if customers 9, 10, 11 are solved
+  //     const requiredCustomers = [7, 8, 9];
+  //     const allRequiredSolved = requiredCustomers.every(id => solvedCustomers.has(id));
 
-      if (allRequiredSolved && isFreezerLocked) {
-        setIsFreezerLocked(false)
-        setFeedback(`Phase 2 ciphers solved! Freezer unlocked.`)
-      }
-    }
-  }, [solvedCustomers, isFreezerLocked, currentPhase])
-
+  //     if (allRequiredSolved && isFreezerLocked) {
+  //       setIsFreezerLocked(false)
+  //       setFeedback(`Phase 2 ciphers solved! Freezer unlocked.`)
+  //     }
+  //   }
+  // }, [solvedCustomers, isFreezerLocked, currentPhase])
   useEffect(() => {
     if (!isFreezerLocked || gameState !== 'waiting' || currentCustomer) return;
 
-    if (!currentCustomer && gameState === 'waiting') {
-      setTimeout(() => {
-        let currentCustomers;
-        if (currentPhase === 1) {
-          currentCustomers = PART_ONE_CUSTOMERS;
-        } else if (currentPhase === 2) {
-          currentCustomers = PHASE_TWO_CUSTOMERS.slice(0, 5);
-        }
-        
-        const availableCustomers = currentCustomers
-          .filter(c => !solvedCustomers.has(c.id) && !skippedCustomers.includes(c.id))
-          .sort((a, b) => a.id - b.id)
-        
-        let nextCustomer;
-        if (availableCustomers.length > 0) {
-          nextCustomer = availableCustomers[Math.floor(Math.random() * availableCustomers.length)]
-        } else {
-          setSkippedCustomers([])
-          const remainingCustomers = currentCustomers.filter(
-            customer => !solvedCustomers.has(customer.id)
-          );
-          if (remainingCustomers.length > 0) {
-            nextCustomer = remainingCustomers[Math.floor(Math.random() * remainingCustomers.length)]
-          } else {
-            // All current phase customers are solved
-            if (currentPhase === 1) {
-              setFeedback('Phase 1 complete! Click the freezer for the final challenge.')
-            } else if (currentPhase === 2) {
-              setFeedback('Phase 2 complete! Click the freezer for the final challenge.')
+    setTimeout(() => {
+      let currentCustomers;
+      let requiredIds;
+      let optionalIds = [];
+      let finalCustomerId;
+
+      if (currentPhase === 1) {
+        currentCustomers = PART_ONE_CUSTOMERS;
+        requiredIds = [1, 2, 3];
+        optionalIds = [4];           // 4 is skippable forever
+        finalCustomerId = 5;         // Final for phase 1
+      } else if (currentPhase === 2) {
+        currentCustomers = PHASE_TWO_CUSTOMERS.slice(0, 5);  // 6–10
+        requiredIds = [7, 8, 9];
+        optionalIds = [6];          // 6 is skippable forever
+        finalCustomerId = 10;       // Final for phase 2
+      }
+
+      const finalCustomer = currentCustomers.find(c => c.id === finalCustomerId);
+      const allRequiredSolved = requiredIds.every(id => solvedCustomers.has(id));
+
+      let pool;
+
+      if (!allRequiredSolved) {
+        // Show any unsolved/skipped required or optional customers (e.g., 1–4 or 7–9+6)
+        pool = currentCustomers.filter(
+          c => {
+            if (requiredIds.includes(c.id)) {
+              // Required customers: show if not solved, and if skipped, still show them
+              return !solvedCustomers.has(c.id);
+            } else if (optionalIds.includes(c.id)) {
+              // Optional customers (troll ciphers): show if not solved, regardless of skip status
+              // This ensures troll ciphers appear at least once
+              return !solvedCustomers.has(c.id);
             }
-            return;
+            return false;
           }
+        );
+      } else {
+        // Show final customer if not yet solved
+        if (!solvedCustomers.has(finalCustomerId)) {
+          pool = [finalCustomer];
+        } else {
+          setFeedback(`Phase ${currentPhase} complete! Click the freezer for the final challenge.`);
+          return;
         }
-        
-        setCurrentCustomer(nextCustomer);
-        setGameState('entering')
-        setCustomerPosition([0, -0.5, -8])
-        
-        let pos = -8
-        const enterInterval = setInterval(() => {
-          if (pos >= -3) {
-            clearInterval(enterInterval)
-            setGameState('serving')
-          } else {
-            pos += 0.2
-            setCustomerPosition([0, -0.5, pos])
-          }
-        }, 50)
-      }, 1500)
-    }
-  }, [currentCustomer, gameState, solvedCustomers, skippedCustomers, isFreezerLocked, currentPhase])
+      }
+
+      if (pool.length === 0) return;
+
+      const nextCustomer = pool[Math.floor(Math.random() * pool.length)];
+      setCurrentCustomer(nextCustomer);
+      setGameState('entering');
+      setCustomerPosition([0, -0.5, -8]);
+
+      let pos = -8;
+      const enterInterval = setInterval(() => {
+        if (pos >= -3) {
+          clearInterval(enterInterval);
+          setGameState('serving');
+        } else {
+          pos += 0.2;
+          setCustomerPosition([0, -0.5, pos]);
+        }
+      }, 50);
+    }, 1500);
+  }, [currentCustomer, gameState, solvedCustomers, skippedCustomers, isFreezerLocked, currentPhase]);
+
 
   const handleCustomerLeave = (wasSkipped = false) => {
     setGameState('leaving')
@@ -651,7 +652,7 @@ export default function App() {
   const handleFreezerClick = (isSecond = false) => {
     if (isSecond) {
       if (!isSecondFreezerLocked) {
-        setFinalWord('kirsten carthew')
+        setFinalWord(ANSWERS.FINAL)
         setGameState('final_challenge_second_freezer')
         setFeedback('')
       } else {
@@ -661,11 +662,11 @@ export default function App() {
     } else {
       if (!isFreezerLocked) {
         if (currentPhase === 1) {
-          setFinalWord('polaris')
+          setFinalWord(ANSWERS.PHASE1)
           setGameState('final_challenge_phase1')
           setFeedback('')
         } else if (currentPhase === 2) {
-          setFinalWord('2022')
+          setFinalWord(ANSWERS.PHASE2)
           setGameState('final_challenge_phase2')
           setFeedback('')
         }
@@ -676,71 +677,100 @@ export default function App() {
     }
   }
 
-  const handleRickRoll = () => {
-    window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank')
-  }
+  // const handleRickRoll = () => {
+  //   window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank')
+  // }
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (gameState === 'final_challenge_phase1' || gameState === 'final_challenge_phase2' || gameState === 'final_challenge_second_freezer') {
-      if (userInput.toLowerCase() === finalWord.toLowerCase()) {
-        if (gameState === 'final_challenge_phase1') {
-          setScore(prevScore => prevScore + 500);
-          setFeedback('Phase 1 complete! Starting Phase 2...');
-          setCurrentPhase(2);
-          setSolvedCustomers(new Set());
-          setSkippedCustomers([]);
-          setIsFreezerLocked(true);
-          setGameState('waiting');
-          setUserInput('');
-          setTimeout(() => setFeedback(''), 3000);
-        } else if (gameState === 'final_challenge_phase2') {
-          setScore(prevScore => prevScore + 1000);
-          setFeedback('Phase 2 complete! Second freezer unlocked!');
-          setShowSecondFreezer(true);
-          setIsSecondFreezerLocked(false);
-          setGameState('waiting');
-          setUserInput('');
-          setTimeout(() => setFeedback(''), 3000);
-        } else if (gameState === 'final_challenge_second_freezer') {
-          setScore(prevScore => prevScore + 2000);
-          setFeedback('Congratulations! You have completed the game!');
-          setGameState('game_over');
-        }
+    if (!currentCustomer || !currentCustomer.id) return;
+    if (gameState !== 'serving' && !gameState.startsWith('final_challenge')) return;
+
+    const cid = currentCustomer.id;
+    const normalizedInput = userInput.toLowerCase();
+
+    // ✅ FINAL SECOND FREEZER — allow submission only here
+    if (gameState === 'final_challenge_second_freezer') {
+      const expected = ANSWERS.FINAL?.toLowerCase();
+      if (normalizedInput === expected) {
+        console.log("Submitting final flag:", userInput, "for user:", userId);
+        setScore(prev => prev + 2000);
+        setGameState('game_over');
+
+        fetch("/api/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user: userId, flag: userInput }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.solved) {
+              setFeedback(data.message);  // ✅ show actual flag
+            } else {
+              setFeedback("Something went wrong submitting your flag.");
+            }
+          })
+          .catch(() => setFeedback("Failed to submit your flag."));
+
+        return;
       } else {
-        setFeedback('That is not correct. Try again!');
-        const input = document.querySelector('.cipher-input');
-        input.classList.add('shake');
-        setTimeout(() => input.classList.remove('shake'), 500);
+        setFeedback("Incorrect final answer. Try again!");
+        return;
       }
+    }
+
+    // ✅ Normal gameplay flow
+    const expectedAnswer = ANSWERS[cid.toString()];
+    if (!expectedAnswer) {
+      setFeedback('No answer registered for this customer');
       return;
     }
 
-    if (gameState !== 'serving') return;
+    const normalizedExpected = expectedAnswer.toLowerCase();
 
-    if (userInput.toLowerCase() === currentCustomer.answer) {
-      const points = currentCustomer.difficulty * 100
-      setScore(prevScore => prevScore + points)
-      // flag style
-      setFeedback(`Correct! +${points} dollars`)
-      setSolvedCustomers(prev => new Set([...prev, currentCustomer.id]))
-      
-      // Check for Rick Roll
-      if (userInput.toLowerCase() === 'nevergonnagiveyouup') {
-        setTimeout(() => {
-          handleRickRoll()
-        }, 1000)
+    if (normalizedInput === normalizedExpected) {
+      if (cid === 5) {
+        setScore(prev => prev + 500);
+        setFeedback('Phase 1 complete! Starting Phase 2...');
+        setCurrentPhase(2);
+        setIsFreezerLocked(true);
+        setGameState('waiting');
+        setUserInput('');
+        handleCustomerLeave(false);
+        return;
       }
-      
-      handleCustomerLeave(false)
+
+      if (cid === 10) {
+        setScore(prev => prev + 1000);
+        setFeedback('Phase 2 complete! Second freezer unlocked!');
+        setShowSecondFreezer(true);
+        setIsSecondFreezerLocked(false);
+        setGameState('waiting');
+        setUserInput('');
+        handleCustomerLeave(false);
+        return;
+      }
+
+      const points = currentCustomer.difficulty * 100;
+      setScore(prev => prev + points);
+      setFeedback(`Correct! +${points} dollars`);
+      setSolvedCustomers(prev => new Set([...prev, cid]));
+
+      // Rickroll logic for customer 6 (Phase 2 troll cipher)
+      if (normalizedInput === 'rickroll' && cid === 6) {
+        window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
+      }
+
+      handleCustomerLeave(false);
     } else {
-      setFeedback('Try again!')
-      const input = document.querySelector('.cipher-input')
-      input.classList.add('shake')
-      setTimeout(() => input.classList.remove('shake'), 500)
+      setFeedback('Try again!');
+      const input = document.querySelector('.cipher-input');
+      input.classList.add('shake');
+      setTimeout(() => input.classList.remove('shake'), 500);
     }
-  }
+  };
+
 
   const handleSkip = () => {
     if (gameState === 'serving') {
@@ -834,7 +864,7 @@ export default function App() {
 
       </div>
       {feedback && <div className="feedback">{feedback}</div>}
-      
+{/*       
       {gameState === 'game_over' && (
         <div className="game-completion-overlay">
           <div className="game-completion-content">
@@ -848,7 +878,7 @@ export default function App() {
             </div>
           </div>
         </div>
-      )}
+      )} */}
       
       {(gameState === 'final_challenge_phase1' || gameState === 'final_challenge_phase2' || gameState === 'final_challenge_second_freezer') && (
         <div className="final-challenge-prompt">
@@ -920,14 +950,16 @@ export default function App() {
             }
           </button>
           {gameState !== 'final_challenge_phase1' && gameState !== 'final_challenge_phase2' && gameState !== 'final_challenge_second_freezer' && gameState !== 'game_over' && (
-            <button 
-              type="button" 
-              className="skip-btn"
-              onClick={handleSkip}
-              disabled={gameState !== 'serving'}
-            >
-              Skip Customer
-            </button>
+          <button 
+            type="button" 
+            className="skip-btn"
+            onClick={handleSkip}
+            disabled={
+              gameState !== 'serving' || currentCustomer?.name === 'Final'
+            }
+          >
+            Skip Customer
+          </button>
           )}
         </form>
       </div>
