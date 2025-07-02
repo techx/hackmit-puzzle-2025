@@ -1,0 +1,31 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    privileged: true
+    expose:
+      - "5000"
+    networks:
+      - internal
+    environment:
+      - JAIL_ENV_PUZZLE_SECRET=${PUZZLE_SECRET}
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
+
+secrets:
+  puzzle_secret:
+    file: ./puzzle_secret.txt

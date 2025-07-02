@@ -7,4 +7,4 @@ read -r USER_ID
 flag_inner="$(printf '%s_%s' "$USER_ID" "$PUZZLE_SECRET" | sha256sum - | awk '{print $1}')"
 printf 'hack{%s}\n' "$flag_inner" > /tmp/flag
 
-exec /app/challenge.sh
+exec /app/challenge.sh 2>&1

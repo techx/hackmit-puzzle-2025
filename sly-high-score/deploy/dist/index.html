@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jailbreak</title>
+    <style>
+      body,
+      html {
+        width: 100%;
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #131b29;
+      }
+
+      h1 {
+        font-size: 3em;
+        color: #fff;
+        margin: 0 0;
+      }
+
+      p {
+        color: #fff;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+        width: 300px;
+      }
+
+      input[type="text"] {
+        padding: 0.5em;
+        font-size: 1em;
+      }
+
+      button {
+        padding: 0.7em;
+        font-size: 1em;
+        background: black;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #333;
+      }
+
+      .highlight {
+        background-color: #000000;
+        color: #fff;
+        padding: 0 0.5em;
+        margin: 1rem 0;
+      }
+
+      .field-q {
+        color: #f00;
+        font-weight: bold;
+      }
+
+      #jailbreak-output {
+        color: #fff;
+        font-size: larger;
+        display: none;
+      }
+
+      #user-id-indicator {
+        position: absolute;
+        color: #fff;
+        left: 0;
+        top: 0;
+        padding: 1rem 1rem;
+        font-size: 1.25rem;
+      }
+    </style>
+    <link rel="stylesheet" href="rrt.css" />
+  </head>
+  <body>
+    <div id="user-id-indicator"></div>
+    <h1>Jailbreak</h1>
+    <div class="highlight">
+      <pre><span></span><span class="ch">#!/usr/bin/env -iS bash</span>
+
+<span class="nb">read</span><span class="w"> </span>VAR<span class="w"> </span>&lt;<span class="w"> </span>&lt;<span class="o">(</span>head<span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tr<span class="w"> </span>-cd<span class="w"> </span><span class="s1">&#39;a-zA-Z0-9&#39;</span><span class="o">)</span>
+<span class="nb">read</span><span class="w"> </span>VAL<span class="w"> </span>&lt;<span class="w"> </span>&lt;<span class="o">(</span>head<span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="o">)</span>
+<span class="nb">declare</span><span class="w"> </span>-n<span class="w"> </span><span class="nv">PTR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$VAR</span><span class="s2">&quot;</span>
+<span class="nv">PTR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$VAL</span><span class="s2">&quot;</span>
+</pre>
+    </div>
+    <form id="jailbreak-form" action="#">
+      <label for="varn">
+        <span class="field-q">where to?</span>
+      </label>
+      <input type="text" placeholder="VAR" name="varn" required />
+      <label for="val">
+        <span class="field-q">what to do there?</span>
+      </label>
+      <input type="text" placeholder="VAL" name="val" required />
+      <button type="submit">Attempt escape</button>
+      <pre id="jailbreak-output"></pre>
+    </form>
+
+    <script>
+      const cleanup = () => {
+        console.log("cleanup");
+        ws ? (ws.onclose = () => {}) : void 0;
+        ws ? (ws.onerror = () => {}) : void 0;
+        try {
+          ws ? ws.close() : void 0;
+        } catch {}
+        ws = null;
+        outBuf = "";
+      };
+
+      const submit = (userId, varn, val) => {
+        cleanup();
+        const host = location.host + "/ws/";
+        // const host = "127.0.0.1:4300";
+        ws = new WebSocket(
+          `${location.protocol === "https:" ? "wss" : "ws"}://${host}`
+        );
+        ws.binaryType = "arraybuffer";
+
+        ws.onmessage = (event) => {
+          clearTimeout(ws.handshakeTimeout);
+          ws.onmessage = (event) => {
+            let text;
+            if (typeof event.data === "string") {
+              text = event.data;
+            } else {
+              try {
+                text = new TextDecoder().decode(event.data);
+              } catch {
+                cleanup();
+                alert("failed to deserialize handshake message from server");
+                return;
+              }
+            }
+            console.log({ text });
+            outBuf += text;
+            output.innerText = outBuf;
+            output.style.display = "block";
+          };
+
+          let text;
+          if (typeof event.data === "string") {
+            text = event.data;
+          } else {
+            try {
+              text = new TextDecoder().decode(event.data);
+            } catch {
+              cleanup();
+              alert("failed to deserialize handshake message from server");
+              return;
+            }
+          }
+
+          if (text.trim() != "user ID:") {
+            cleanup();
+            alert("received invalid handshake from server");
+          }
+
+          ws.send(new TextEncoder().encode(userId + "\n"));
+          setTimeout(() => {
+            ws.send(new TextEncoder().encode(varn + "\n"));
+            setTimeout(() => {
+              ws.send(new TextEncoder().encode(val + "\n"));
+            }, 10);
+          }, 10);
+        };
+
+        ws.onopen = () => {
+          ws.handshakeTimeout = setTimeout(() => {
+            cleanup();
+            alert("timed out while waiting for server handshake");
+          }, 5000);
+        };
+
+        ws.onerror = () => {
+          cleanup();
+          alert("error connecting to server");
+        };
+      };
+
+      const main = (userId) => {
+        const userIdIndicator = document.getElementById("user-id-indicator");
+        userIdIndicator.innerText = `Logged in as ${userId}`;
+        const form = document.getElementById("jailbreak-form");
+        const output = document.getElementById("jailbreak-output");
+        let ws;
+        let outBuf = "";
+
+        form.onsubmit = (e) => {
+          e.preventDefault();
+          const formData = new FormData(form);
+          const values = {};
+          for (let [key, value] of formData.entries()) {
+            values[key] = value;
+          }
+          const { varn, val } = values;
+          if (
+            typeof varn !== "string" ||
+            !varn ||
+            typeof val !== "string" ||
+            !val
+          )
+            return;
+
+          submit(userId, varn, val);
+        };
+      };
+
+      const AUTH_PATH_REGEX = /^\/u\/([^/]+)$/;
+      const path = location.pathname;
+      if (path === "/") {
+        const user_id = (localStorage.getItem("user_id") || "").trim();
+
+        if (
+          typeof user_id !== "string" ||
+          !user_id ||
+          user_id.indexOf("\n") != -1 ||
+          user_id.indexOf(" ") != -1 ||
+          user_id.indexOf("\r") != -1
+        ) {
+          window.location.href = "/unauthorized";
+        }
+        main(user_id);
+      } else if (path === "/unauthorized") {
+        const newBody = document.createElement("body");
+        const heading = document.createElement("h1");
+        heading.innerText = "Unauthorized";
+        newBody.appendChild(heading);
+        const p = document.createElement("p");
+        p.innerText = "Please access this site through a direct link";
+        newBody.appendChild(p);
+        document.body.replaceWith(newBody);
+      } else if (path.match(AUTH_PATH_REGEX) !== null) {
+        const match = path.match(AUTH_PATH_REGEX);
+        console.log({ match });
+        const user_id = match[1];
+        localStorage.setItem("user_id", user_id);
+        window.location.href = "/";
+      } else {
+        const newBody = document.createElement("body");
+        const p = document.createElement("p");
+        p.innerText = "Not Found";
+        newBody.appendChild(p);
+        document.body.replaceWith(newBody);
+      }
+    </script>
+  </body>
+</html>
