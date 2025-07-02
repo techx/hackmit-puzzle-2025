@@ -1,5 +1,6 @@
 services:
   backend:
+    # ensure more performant libc version is used
     build:
       context: .
       dockerfile: Dockerfile.backend
