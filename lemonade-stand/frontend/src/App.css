@@ -1,0 +1,76 @@
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+.title {
+  font-family: "Chewy", sans-serif;
+}
+.lucide-citrus-icon {
+  color: #ffeb3b;
+}
+.card {
+  position: relative;
+  background-image: url("./images/wood.png");
+  background-size: cover;
+  background-position: center;
+  border-radius: 8px;
+  box-shadow: 6px 8px 20px rgba(0, 0, 0, 0.4);
+  padding: 1.5rem;
+  color: #2b1e0f;
+  font-family: "Comic Neue Bold", sans-serif;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom right,
+    rgba(255, 255, 255, 0.6),
+    rgba(255, 255, 255, 0.4)
+  );
+  backdrop-filter: blur(1px);
+  z-index: 0;
+  mix-blend-mode: lighten;
+}
+
+.card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.block.text-lg.font-semibold.mb-1 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+@font-face {
+  font-family: "Comic Neue";
+  src: url("/fonts/ComicNeue-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Comic Neue Bold";
+  src: url("/fonts/ComicNeue-Bold.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Chewy";
+  src: url("/fonts/Chewy-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+.dimmed {
+  opacity: 0.3;
+  pointer-events: none;
+}
