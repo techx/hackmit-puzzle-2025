@@ -114,6 +114,7 @@ Then you can package deploy into a distributable tarball, and make it available 
 
 ```sh
 cd deploy/
+rm -f dist/lemonade_stand.tar.gz
 tar czv . -f ../lemonade_stand.tar.gz
 cp ../lemonade_stand.tar.gz ./dist
 ```
