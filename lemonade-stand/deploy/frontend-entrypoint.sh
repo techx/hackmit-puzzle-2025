@@ -11,7 +11,7 @@ BACKEND_IP=$(getent hosts backend | awk '{ print $1 }')
 echo "Resolved backend IP: $BACKEND_IP"
 
 # Run websocat in background
-websockify 4301 "$BACKEND_IP":5000 &
+websockify 4300 "$BACKEND_IP":5000 &
 echo "Started websocket forwarding to $BACKEND_IP:5000"
 
 # Start nginx in foreground
