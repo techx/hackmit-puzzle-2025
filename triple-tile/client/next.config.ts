@@ -5,11 +5,11 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/get_triple_flag",
-        destination: "http://localhost:2000/get_triple_flag", // Flask
+        destination: "http://localhost:2007/get_triple_flag", // Flask
       },
       {
         source: "/api/submit",
-        destination: "http://localhost:2000/api/submit",
+        destination: "http://localhost:2007/api/submit",
       },
     ];
   },

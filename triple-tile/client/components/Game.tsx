@@ -427,20 +427,42 @@ const PuzzleGame: React.FC = () => {
 
       {/* Optional: Result message */}
       {flagStatus === "correct" && (
-        <div
+      <div style={{ marginTop: "0.5em", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.7em", flexWrap: "wrap" }}>
+        <code
           style={{
-            color: "lightgreen",
-            textAlign: "center",
-            marginTop: "10px",
+            background: "#222",
+            color: "#b5fcb5",
+            padding: "0.35em 0.6em",
+            borderRadius: "6px",
+            fontSize: "1.1em",
+            wordBreak: "break-all"
           }}
         >
-          Correct flag!
-          {hashedFlag && (
-            <div style={{ marginTop: "0.5em" }}>
-              🔐 Your hashed flag: <code>{hashedFlag}</code>
-            </div>
-          )}
-        </div>
+          {hashedFlag}
+        </code>
+        <button
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(hashedFlag ?? "");
+              alert("Copied!");
+            } catch (err) {
+              alert("Copy failed");
+            }
+          }}
+          style={{
+            background: "#454",
+            color: "white",
+            border: "none",
+            padding: "0.35em 0.85em",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontWeight: "bold"
+          }}
+        >
+          Copy
+        </button>
+      </div>
+
       )}
       {flagStatus === "incorrect" && (
         <div
