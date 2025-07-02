@@ -10,13 +10,12 @@ env_path = Path(__file__).resolve().parents[2] / "command-center" / ".env"
 load_dotenv(dotenv_path=env_path, override=True)  
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["https://tripletile.hackmit.org", "http://localhost:3000"])
 
 # Load the puzzle-specific secret and global secret key
 env = dotenv_values(env_path)
 PUZZLE_SECRET = os.getenv("TRIPLE_PUZZLE_SECRET")
 SECRET_KEY = os.getenv("SECRET_KEY")
-# const FLAG = "FORESTTMPL";
 
 print(PUZZLE_SECRET, SECRET_KEY)
 if not PUZZLE_SECRET or not SECRET_KEY:

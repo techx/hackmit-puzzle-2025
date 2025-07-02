@@ -70,7 +70,7 @@ const PuzzleGame: React.FC = () => {
   useEffect(() => {
     const userId = window.location.href.substring(window.location.href.lastIndexOf("/") + 1);
 
-    fetch("/get_triple_flag", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/get_triple_flag`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId }),
@@ -154,7 +154,7 @@ const PuzzleGame: React.FC = () => {
       window.location.href.lastIndexOf("/") + 1
     );
 
-    fetch("/api/submit", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/submit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ user: userId, flag: cleaned }),
