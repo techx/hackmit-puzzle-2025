@@ -11,7 +11,7 @@ export type Puzzle = {
   color: string;
   url: string;
   description: string | React.ReactNode;
-  // vishyURL?: boolean;
+  kosiURL?: boolean;
   annieURL?: boolean;
 };
 
@@ -124,15 +124,16 @@ const unshuffledPuzzles: Puzzle[] = [
     url: "https://romhack.hackmit.org",
     description: "Gotta catch them all!",
     annieURL: false,
+    kosiURL: true
   },
 ];
 
 export const puzzles = unshuffledPuzzles.sort(() => Math.random() - 0.5);
 
 export const getURLFromPuzzle = (puzzle: Puzzle, user_id: string) => {
-  // if (puzzle.vishyURL) {
-  //   return `${puzzle.url}/?u=${user_id}`;
-  // }
+  if (puzzle.kosiURL) {
+    return `${puzzle.url}`;
+  }
   if (puzzle.annieURL) {
     return `${puzzle.url}/${user_id}`;
   }
