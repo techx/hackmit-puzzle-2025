@@ -107,11 +107,18 @@ export default function CoolGameCard({
       </Modal>
 
       <li className="flex gap-2 items-center h-fit">
-        <div className="w-20 h-12 border border-accent rounded-lg overflow-hidden bg-white flex items-center justify-center">
-          <div className="w-full h-full object-cover object-center">
-            {puzzle.largeIcon}
-          </div>
-        </div>
+      <div className="w-20 h-12 border border-accent rounded-lg overflow-hidden bg-white flex items-center justify-center">
+
+      <div
+        className={`${
+          puzzle.name === "Jailbreak" ? "translate-x-0.5 translate-y-2.5" : "translate-x-0.4 translate-y-1.25"
+        }`}
+      >
+        {puzzle.largeIcon}
+      </div>
+
+      </div>
+
 
         <div className="flex flex-col">
           <button

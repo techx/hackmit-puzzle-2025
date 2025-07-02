@@ -89,20 +89,20 @@ const unshuffledPuzzles: Puzzle[] = [
     annieURL: true,
   },
   {
-    name: "Sly High",
+    name: "Jailbreak",
     icon: (
       <div style={{ width: "28px", height: "28px" }}>
-        <Image src="/coolhackgames.svg" alt="Sly High" />
+        <Image src="/jailbreak.svg" alt="Jailbreak" />
       </div>
     ),
     largeIcon: (
       <div style={{ width: "64px", height: "64px" }}>
-        <Image src="/coolhackgames.svg" alt="Sly High" />
+        <Image src="/jailbreak.svg" alt="Jailbreak" />
       </div>
     ),
     color: "#FB9B00",
-    url: "https://slyhigh.hackmit.org",
-    description: "Sly high",
+    url: "https://jailbreak.hackmit.org",
+    description: "Jailbreak",
   },
   {
     name: "ROM Hack",
@@ -139,6 +139,11 @@ export const getURLFromPuzzleLeaderboard = (url: string, user_id: string) => {
     return url;
   }
   const puzzleobj = puzzles.find((puzzle) => puzzle.url === url);
+  if (!puzzleobj) {
+    console.warn(`⚠️ puzzle not found for URL: ${url}`);
+    console.warn(`Known puzzle URLs:`, puzzles.map(p => p.url));
+    return url;
+  }
   return getURLFromPuzzle(puzzleobj, user_id);
 };
 
