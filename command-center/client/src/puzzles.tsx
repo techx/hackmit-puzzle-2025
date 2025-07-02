@@ -38,6 +38,7 @@ const unshuffledPuzzles: Puzzle[] = [
     color: "#F7DA21",
     url: "https://papas.hackmit.org",
     description: "Learn to operate your brand new cipheria!",
+    annieURL: false,
   },
   {
     name: "Chess",
@@ -54,6 +55,7 @@ const unshuffledPuzzles: Puzzle[] = [
     color: "#B5E352",
     url: "https://chess.hackmit.org",
     description: "Play chess with the best!",
+    annieURL: false,
   },
   {
     name: "Lemonade Stand",
@@ -70,6 +72,7 @@ const unshuffledPuzzles: Puzzle[] = [
     color: "#00A2B3",
     url: "https://lemonade.hackmit.org",
     description: "Got any grapes?",
+    annieURL: false,
   },
   {
     name: "Triple Tile",
@@ -103,6 +106,7 @@ const unshuffledPuzzles: Puzzle[] = [
     color: "#FB9B00",
     url: "https://jailbreak.hackmit.org",
     description: "Jailbreak",
+    annieURL: false,
   },
   {
     name: "ROM Hack",
@@ -119,6 +123,7 @@ const unshuffledPuzzles: Puzzle[] = [
     color: "#B4A8FF",
     url: "https://romhack.hackmit.org",
     description: "Gotta catch them all!",
+    annieURL: false,
   },
 ];
 
@@ -139,11 +144,6 @@ export const getURLFromPuzzleLeaderboard = (url: string, user_id: string) => {
     return url;
   }
   const puzzleobj = puzzles.find((puzzle) => puzzle.url === url);
-  if (!puzzleobj) {
-    console.warn(`⚠️ puzzle not found for URL: ${url}`);
-    console.warn(`Known puzzle URLs:`, puzzles.map(p => p.url));
-    return url;
-  }
   return getURLFromPuzzle(puzzleobj, user_id);
 };
 
