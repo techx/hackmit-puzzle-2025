@@ -690,7 +690,6 @@ export default function App() {
     const cid = currentCustomer.id;
     const normalizedInput = userInput.toLowerCase();
 
-    // ✅ FINAL SECOND FREEZER — allow submission only here
     if (gameState === 'final_challenge_second_freezer') {
       const expected = ANSWERS.FINAL?.toLowerCase();
       if (normalizedInput === expected) {
@@ -706,7 +705,7 @@ export default function App() {
           .then((res) => res.json())
           .then((data) => {
             if (data.solved) {
-              setFeedback(data.message);  // ✅ show actual flag
+              setFeedback(data.message);  
             } else {
               setFeedback("Something went wrong submitting your flag.");
             }
@@ -720,7 +719,6 @@ export default function App() {
       }
     }
 
-    // ✅ Normal gameplay flow
     const expectedAnswer = ANSWERS[cid.toString()];
     if (!expectedAnswer) {
       setFeedback('No answer registered for this customer');

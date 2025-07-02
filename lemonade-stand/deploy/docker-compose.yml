@@ -19,7 +19,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "4300:80"
+      - "4301:80"
     networks:
       - internal
 
