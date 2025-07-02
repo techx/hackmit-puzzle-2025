@@ -580,10 +580,17 @@ export default function App() {
       if (!allRequiredSolved) {
         // Show any unsolved/skipped required or optional customers (e.g., 1–4 or 7–9+6)
         pool = currentCustomers.filter(
-          c =>
-            (requiredIds.includes(c.id) || optionalIds.includes(c.id)) &&
-            !solvedCustomers.has(c.id) && (!skippedCustomers.includes(c.id) || requiredIds.includes(c.id))
-
+          c => {
+            if (requiredIds.includes(c.id)) {
+              // Required customers: show if not solved, and if skipped, still show them
+              return !solvedCustomers.has(c.id);
+            } else if (optionalIds.includes(c.id)) {
+              // Optional customers (troll ciphers): show if not solved, regardless of skip status
+              // This ensures troll ciphers appear at least once
+              return !solvedCustomers.has(c.id);
+            }
+            return false;
+          }
         );
       } else {
         // Show final customer if not yet solved
@@ -750,7 +757,8 @@ export default function App() {
       setFeedback(`Correct! +${points} dollars`);
       setSolvedCustomers(prev => new Set([...prev, cid]));
 
-      if (normalizedInput === 'nevergonnagiveyouup') {
+      // Rickroll logic for customer 6 (Phase 2 troll cipher)
+      if (normalizedInput === 'rickroll' && cid === 6) {
         window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
       }
 
