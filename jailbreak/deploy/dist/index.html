@@ -68,6 +68,10 @@
         font-weight: bold;
       }
 
+      #jailbreak-form {
+        margin-top: 0.5rem;
+      }
+
       #jailbreak-output {
         color: #fff;
         font-size: larger;
@@ -91,12 +95,15 @@
     <div class="highlight">
       <pre><span></span><span class="ch">#!/usr/bin/env -iS bash</span>
 
+<span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;VAR: &quot;</span>
 <span class="nb">read</span><span class="w"> </span>VAR<span class="w"> </span>&lt;<span class="w"> </span>&lt;<span class="o">(</span>head<span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tr<span class="w"> </span>-cd<span class="w"> </span><span class="s1">&#39;a-zA-Z0-9&#39;</span><span class="o">)</span>
+<span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;VAL: &quot;</span>
 <span class="nb">read</span><span class="w"> </span>VAL<span class="w"> </span>&lt;<span class="w"> </span>&lt;<span class="o">(</span>head<span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="o">)</span>
 <span class="nb">declare</span><span class="w"> </span>-n<span class="w"> </span><span class="nv">PTR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$VAR</span><span class="s2">&quot;</span>
 <span class="nv">PTR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$VAL</span><span class="s2">&quot;</span>
 </pre>
     </div>
+    <a href="/jailbreak.tar.gz">download exact deployment setup</a>
     <form id="jailbreak-form" action="#">
       <label for="varn">
         <span class="field-q">where to?</span>
@@ -111,6 +118,11 @@
     </form>
 
     <script>
+      const form = document.getElementById("jailbreak-form");
+      const output = document.getElementById("jailbreak-output");
+      let ws;
+      let outBuf = "";
+
       const cleanup = () => {
         console.log("cleanup");
         ws ? (ws.onclose = () => {}) : void 0;
@@ -133,7 +145,7 @@
 
         ws.onmessage = (event) => {
           clearTimeout(ws.handshakeTimeout);
-          ws.onmessage = (event) => {
+          const onMessageLogOutput = (event) => {
             let text;
             if (typeof event.data === "string") {
               text = event.data;
@@ -170,13 +182,19 @@
             alert("received invalid handshake from server");
           }
 
-          ws.send(new TextEncoder().encode(userId + "\n"));
-          setTimeout(() => {
-            ws.send(new TextEncoder().encode(varn + "\n"));
-            setTimeout(() => {
+          ws.submitTimeout = setTimeout(() => {
+            cleanup();
+            alert("timed out while submitting");
+          }, 5000);
+          ws.onmessage = () => {
+            ws.onmessage = () => {
+              ws.onmessage = onMessageLogOutput;
               ws.send(new TextEncoder().encode(val + "\n"));
-            }, 10);
-          }, 10);
+              clearTimeout(ws.submitTimeout);
+            };
+            ws.send(new TextEncoder().encode(varn + "\n"));
+          };
+          ws.send(new TextEncoder().encode(userId + "\n"));
         };
 
         ws.onopen = () => {
@@ -195,10 +213,6 @@
       const main = (userId) => {
         const userIdIndicator = document.getElementById("user-id-indicator");
         userIdIndicator.innerText = `Logged in as ${userId}`;
-        const form = document.getElementById("jailbreak-form");
-        const output = document.getElementById("jailbreak-output");
-        let ws;
-        let outBuf = "";
 
         form.onsubmit = (e) => {
           e.preventDefault();
