@@ -2,6 +2,7 @@ services:
   backend:
     build:
       context: .
+      # see Dockerfile.backend for instructions on how to build base image
       dockerfile: Dockerfile.backend
     privileged: true
     expose:
