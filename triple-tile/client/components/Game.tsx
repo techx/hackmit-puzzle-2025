@@ -57,6 +57,8 @@ const PuzzleGame: React.FC = () => {
   );
   const [hashedFlag, setHashedFlag] = useState(null);
   const [word, setWord] = useState<string>("");
+  const [copied, setCopied] = useState(false);
+
 
   useEffect(() => {
     fetch("/scene.json")
@@ -441,26 +443,22 @@ const PuzzleGame: React.FC = () => {
           {hashedFlag}
         </code>
         <button
-          onClick={async () => {
-            try {
-              await navigator.clipboard.writeText(hashedFlag ?? "");
-              alert("Copied!");
-            } catch (err) {
-              alert("Copy failed");
+          className={styles.copybtn}
+          onClick={() => {
+            if (hashedFlag) {
+              navigator.clipboard.writeText(hashedFlag);
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000); // hide after 2s
             }
           }}
-          style={{
-            background: "#454",
-            color: "white",
-            border: "none",
-            padding: "0.35em 0.85em",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontWeight: "bold"
-          }}
         >
-          Copy
+          Copy Text
         </button>
+        {copied && (
+          <div style={{ color: "lightgreen", fontWeight: "bold", marginTop: "0.3em" }}>
+            Copied!
+          </div>
+        )}
       </div>
 
       )}

@@ -8,7 +8,15 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv(Path(__file__).parent.parent / ".env")
 
-app = Flask(__name__)
+STATIC_FOLDER = "../src/build"
+
+app = Flask(
+    __name__,
+    static_folder=STATIC_FOLDER,
+    template_folder=STATIC_FOLDER,
+    static_url_path="",
+)
+
 CORS(app)
 
 #### command center stuff ####
