@@ -56,57 +56,57 @@ def submit():
         user_id=user_id, puzzle_name=puzzle_name, submission=submission
     )
 
-    # score = None
+    score = None
     # if puzzle_name == EVAN_ADAM_PUZZLE_NAME:
     #     _, score = get_puzzle_answer_from_submission_evan_adam(
     #         submission, user_id, puzzle_name
     #     )
 
-    # puzzle_user = (
-    #     db.session.execute(
-    #         select(PuzzleUser).where(
-    #             PuzzleUser.user_id == user_id, PuzzleUser.puzzle_name == puzzle_name
-    #         )
-    #     )
-    #     .scalars()
-    #     .first()
-    # )
+    puzzle_user = (
+        db.session.execute(
+            select(PuzzleUser).where(
+                PuzzleUser.user_id == user_id, PuzzleUser.puzzle_name == puzzle_name
+            )
+        )
+        .scalars()
+        .first()
+    )
 
-    # if puzzle_user is None:
-    #     puzzle_user = PuzzleUser(
-    #         user_id=user_id,
-    #         puzzle_name=puzzle_name,
-    #         is_solved=is_solved,
-    #         evan_adam_score=score,
-    #     )
-    #     if is_solved:
-    #         puzzle_user.earliest_correct_time = datetime.now()
-    #     puzzle_user.last_submission_time = datetime.now()
-    #     db.session.add(puzzle_user)
-    #     db.session.commit()
-    # else:
-    #     last_submission_time = puzzle_user.last_submission_time
-    #     if (
-    #         last_submission_time is None
-    #         or datetime.now() - last_submission_time > timedelta(minutes=1)
-    #     ):
-    #         puzzle_user.last_submission_time = datetime.now()
-    #         if is_solved:
-    #             puzzle_user.is_solved = is_solved
-    #         if is_solved and puzzle_user.earliest_correct_time is None:
-    #             puzzle_user.earliest_correct_time = datetime.now()
-    #         if puzzle_name == EVAN_ADAM_PUZZLE_NAME:
-    #             puzzle_user.evan_adam_score = max(
-    #                 puzzle_user.evan_adam_score or 0, score or 0
-    #             )
-    #         db.session.commit()
-    #     else:
-    #         return jsonify(
-    #             {
-    #                 "solved": False,
-    #                 "message": "Please wait one minute before submitting again",
-    #             }
-    #         ), 400
+    if puzzle_user is None:
+        puzzle_user = PuzzleUser(
+            user_id=user_id,
+            puzzle_name=puzzle_name,
+            is_solved=is_solved,
+            evan_adam_score=score,
+        )
+        if is_solved:
+            puzzle_user.earliest_correct_time = datetime.now()
+        puzzle_user.last_submission_time = datetime.now()
+        db.session.add(puzzle_user)
+        db.session.commit()
+    else:
+        last_submission_time = puzzle_user.last_submission_time
+        if (
+            last_submission_time is None
+            or datetime.now() - last_submission_time > timedelta(minutes=1)
+        ):
+            puzzle_user.last_submission_time = datetime.now()
+            if is_solved:
+                puzzle_user.is_solved = is_solved
+            if is_solved and puzzle_user.earliest_correct_time is None:
+                puzzle_user.earliest_correct_time = datetime.now()
+            # if puzzle_name == EVAN_ADAM_PUZZLE_NAME:
+            #     puzzle_user.evan_adam_score = max(
+            #         puzzle_user.evan_adam_score or 0, score or 0
+            #     )
+            db.session.commit()
+        else:
+            return jsonify(
+                {
+                    "solved": False,
+                    "message": "Please wait one minute before submitting again",
+                }
+            ), 400
 
     submission_db = Submission(
         user_id=user_id,
