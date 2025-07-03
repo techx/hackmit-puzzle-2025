@@ -124,7 +124,7 @@ const ProfileCard = ({
         </Button>
       </Modal>
 
-      <Stack spacing="xl">
+      <Stack gap="xl">
         <Group justify="flex-start" align="center">
           <Image
             src={`https://github.com/${username}.png`}
@@ -141,8 +141,9 @@ const ProfileCard = ({
               </Button>
             )}
           </Stack>
-        </Group>
-
+        </Group
+>
+	{/*
         <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
           {solvedPuzzles.length > 0 ? (
             solvedPuzzles.map((puzzle) => (
@@ -156,7 +157,8 @@ const ProfileCard = ({
           ) : (
             <Text c="white">No puzzles solved yet.</Text>
           )}
-        </SimpleGrid>
+        </SimpleGrid> */}
+
       </Stack>
     </>
   );

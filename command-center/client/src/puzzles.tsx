@@ -105,7 +105,7 @@ const unshuffledPuzzles: Puzzle[] = [
     ),
     color: "#FB9B00",
     url: "https://jailbreak.hackmit.org",
-    description: "Jailbreak",
+    description: "Can you escape??",
     annieURL: false,
   },
   {
@@ -162,7 +162,7 @@ export const discord: Puzzle = {
   icon: <FaDiscord />,
   largeIcon: <FaDiscord style={largeIconStyle} />,
   color: "#5865F2",
-  url: "https://discord.gg/94dGUZPSKF",
+  url: "https://discord.gg/9UCMPrSV",
   description: "",
 };
 
