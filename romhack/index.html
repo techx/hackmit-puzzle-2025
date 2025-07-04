@@ -33,10 +33,10 @@ Author: kosinw                                              Reversing
 
                               <span class="h1">romhack</span>
 
-<span class="h2">Description</span>
+<!-- <span class="h2">Description</span>
 
     Try out my new Pokémon ROM hack. There might be something new
-    in the Pokémon Center.
+    in the Pokémon Center. -->
 
 <span class="h2">Handout</span>
 
@@ -66,6 +66,7 @@ Author: kosinw                                              Reversing
       </pre>
     </div>
   </div>
+  <img id="description-image" src="./description.png" alt="Description" class="description-image">
 </body>
 
 <script>
@@ -87,6 +88,16 @@ Author: kosinw                                              Reversing
   }
 
   (function () { switch_theme(false); })();
+
+  // Add click event listener to show/hide description image
+  document.addEventListener('click', function() {
+    const descriptionImage = document.getElementById('description-image');
+    if (descriptionImage.style.display === 'none' || descriptionImage.style.display === '') {
+      descriptionImage.style.display = 'block';
+    } else {
+      descriptionImage.style.display = 'none';
+    }
+  });
 </script>
 
 </html>

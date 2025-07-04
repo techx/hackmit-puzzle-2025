@@ -107,6 +107,12 @@ th {
 html {
     color: var(--fg);
     background-color: var(--bg);
+    background-image: url('./bkgd.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
 }
 
 .container {
@@ -148,4 +154,14 @@ span.code {
     background-color: var(--bg2);
     padding: 3px 5px;
     border: 0.2px solid var(--bs-gray-400);
+}
+
+.description-image {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    display: none;
+    z-index: 1000;
 }
