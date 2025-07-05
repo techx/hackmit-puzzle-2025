@@ -50,10 +50,6 @@ def verify_username(uname):
     
 
 #### api ####
-@app.route("/api/answers", methods=["GET"])
-def get_answers():
-    return jsonify(ANSWERS)
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -89,6 +85,46 @@ def submit_puzzle():
         ), 200
 
     return jsonify({"solved": False, "message": "wrong"}), 400
+
+@app.route('/api/check-answer', methods=['POST'])
+def check_answer():
+    """Check if a customer's answer is correct."""
+    body = request.get_json(force=True)
+    if body is None:
+        return jsonify({"correct": False, "message": "Invalid request"}), 400
+
+    customer_id = body.get("customerId", None)
+    answer = body.get("answer", None)
+    
+    if customer_id is None or answer is None:
+        return jsonify({"correct": False, "message": "Invalid request"}), 400
+
+    customer_id_str = str(customer_id)
+    if customer_id_str not in ANSWERS:
+        return jsonify({"correct": False, "message": "Customer not found"}), 400
+
+    expected_answer = ANSWERS[customer_id_str]
+    if not expected_answer:
+        return jsonify({"correct": False, "message": "No answer registered for this customer"}), 400
+
+    is_correct = answer.strip().lower() == expected_answer.strip().lower()
+    
+    return jsonify({
+        "correct": is_correct,
+        "message": "Correct!" if is_correct else "Try again!"
+    }), 200
+
+@app.route('/api/final-word/<phase>', methods=['GET'])
+def get_final_word(phase):
+    """Get the final word for a specific phase without revealing the answer."""
+    if phase == "1" and "ANSWER_PHASE1" in ANSWERS:
+        return jsonify({"word": ANSWERS["ANSWER_PHASE1"]}), 200
+    elif phase == "2" and "ANSWER_PHASE2" in ANSWERS:
+        return jsonify({"word": ANSWERS["ANSWER_PHASE2"]}), 200
+    elif phase == "final" and "ANSWER_FINAL" in ANSWERS:
+        return jsonify({"word": ANSWERS["ANSWER_FINAL"]}), 200
+    else:
+        return jsonify({"error": "Phase not found"}), 404
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5103) 
