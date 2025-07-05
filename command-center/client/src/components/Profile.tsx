@@ -146,23 +146,27 @@ const ProfileCard = ({
               </Button>
             )}
           </Stack>
-        </Group
->
-	{
-        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
-          {solvedPuzzlesError ? (
-            <Text c="white">{solvedPuzzlesError}</Text>
-          ) : (
-            solvedPuzzles.map((puzzle) => (
-              <CoolGameCard
-                key={puzzle.name}
-                puzzle={puzzle}
-                loggedIn={loggedIn}
-                user_id={user_id}
-              />
-            ))
-          )}
-        </SimpleGrid>}
+        </Group>
+        
+        {solvedPuzzlesError ? (
+          <Text c="white">{solvedPuzzlesError}</Text>
+        ) : (
+          <>
+            <Text fz={20} fw={600} style={{ color: "white" }} mb="md">
+              Solved Puzzles
+            </Text>
+            <SimpleGrid cols={{ base: 1, sm: 2, md: 2 }} spacing="lg">
+              {solvedPuzzles.map((puzzle) => (
+                <CoolGameCard
+                  key={puzzle.name}
+                  puzzle={puzzle}
+                  loggedIn={loggedIn}
+                  user_id={user_id}
+                />
+              ))}
+            </SimpleGrid>
+          </>
+        )}
 
       </Stack>
     </>

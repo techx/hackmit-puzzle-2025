@@ -1,8 +1,22 @@
 import { Puzzle } from "../puzzles";
 import { useState } from "react";
-import { Modal, TextInput, Button, Text } from "@mantine/core";
+import { Modal, TextInput, Button, Text, Image } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { getURLFromPuzzle } from "../puzzles";
+
+// Function to get the icon for a puzzle based on its name
+const getPuzzleIcon = (puzzleName: string) => {
+  const iconMap: { [key: string]: string } = {
+    "Chess": "/chess.svg",
+    "Lemonade Stand": "/lemonade.svg", 
+    "ROM Hack": "/romhackbg.svg",
+    "Jailbreak": "/jailbreak.svg",
+    "Papas Cipheria": "/papascipheria.svg",
+    "Triple Tile": "/tripletile.ico"
+  };
+  
+  return iconMap[puzzleName] || "/chess.svg"; // fallback
+};
 
 export default function CoolGameCard({
   puzzle,
@@ -114,7 +128,15 @@ export default function CoolGameCard({
           puzzle.name === "Jailbreak" ? "translate-x-0.5 translate-y-2.5" : "translate-x-0.4 translate-y-1.25"
         }`}
       >
-        {puzzle.largeIcon}
+        {puzzle.largeIcon ? (
+          puzzle.largeIcon
+        ) : (
+          <Image 
+            src={getPuzzleIcon(puzzle.name)} 
+            alt={puzzle.name}
+            style={{ width: "64px", height: "64px" }}
+          />
+        )}
       </div>
 
       </div>

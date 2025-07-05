@@ -305,8 +305,30 @@ def get_puzzles_solved():
         .all()
     )
     puzzles = get_user_solved_puzzles(puzzle_users)
-    if not puzzles:
-        return jsonify({"success": False, "message": "No puzzles completed"}), 404
+
+    # manually add puzzles for testing
+    # test_puzzles = [
+    #     {
+    #         "name": "Chess", 
+    #         "url": "https://chess.hackmit.org",
+    #         "description": "Play chess with the best!",
+    #         "color": "#B5E352"
+    #     },
+    #     {
+    #         "name": "Lemonade Stand", 
+    #         "url": "https://lemonade.hackmit.org",
+    #         "description": "Got any grapes?",
+    #         "color": "#00A2B3"
+    #     },
+    #     {
+    #         "name": "ROM Hack", 
+    #         "url": "https://romhack.hackmit.org",
+    #         "description": "Gotta catch them all!",
+    #         "color": "#B4A8FF"
+    #     }
+    # ]
+    # return jsonify({"success": True, "solved_puzzles": test_puzzles})
+    
     return jsonify({"success": True, "solved_puzzles": puzzles})
 
 
