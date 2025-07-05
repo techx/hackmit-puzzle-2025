@@ -39,6 +39,8 @@ const NavbarCard = ({
           window.location.href = `/`;
         } else if (puzzle.name === "Discord") {
           window.location.href = `${puzzle.url}`;
+        } else if (puzzle.name === "Solved Puzzles") {
+          window.location.href = `/profile`;
         } else {
           window.location.href = getURLFromPuzzle(puzzle, user_id);
         }

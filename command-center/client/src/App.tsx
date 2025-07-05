@@ -20,7 +20,7 @@ import {
 import { IconUser, IconLogout } from "@tabler/icons-react";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { useState, useEffect } from "react";
-import { puzzles, leaderboard, home, discord } from "./puzzles";
+import { puzzles, leaderboard, home, discord, solved } from "./puzzles";
 import NavbarCard from "./components/NavbarCard";
 import Footer from "./components/Footer";
 import Leaderboard from "./components/Leaderboard";
@@ -118,6 +118,7 @@ export default function App() {
                 </div>
                 <NavbarCard key={discord.name} puzzle={discord} user_id={user_id} isLoggedIn={true} />
                 <NavbarCard key={leaderboard.name} puzzle={leaderboard} user_id={user_id} isLoggedIn={true} />
+                <NavbarCard key={solved.name} puzzle={solved} user_id={user_id} isLoggedIn={true} />
               </Stack>
             </div>
 

@@ -294,6 +294,7 @@ def leaderboard():
 def get_puzzles_solved():
     """Get puzzles solved from a user"""
     if not session.get("user"):
+        print("user not logged in")
         return jsonify({"success": False, "message": "User not logged in"}), 401
     print("ses", session["user"]["login"])
     puzzle_users = (

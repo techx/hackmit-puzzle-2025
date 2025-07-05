@@ -29,6 +29,7 @@ const ProfileCard = ({
   const [correctMessage, setCorrectMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [solvedPuzzles, setSolvedPuzzles] = useState([]);
+  const [solvedPuzzlesError, setSolvedPuzzlesError] = useState("");
 
   useEffect(() => {
     setCorrectMessage("");
@@ -51,6 +52,10 @@ const ProfileCard = ({
       .then((data) => {
         if (data.success) {
           setSolvedPuzzles(data.solved_puzzles);
+          setSolvedPuzzlesError("");
+        } else {
+          setSolvedPuzzlesError(data.message);
+          setSolvedPuzzles([]);
         }
       });
   }, []);
@@ -143,9 +148,11 @@ const ProfileCard = ({
           </Stack>
         </Group
 >
-	{/*
+	{
         <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
-          {solvedPuzzles.length > 0 ? (
+          {solvedPuzzlesError ? (
+            <Text c="white">{solvedPuzzlesError}</Text>
+          ) : (
             solvedPuzzles.map((puzzle) => (
               <CoolGameCard
                 key={puzzle.name}
@@ -154,10 +161,8 @@ const ProfileCard = ({
                 user_id={user_id}
               />
             ))
-          ) : (
-            <Text c="white">No puzzles solved yet.</Text>
           )}
-        </SimpleGrid> */}
+        </SimpleGrid>}
 
       </Stack>
     </>
