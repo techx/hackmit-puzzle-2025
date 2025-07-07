@@ -1,8 +1,8 @@
-import { IconPuzzle } from "@tabler/icons-react";
+// import { IconPuzzle } from "@tabler/icons-react";
 import { CiTrophy } from "react-icons/ci";
 import { IconHome } from "@tabler/icons-react";
 import { FaDiscord } from "react-icons/fa";
-import { IconCheck } from "@tabler/icons-react";
+// import { IconCheck } from "@tabler/icons-react";
 import { Image } from "@mantine/core";
 
 export type Puzzle = {
@@ -176,11 +176,11 @@ export const home: Puzzle = {
   description: "",
 };
 
-export const solved: Puzzle = {
-  name: "Solved Puzzles",
-  icon: <IconCheck />,
-  largeIcon: <IconCheck style={largeIconStyle} />,
-  color: "#00C851",
-  url: "/profile",
-  description: "",
-};
+// export const solved: Puzzle = {
+//   name: "Solved Puzzles",
+//   icon: <IconCheck />,
+//   largeIcon: <IconCheck style={largeIconStyle} />,
+//   color: "#00C851",
+//   url: "/profile",
+//   description: "",
+// };
