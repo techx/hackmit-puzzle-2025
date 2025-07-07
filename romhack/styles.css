@@ -156,12 +156,12 @@ span.code {
     border: 0.2px solid var(--bs-gray-400);
 }
 
-.description-image {
+.textbox-image {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
     height: auto;
-    display: none;
+    /* display: block; */
     z-index: 1000;
 }

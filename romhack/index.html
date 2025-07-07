@@ -25,77 +25,159 @@
 </head>
 
 <body>
-  <div class="container">
-    <div class="markup">
-      <br class="noprint">
-      <pre>
-Author: kosinw                                              Reversing
-
-                              <span class="h1">romhack</span>
-
-<!-- <span class="h2">Description</span>
-
-    Try out my new Pokémon ROM hack. There might be something new
-    in the Pokémon Center. -->
-
-<span class="h2">Handout</span>
-
-    <a href="handout/romhack.tar.gz">romhack.tar.gz</a> .............................................. 23M
-    ├── romhack.ips ............................................. 8.3M
-    └── romhack.elf ............................................. 48M
-
-<span class="h2">Usage</span>
-
-    To run the challenge, extract the tarfile and apply the <span class="code">romhack.ips</span>
-    patch to a Gameboy Advance ROM (you will need to find it yourself).
-
-    If the patch was applied correctly, the sha1 checksum should be:
-
-    <span class="code">6b7a9d4a1a870fb4dfd276c95a0418bde321163b  romhack.gba</span>
-
-    You will need a Gameboy Advance emulator to run the patched ROM.
-    I recommend <a target="_blank" href="https://mgba.io/">mGBA</a>, as it is fast and accurate.
-
-    The flag format should match <span class="code">/hack\([A-Za-z0-9!]+\)/</span>.
-
-    Replace "(" and ")" with "{" and "}" before submitting the flag.
-
-<span class="h2">See Also</span>
-
-    <a target="_blank" href="https://diveintosystems.org/singlepage/#_getting_started_programming_in_c">Learn C and Assembly(1)</a>, <a target="_blank" href="https://youtu.be/gPsYkV7-yJk">Learn Reverse Engineering(1)</a>, <a target="_blank" href="https://mgba.io">mGBA(1)</a>
-      </pre>
+  <img id="textbox-image" src="./textbox.png" alt="Textbox" class="textbox-image">
+  <div id="title-text" style="position: fixed; bottom: 5.5vw; left: 3vw; width: 90%; padding: 20px; font-size: 4vw; font-family: 'Courier New', monospace; text-align: left; z-index: 1000;">
+    Welcome to ROM Hack!
+    <div style="position: fixed; bottom: 3.5vw; left: 3vw; width: 90%; padding: 20px; font-size: 2vw; font-family: 'Courier New', monospace; text-align: left; z-index: 1000;">
+      Author: kosinw
     </div>
   </div>
-  <img id="description-image" src="./description.png" alt="Description" class="description-image">
+  <div id="description-text" style="display: none; position: fixed; bottom: 3vw; left: 3vw; width: 90%; padding: 20px; font-size: 3.25vw; font-family: 'Courier New', monospace; text-align: left; z-index: 1000;">
+    Try out my new Pokémon ROM hack. There might be something new in the Pokémon Center.
+  </div>
+  <div id="usage-text" style="display: none; position: fixed; bottom: 3.9vw; left: 3vw; width: 92%; height: 17vh; padding: 20px; font-size: 1.5vw; font-family: 'Courier New', monospace; text-align: left; z-index: 1000; overflow-y: auto;">
+    To run the challenge, extract the tarfile and apply the <span class="code">romhack.ips</span> patch to a Gameboy Advance ROM (you will need to find it yourself).<br>
+    <br>
+    If the patch was applied correctly, the sha1 checksum should be:<br>
+    <br>
+    <span class="code">6b7a9d4a1a870fb4dfd276c95a0418bde321163b  romhack.gba</span><br>
+    <br>
+    You will need a Gameboy Advance emulator to run the patched ROM. I recommend <a target="_blank" href="https://mgba.io/">mGBA</a>, as it is fast and accurate.<br>
+    <br>
+    The flag format should match <span class="code">/hack\([A-Za-z0-9!]+\)/</span>.<br>
+    <br>
+    Replace "(" and ")" with "{" and "}" before submitting the flag.
+  </div>
+  <div id="handout-text" style="display: none; position: fixed; bottom: 3.2vw; left: 3vw; width: 92%; padding: 20px; font-size: 2.1vw; font-family: 'Courier New', monospace; text-align: left; z-index: 1000;">
+    <a href="handout/romhack.tar.gz">romhack.tar.gz</a> .............................................. 23M<br>
+    ├── romhack.ips ............................................. 8.3M<br>
+    └── romhack.elf ............................................. 48M
+  </div>
+  <div id="see-also-text" style="display: none; position: fixed; bottom: 3vw; left: 3vw; width: 90%; padding: 20px; font-size: 3.25vw; font-family: 'Courier New', monospace; text-align: left; z-index: 1000;">
+    <strong>See Also: </strong><a target="_blank" href="https://diveintosystems.org/singlepage/#_getting_started_programming_in_c">Learn C and Assembly(1)</a>, <a target="_blank" href="https://youtu.be/gPsYkV7-yJk">Learn Reverse Engineering(1)</a>, <a target="_blank" href="https://mgba.io">mGBA(1)</a>
+  </div>
+  <div id="usage-area-indicator" style="position: fixed; background: rgba(255, 0, 0, 0.3); border: 2px solid red; z-index: 999; pointer-events: none;"></div>
+  <div id="handout-area-indicator" style="position: fixed; background: rgba(0, 255, 0, 0.3); border: 2px solid green; z-index: 999; pointer-events: none;"></div>
+  <div id="see-also-area-indicator" style="position: fixed; background: rgba(0, 0, 255, 0.3); border: 2px solid blue; z-index: 999; pointer-events: none;"></div>
 </body>
 
 <script>
   const html = document.documentElement;
-  let lightMode = true;
-
-  function switch_theme(mode) {
-    if (!mode) {
-      html.style.setProperty("--fg", "var(--bs-black)");
-      html.style.setProperty("--bg", "var(--bs-light)");
-      html.style.setProperty("--bg2", "var(--bs-gray-200)");
-    } else {
-      html.style.setProperty("--fg", "var(--bs-light)");
-      html.style.setProperty("--bg", "var(--bs-black)");
-      html.style.setProperty("--bg2", "var(--bs-black)");
+  
+  // Configurable click areas
+  const USAGE_AREA = {
+    xStart: 0.79,
+    xEnd: 0.86,
+    yStart: 0.18,
+    yEnd: 0.33
+  };
+  
+  const HANDOUT_AREA = {
+    xStart: 0.93,
+    xEnd: 1,
+    yStart: 0.35,
+    yEnd: 0.57
+  };
+  
+  const SEE_ALSO_AREA = {
+    xStart: 0.36,
+    xEnd: 0.43,
+    yStart: 0.31,
+    yEnd: 0.47
+  };
+  
+  // Function to update the visual indicators
+  function updateAreaIndicators() {
+    // Update usage area indicator
+    const usageIndicator = document.getElementById('usage-area-indicator');
+    if (usageIndicator) {
+      const left = USAGE_AREA.xStart * 100;
+      const top = USAGE_AREA.yStart * 100;
+      const width = (USAGE_AREA.xEnd - USAGE_AREA.xStart) * 100;
+      const height = (USAGE_AREA.yEnd - USAGE_AREA.yStart) * 100;
+      
+      usageIndicator.style.left = left + '%';
+      usageIndicator.style.top = top + '%';
+      usageIndicator.style.width = width + '%';
+      usageIndicator.style.height = height + '%';
     }
-
-    lightMode = mode;
+    
+    // Update handout area indicator
+    const handoutIndicator = document.getElementById('handout-area-indicator');
+    if (handoutIndicator) {
+      const left = HANDOUT_AREA.xStart * 100;
+      const top = HANDOUT_AREA.yStart * 100;
+      const width = (HANDOUT_AREA.xEnd - HANDOUT_AREA.xStart) * 100;
+      const height = (HANDOUT_AREA.yEnd - HANDOUT_AREA.yStart) * 100;
+      
+      handoutIndicator.style.left = left + '%';
+      handoutIndicator.style.top = top + '%';
+      handoutIndicator.style.width = width + '%';
+      handoutIndicator.style.height = height + '%';
+    }
+    
+    // Update see also area indicator
+    const seeAlsoIndicator = document.getElementById('see-also-area-indicator');
+    if (seeAlsoIndicator) {
+      const left = SEE_ALSO_AREA.xStart * 100;
+      const top = SEE_ALSO_AREA.yStart * 100;
+      const width = (SEE_ALSO_AREA.xEnd - SEE_ALSO_AREA.xStart) * 100;
+      const height = (SEE_ALSO_AREA.yEnd - SEE_ALSO_AREA.yStart) * 100;
+      
+      seeAlsoIndicator.style.left = left + '%';
+      seeAlsoIndicator.style.top = top + '%';
+      seeAlsoIndicator.style.width = width + '%';
+      seeAlsoIndicator.style.height = height + '%';
+    }
   }
+  
+  // Initialize the indicators
+  updateAreaIndicators();
+  
+  document.addEventListener('click', function(event) {
+    const titleText = document.getElementById('title-text');
+    const descriptionText = document.getElementById('description-text');
+    const usageText = document.getElementById('usage-text');
+    const handoutText = document.getElementById('handout-text');
+    const seeAlsoText = document.getElementById('see-also-text');
 
-  (function () { switch_theme(false); })();
+    const isUsage = event.clientX > window.innerWidth * USAGE_AREA.xStart && 
+                   event.clientX < window.innerWidth * USAGE_AREA.xEnd && 
+                   event.clientY > window.innerHeight * USAGE_AREA.yStart && 
+                   event.clientY < window.innerHeight * USAGE_AREA.yEnd;
+    const isHandout = event.clientX > window.innerWidth * HANDOUT_AREA.xStart && 
+                     event.clientX < window.innerWidth * HANDOUT_AREA.xEnd && 
+                     event.clientY > window.innerHeight * HANDOUT_AREA.yStart && 
+                     event.clientY < window.innerHeight * HANDOUT_AREA.yEnd;
+    const isSeeAlso = event.clientX > window.innerWidth * SEE_ALSO_AREA.xStart && 
+                     event.clientX < window.innerWidth * SEE_ALSO_AREA.xEnd && 
+                     event.clientY > window.innerHeight * SEE_ALSO_AREA.yStart && 
+                     event.clientY < window.innerHeight * SEE_ALSO_AREA.yEnd;
 
-  // Add click event listener to show/hide description image
-  document.addEventListener('click', function() {
-    const descriptionImage = document.getElementById('description-image');
-    if (descriptionImage.style.display === 'none' || descriptionImage.style.display === '') {
-      descriptionImage.style.display = 'block';
+    if (isUsage) {
+      titleText.style.display = 'none';
+      usageText.style.display = 'block';
+      descriptionText.style.display = 'none';
+      handoutText.style.display = 'none';
+      seeAlsoText.style.display = 'none';
+    } else if (isHandout) {
+      titleText.style.display = 'none';
+      usageText.style.display = 'none';
+      descriptionText.style.display = 'none';
+      handoutText.style.display = 'block';
+      seeAlsoText.style.display = 'none';
+    } else if (isSeeAlso) {
+      titleText.style.display = 'none';
+      usageText.style.display = 'none';
+      descriptionText.style.display = 'none';
+      handoutText.style.display = 'none';
+      seeAlsoText.style.display = 'block';
     } else {
-      descriptionImage.style.display = 'none';
+      titleText.style.display = 'none';
+      usageText.style.display = 'none';
+      descriptionText.style.display = 'block';
+      handoutText.style.display = 'none';
+      seeAlsoText.style.display = 'none';
     }
   });
 </script>
