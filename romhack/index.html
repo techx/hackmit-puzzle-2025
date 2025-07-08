@@ -26,17 +26,17 @@
 
 <body>
   <img id="textbox-image" src="./textbox.png" alt="Textbox" class="textbox-image">
-  <div id="title-text" style="position: fixed; bottom: 5.5vw; left: 3vw; width: 90%; padding: 20px; font-size: 4vw; font-family: 'Courier New', monospace; text-align: left; z-index: 1000;">
+  <div id="description-text" style="position: fixed; bottom: 7vw; left: 3vw; width: 90%; padding: 20px; font-size: 3.5vw; font-family: 'Courier New', monospace; text-align: left; z-index: 1000;">
     Welcome to ROM Hack!
-    <div style="position: fixed; bottom: 3.5vw; left: 3vw; width: 90%; padding: 20px; font-size: 2vw; font-family: 'Courier New', monospace; text-align: left; z-index: 1000;">
+    <div style="position: fixed; bottom: 6vw; left: 3vw; width: 90%; padding: 20px; font-size: 1.2vw; font-family: 'Courier New', monospace; text-align: left; z-index: 1000;">
       Author: kosinw
     </div>
-  </div>
-  <div id="description-text" style="display: none; position: fixed; bottom: 3vw; left: 3vw; width: 90%; padding: 20px; font-size: 3.25vw; font-family: 'Courier New', monospace; text-align: left; z-index: 1000;">
-    Try out my new Pokémon ROM hack. There might be something new in the Pokémon Center.
+    <div style="position: fixed; bottom: 3.5vw; left: 3vw; width: 95%; padding: 20px; font-size: 1.35vw; font-family: 'Courier New', monospace; text-align: left; z-index: 1000;">
+      Try out my new Pokémon ROM hack. There might be something new in the Pokémon Center...Click around to explore!
+    </div>
   </div>
   <div id="usage-text" style="display: none; position: fixed; bottom: 3.9vw; left: 3vw; width: 92%; height: 17vh; padding: 20px; font-size: 1.5vw; font-family: 'Courier New', monospace; text-align: left; z-index: 1000; overflow-y: auto;">
-    To run the challenge, extract the tarfile and apply the <span class="code">romhack.ips</span> patch to a Gameboy Advance ROM (you will need to find it yourself).<br>
+    To run the challenge, extract the tarfile in the PC and apply the <span class="code">romhack.ips</span> patch to a Gameboy Advance ROM (you will need to find it yourself).<br>
     <br>
     If the patch was applied correctly, the sha1 checksum should be:<br>
     <br>
@@ -56,9 +56,24 @@
   <div id="see-also-text" style="display: none; position: fixed; bottom: 3vw; left: 3vw; width: 90%; padding: 20px; font-size: 3.25vw; font-family: 'Courier New', monospace; text-align: left; z-index: 1000;">
     <strong>See Also: </strong><a target="_blank" href="https://diveintosystems.org/singlepage/#_getting_started_programming_in_c">Learn C and Assembly(1)</a>, <a target="_blank" href="https://youtu.be/gPsYkV7-yJk">Learn Reverse Engineering(1)</a>, <a target="_blank" href="https://mgba.io">mGBA(1)</a>
   </div>
+    <div id="disclaimer-text" style="display: none; position: fixed; bottom: 3.9vw; left: 3vw; width: 92%; height: 17vh; padding: 20px; font-size: 1.5vw; font-family: 'Courier New', monospace; text-align: left; z-index: 1000; overflow-y: auto;">
+    <strong>Disclaimer</strong><br>
+    <u>Unofficial Project</u><br>
+    This website, created for HackMIT, is an independent fan-made project that incorporates background images, palettes, sprites, and UI elements inspired by the Pokémon Red/Blue/Yellow games. It is not an official Pokémon product.<br>
+    <br>
+    <u>No Affiliation</u><br>
+    HackMIT and this website are not endorsed by, sponsored by, or affiliated with Nintendo, Game Freak, The Pokémon Company, or any of their subsidiaries.<br>
+    <br>
+    <u>Trademark & Copyright Notice</u><br>
+    All Pokémon characters, names, logos, artwork, and related indicia are property of Nintendo, Game Freak, and The Pokémon Company. This site makes no claim of ownership and uses these materials solely under the principles of fair use for nostalgic and illustrative purposes.<br>
+    <br>
+    <u>No Warranties; Limitation of Liability</u><br>
+    All content is provided “as is” for entertainment and informational purposes only. We make no warranties—express or implied—regarding the accuracy, completeness, or reliability of any content on this site, and we disclaim all liability for any damages arising from its use.
+  </div>
   <div id="usage-area-indicator" style="position: fixed; background: rgba(255, 0, 0, 0.3); border: 2px solid red; z-index: 999; pointer-events: none;"></div>
   <div id="handout-area-indicator" style="position: fixed; background: rgba(0, 255, 0, 0.3); border: 2px solid green; z-index: 999; pointer-events: none;"></div>
   <div id="see-also-area-indicator" style="position: fixed; background: rgba(0, 0, 255, 0.3); border: 2px solid blue; z-index: 999; pointer-events: none;"></div>
+  <div id="disclaimer-area-indicator" style="position: fixed; background: rgba(255, 255, 0, 0.3); border: 2px solid yellow; z-index: 999; pointer-events: none;"></div>
 </body>
 
 <script>
@@ -84,6 +99,13 @@
     xEnd: 0.43,
     yStart: 0.31,
     yEnd: 0.47
+  };
+  
+  const DISCLAIMER_AREA = {
+    xStart: 0.02,
+    xEnd: 0.09,
+    yStart: 0.49,
+    yEnd: 0.63
   };
   
   // Function to update the visual indicators
@@ -131,15 +153,29 @@
     }
   }
   
+  // Update disclaimer area indicator
+  const disclaimerIndicator = document.getElementById('disclaimer-area-indicator');
+  if (disclaimerIndicator) {
+    const left = DISCLAIMER_AREA.xStart * 100;
+    const top = DISCLAIMER_AREA.yStart * 100;
+    const width = (DISCLAIMER_AREA.xEnd - DISCLAIMER_AREA.xStart) * 100;
+    const height = (DISCLAIMER_AREA.yEnd - DISCLAIMER_AREA.yStart) * 100;
+    
+    disclaimerIndicator.style.left = left + '%';
+    disclaimerIndicator.style.top = top + '%';
+    disclaimerIndicator.style.width = width + '%';
+    disclaimerIndicator.style.height = height + '%';
+  }
+  
   // Initialize the indicators
   updateAreaIndicators();
   
   document.addEventListener('click', function(event) {
-    const titleText = document.getElementById('title-text');
     const descriptionText = document.getElementById('description-text');
     const usageText = document.getElementById('usage-text');
     const handoutText = document.getElementById('handout-text');
     const seeAlsoText = document.getElementById('see-also-text');
+    const disclaimerText = document.getElementById('disclaimer-text');
 
     const isUsage = event.clientX > window.innerWidth * USAGE_AREA.xStart && 
                    event.clientX < window.innerWidth * USAGE_AREA.xEnd && 
@@ -153,31 +189,35 @@
                      event.clientX < window.innerWidth * SEE_ALSO_AREA.xEnd && 
                      event.clientY > window.innerHeight * SEE_ALSO_AREA.yStart && 
                      event.clientY < window.innerHeight * SEE_ALSO_AREA.yEnd;
+    const isDisclaimer = event.clientX > window.innerWidth * DISCLAIMER_AREA.xStart && 
+                     event.clientX < window.innerWidth * DISCLAIMER_AREA.xEnd && 
+                     event.clientY > window.innerHeight * DISCLAIMER_AREA.yStart && 
+                     event.clientY < window.innerHeight * DISCLAIMER_AREA.yEnd;
 
     if (isUsage) {
-      titleText.style.display = 'none';
       usageText.style.display = 'block';
       descriptionText.style.display = 'none';
       handoutText.style.display = 'none';
       seeAlsoText.style.display = 'none';
+      disclaimerText.style.display = 'none'
     } else if (isHandout) {
-      titleText.style.display = 'none';
       usageText.style.display = 'none';
       descriptionText.style.display = 'none';
       handoutText.style.display = 'block';
       seeAlsoText.style.display = 'none';
+      disclaimerText.style.displa = 'none'
     } else if (isSeeAlso) {
-      titleText.style.display = 'none';
       usageText.style.display = 'none';
       descriptionText.style.display = 'none';
       handoutText.style.display = 'none';
       seeAlsoText.style.display = 'block';
-    } else {
-      titleText.style.display = 'none';
+      disclaimerText.style.display = 'none'
+    } else if (isDisclaimer) {
       usageText.style.display = 'none';
-      descriptionText.style.display = 'block';
+      descriptionText.style.display = 'none';
       handoutText.style.display = 'none';
       seeAlsoText.style.display = 'none';
+      disclaimerText.style.display = 'block'
     }
   });
 </script>
