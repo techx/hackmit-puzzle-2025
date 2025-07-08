@@ -38,18 +38,6 @@ def get_flag(user_id):
     print("HIII", user_id)
     return hashlib.sha256(f"{user_id}_{SECRET_KEY}".encode("utf-8")).hexdigest()
 
-# POST endpoint to serve hashed flag
-# @app.route("/get_triple_flag", methods=["POST"])
-# def serve_triple_flag():
-#     data = request.get_json()
-#     user_id = data.get("userId")
-
-#     if not verify_username(user_id):
-#         return jsonify({"error": "Invalid or missing user ID"}), 403
-
-#     # flag = get_flag(user_id)
-#     return jsonify({"flag": PUZZLE_SECRET})
-
 @app.route("/api/submit", methods=["POST"])
 def submit_puzzle():
     """Submit endpoint."""
@@ -71,9 +59,35 @@ def submit_puzzle():
                 f"collect your points: {get_flag(user_id)}",
             }
         ), 200
-        
+
     return jsonify({"solved": False, "message": "wrong"}), 400
 
+# Morse code dictionary
+MORSE_MAP = {
+    "A": ".-",   "B": "-...", "C": "-.-.", "D": "-..", "E": ".",
+    "F": "..-.", "G": "--.",  "H": "....", "I": "..",  "J": ".---",
+    "K": "-.-",  "L": ".-..", "M": "--",   "N": "-.",  "O": "---",
+    "P": ".--.", "Q": "--.-", "R": ".-.",  "S": "...", "T": "-",
+    "U": "..-",  "V": "...-", "W": ".--",  "X": "-..-", "Y": "-.--",
+    "Z": "--.."
+}
+
+# API route to get one Morse letter at a time for building flashing
+@app.route("/api/morse_letter", methods=["POST"])
+def get_morse_letter():
+    data = request.get_json()
+    index = data.get("index")
+
+    if index is None or not isinstance(index, int):
+        return jsonify({"error": "Missing or invalid index"}), 400
+
+    if index < 0 or index >= len(PUZZLE_SECRET):
+        return jsonify({"morse": None})
+
+    letter = PUZZLE_SECRET[index].upper()
+    morse = MORSE_MAP.get(letter)
+
+    return jsonify({"morse": morse})
 
 # Root fallback (optional for frontend routing)
 @app.route("/", defaults={"path": ""})
