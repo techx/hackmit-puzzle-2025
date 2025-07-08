@@ -39,16 +39,16 @@ def get_flag(user_id):
     return hashlib.sha256(f"{user_id}_{SECRET_KEY}".encode("utf-8")).hexdigest()
 
 # POST endpoint to serve hashed flag
-@app.route("/get_triple_flag", methods=["POST"])
-def serve_triple_flag():
-    data = request.get_json()
-    user_id = data.get("userId")
+# @app.route("/get_triple_flag", methods=["POST"])
+# def serve_triple_flag():
+#     data = request.get_json()
+#     user_id = data.get("userId")
 
-    if not verify_username(user_id):
-        return jsonify({"error": "Invalid or missing user ID"}), 403
+#     if not verify_username(user_id):
+#         return jsonify({"error": "Invalid or missing user ID"}), 403
 
-    # flag = get_flag(user_id)
-    return jsonify({"flag": PUZZLE_SECRET})
+#     # flag = get_flag(user_id)
+#     return jsonify({"flag": PUZZLE_SECRET})
 
 @app.route("/api/submit", methods=["POST"])
 def submit_puzzle():
@@ -63,8 +63,6 @@ def submit_puzzle():
     if user_id is None or flag is None:
         return jsonify({"solved": False, "message": "Invalid request"}), 400
 
-    # this kinda defeats the purpose of the user hashing but it's fine
-    print("hi", flag, PUZZLE_SECRET)
     if flag.strip().lower() == PUZZLE_SECRET.strip().lower():
         return jsonify(
             {
@@ -73,6 +71,7 @@ def submit_puzzle():
                 f"collect your points: {get_flag(user_id)}",
             }
         ), 200
+        
     return jsonify({"solved": False, "message": "wrong"}), 400
 
 

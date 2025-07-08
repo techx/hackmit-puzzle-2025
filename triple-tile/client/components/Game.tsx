@@ -69,21 +69,6 @@ const PuzzleGame: React.FC = () => {
       });
   }, []);
 
-  useEffect(() => {
-    const userId = window.location.href.substring(window.location.href.lastIndexOf("/") + 1);
-
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/get_triple_flag`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.flag) setWord(data.flag.toUpperCase());
-      })
-      .catch((err) => console.error("Failed to load flag word:", err));
-  }, []);
-
   // Tile click handler
   const handleClick = (tile: Tile) => {
     if (queue.length >= 7) return;
@@ -194,24 +179,6 @@ const PuzzleGame: React.FC = () => {
     };
     return `/icons/${iconName}.${extMap[iconName] || "png"}`;
   };
-
-  // useEffect(() => {
-  //   if (flagStatus === "correct" && !hashedFlag) {
-  //     const userId = window.location.href.substring(window.location.href.lastIndexOf("/") + 1);
-
-  //     fetch("/api/getFlag", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ userId }),
-  //     })
-  //       .then((res) => res.json())
-  //       .then((data) => {
-  //         console.log("Flag response:", data);
-  //         setHashedFlag(data.flag);
-  //       })
-  //       .catch((err) => console.error("Fetch error:", err));
-  //   }
-  // }, [flagStatus, hashedFlag]);
 
   return (
     <>
@@ -403,7 +370,7 @@ const PuzzleGame: React.FC = () => {
           <span style={{ fontSize: "20px" }}>💾</span>
           Export Puzzle
         </button>
-        {/* {matchCount >= 0 && ( */}
+        {matchCount >= 35 && (
           <button
             onClick={() => setShowFlagInput(true)}
             style={{
@@ -417,7 +384,7 @@ const PuzzleGame: React.FC = () => {
           >
             🚩
           </button>
-        {/* )} */}
+        )}
       </div>
 
       {showFlagInput && (
