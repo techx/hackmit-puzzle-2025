@@ -70,10 +70,10 @@
     <u>No Warranties; Limitation of Liability</u><br>
     All content is provided “as is” for entertainment and informational purposes only. We make no warranties—express or implied—regarding the accuracy, completeness, or reliability of any content on this site, and we disclaim all liability for any damages arising from its use.
   </div>
-  <div id="usage-area-indicator" style="position: fixed; background: rgba(255, 0, 0, 0.3); border: 2px solid red; z-index: 999; pointer-events: none;"></div>
+  <!-- <div id="usage-area-indicator" style="position: fixed; background: rgba(255, 0, 0, 0.3); border: 2px solid red; z-index: 999; pointer-events: none;"></div>
   <div id="handout-area-indicator" style="position: fixed; background: rgba(0, 255, 0, 0.3); border: 2px solid green; z-index: 999; pointer-events: none;"></div>
   <div id="see-also-area-indicator" style="position: fixed; background: rgba(0, 0, 255, 0.3); border: 2px solid blue; z-index: 999; pointer-events: none;"></div>
-  <div id="disclaimer-area-indicator" style="position: fixed; background: rgba(255, 255, 0, 0.3); border: 2px solid yellow; z-index: 999; pointer-events: none;"></div>
+  <div id="disclaimer-area-indicator" style="position: fixed; background: rgba(255, 255, 0, 0.3); border: 2px solid yellow; z-index: 999; pointer-events: none;"></div> -->
 </body>
 
 <script>
@@ -109,66 +109,66 @@
   };
   
   // Function to update the visual indicators
-  function updateAreaIndicators() {
-    // Update usage area indicator
-    const usageIndicator = document.getElementById('usage-area-indicator');
-    if (usageIndicator) {
-      const left = USAGE_AREA.xStart * 100;
-      const top = USAGE_AREA.yStart * 100;
-      const width = (USAGE_AREA.xEnd - USAGE_AREA.xStart) * 100;
-      const height = (USAGE_AREA.yEnd - USAGE_AREA.yStart) * 100;
+  // function updateAreaIndicators() {
+  //   // Update usage area indicator
+  //   const usageIndicator = document.getElementById('usage-area-indicator');
+  //   if (usageIndicator) {
+  //     const left = USAGE_AREA.xStart * 100;
+  //     const top = USAGE_AREA.yStart * 100;
+  //     const width = (USAGE_AREA.xEnd - USAGE_AREA.xStart) * 100;
+  //     const height = (USAGE_AREA.yEnd - USAGE_AREA.yStart) * 100;
       
-      usageIndicator.style.left = left + '%';
-      usageIndicator.style.top = top + '%';
-      usageIndicator.style.width = width + '%';
-      usageIndicator.style.height = height + '%';
-    }
+  //     usageIndicator.style.left = left + '%';
+  //     usageIndicator.style.top = top + '%';
+  //     usageIndicator.style.width = width + '%';
+  //     usageIndicator.style.height = height + '%';
+  //   }
     
-    // Update handout area indicator
-    const handoutIndicator = document.getElementById('handout-area-indicator');
-    if (handoutIndicator) {
-      const left = HANDOUT_AREA.xStart * 100;
-      const top = HANDOUT_AREA.yStart * 100;
-      const width = (HANDOUT_AREA.xEnd - HANDOUT_AREA.xStart) * 100;
-      const height = (HANDOUT_AREA.yEnd - HANDOUT_AREA.yStart) * 100;
+  //   // Update handout area indicator
+  //   const handoutIndicator = document.getElementById('handout-area-indicator');
+  //   if (handoutIndicator) {
+  //     const left = HANDOUT_AREA.xStart * 100;
+  //     const top = HANDOUT_AREA.yStart * 100;
+  //     const width = (HANDOUT_AREA.xEnd - HANDOUT_AREA.xStart) * 100;
+  //     const height = (HANDOUT_AREA.yEnd - HANDOUT_AREA.yStart) * 100;
       
-      handoutIndicator.style.left = left + '%';
-      handoutIndicator.style.top = top + '%';
-      handoutIndicator.style.width = width + '%';
-      handoutIndicator.style.height = height + '%';
-    }
+  //     handoutIndicator.style.left = left + '%';
+  //     handoutIndicator.style.top = top + '%';
+  //     handoutIndicator.style.width = width + '%';
+  //     handoutIndicator.style.height = height + '%';
+  //   }
     
-    // Update see also area indicator
-    const seeAlsoIndicator = document.getElementById('see-also-area-indicator');
-    if (seeAlsoIndicator) {
-      const left = SEE_ALSO_AREA.xStart * 100;
-      const top = SEE_ALSO_AREA.yStart * 100;
-      const width = (SEE_ALSO_AREA.xEnd - SEE_ALSO_AREA.xStart) * 100;
-      const height = (SEE_ALSO_AREA.yEnd - SEE_ALSO_AREA.yStart) * 100;
+  //   // Update see also area indicator
+  //   const seeAlsoIndicator = document.getElementById('see-also-area-indicator');
+  //   if (seeAlsoIndicator) {
+  //     const left = SEE_ALSO_AREA.xStart * 100;
+  //     const top = SEE_ALSO_AREA.yStart * 100;
+  //     const width = (SEE_ALSO_AREA.xEnd - SEE_ALSO_AREA.xStart) * 100;
+  //     const height = (SEE_ALSO_AREA.yEnd - SEE_ALSO_AREA.yStart) * 100;
       
-      seeAlsoIndicator.style.left = left + '%';
-      seeAlsoIndicator.style.top = top + '%';
-      seeAlsoIndicator.style.width = width + '%';
-      seeAlsoIndicator.style.height = height + '%';
-    }
-  }
-  
-  // Update disclaimer area indicator
-  const disclaimerIndicator = document.getElementById('disclaimer-area-indicator');
-  if (disclaimerIndicator) {
-    const left = DISCLAIMER_AREA.xStart * 100;
-    const top = DISCLAIMER_AREA.yStart * 100;
-    const width = (DISCLAIMER_AREA.xEnd - DISCLAIMER_AREA.xStart) * 100;
-    const height = (DISCLAIMER_AREA.yEnd - DISCLAIMER_AREA.yStart) * 100;
-    
-    disclaimerIndicator.style.left = left + '%';
-    disclaimerIndicator.style.top = top + '%';
-    disclaimerIndicator.style.width = width + '%';
-    disclaimerIndicator.style.height = height + '%';
-  }
+  //     seeAlsoIndicator.style.left = left + '%';
+  //     seeAlsoIndicator.style.top = top + '%';
+  //     seeAlsoIndicator.style.width = width + '%';
+  //     seeAlsoIndicator.style.height = height + '%';
+  //   }
+
+  //     // Update disclaimer area indicator
+  //   const disclaimerIndicator = document.getElementById('disclaimer-area-indicator');
+  //   if (disclaimerIndicator) {
+  //     const left = DISCLAIMER_AREA.xStart * 100;
+  //     const top = DISCLAIMER_AREA.yStart * 100;
+  //     const width = (DISCLAIMER_AREA.xEnd - DISCLAIMER_AREA.xStart) * 100;
+  //     const height = (DISCLAIMER_AREA.yEnd - DISCLAIMER_AREA.yStart) * 100;
+      
+  //     disclaimerIndicator.style.left = left + '%';
+  //     disclaimerIndicator.style.top = top + '%';
+  //     disclaimerIndicator.style.width = width + '%';
+  //     disclaimerIndicator.style.height = height + '%';
+  //   }
+  // }
   
   // Initialize the indicators
-  updateAreaIndicators();
+  // updateAreaIndicators();
   
   document.addEventListener('click', function(event) {
     const descriptionText = document.getElementById('description-text');
