@@ -73,7 +73,9 @@
   <!-- <div id="usage-area-indicator" style="position: fixed; background: rgba(255, 0, 0, 0.3); border: 2px solid red; z-index: 999; pointer-events: none;"></div>
   <div id="handout-area-indicator" style="position: fixed; background: rgba(0, 255, 0, 0.3); border: 2px solid green; z-index: 999; pointer-events: none;"></div>
   <div id="see-also-area-indicator" style="position: fixed; background: rgba(0, 0, 255, 0.3); border: 2px solid blue; z-index: 999; pointer-events: none;"></div>
-  <div id="disclaimer-area-indicator" style="position: fixed; background: rgba(255, 255, 0, 0.3); border: 2px solid yellow; z-index: 999; pointer-events: none;"></div> -->
+  <div id="disclaimer-area-indicator" style="position: fixed; background: rgba(255, 255, 0, 0.3); border: 2px solid yellow; z-index: 999; pointer-events: none;"></div>
+  <div id="description-area-indicator" style="position: fixed; background: rgba(128, 0, 128, 0.3); border: 2px solid purple; z-index: 999; pointer-events: none;"></div> -->
+
 </body>
 
 <script>
@@ -108,7 +110,14 @@
     yEnd: 0.63
   };
   
-  // Function to update the visual indicators
+  const DESCRIPTION_AREA = {
+    xStart: 0.22,
+    xEnd: 0.285,
+    yStart: 0.04,
+    yEnd: 0.19
+  };
+  
+  // // Function to update the visual indicators
   // function updateAreaIndicators() {
   //   // Update usage area indicator
   //   const usageIndicator = document.getElementById('usage-area-indicator');
@@ -165,9 +174,23 @@
   //     disclaimerIndicator.style.width = width + '%';
   //     disclaimerIndicator.style.height = height + '%';
   //   }
+    
+  //     // Update description area indicator
+  //   const descriptionIndicator = document.getElementById('description-area-indicator');
+  //   if (descriptionIndicator) {
+  //     const left = DESCRIPTION_AREA.xStart * 100;
+  //     const top = DESCRIPTION_AREA.yStart * 100;
+  //     const width = (DESCRIPTION_AREA.xEnd - DESCRIPTION_AREA.xStart) * 100;
+  //     const height = (DESCRIPTION_AREA.yEnd - DESCRIPTION_AREA.yStart) * 100;
+      
+  //     descriptionIndicator.style.left = left + '%';
+  //     descriptionIndicator.style.top = top + '%';
+  //     descriptionIndicator.style.width = width + '%';
+  //     descriptionIndicator.style.height = height + '%';
+  //   }
   // }
   
-  // Initialize the indicators
+  // // Initialize the indicators
   // updateAreaIndicators();
   
   document.addEventListener('click', function(event) {
@@ -193,6 +216,10 @@
                      event.clientX < window.innerWidth * DISCLAIMER_AREA.xEnd && 
                      event.clientY > window.innerHeight * DISCLAIMER_AREA.yStart && 
                      event.clientY < window.innerHeight * DISCLAIMER_AREA.yEnd;
+    const isDescription = event.clientX > window.innerWidth * DESCRIPTION_AREA.xStart && 
+                     event.clientX < window.innerWidth * DESCRIPTION_AREA.xEnd && 
+                     event.clientY > window.innerHeight * DESCRIPTION_AREA.yStart && 
+                     event.clientY < window.innerHeight * DESCRIPTION_AREA.yEnd;
 
     if (isUsage) {
       usageText.style.display = 'block';
@@ -218,6 +245,12 @@
       handoutText.style.display = 'none';
       seeAlsoText.style.display = 'none';
       disclaimerText.style.display = 'block'
+    } else if (isDescription) {
+      usageText.style.display = 'none';
+      descriptionText.style.display = 'block';
+      handoutText.style.display = 'none';
+      seeAlsoText.style.display = 'none';
+      disclaimerText.style.display = 'none'
     }
   });
 </script>
