@@ -1,7 +1,8 @@
-import { IconPuzzle } from "@tabler/icons-react";
+// import { IconPuzzle } from "@tabler/icons-react";
 import { CiTrophy } from "react-icons/ci";
 import { IconHome } from "@tabler/icons-react";
 import { FaDiscord } from "react-icons/fa";
+// import { IconCheck } from "@tabler/icons-react";
 import { Image } from "@mantine/core";
 
 export type Puzzle = {
@@ -105,7 +106,7 @@ const unshuffledPuzzles: Puzzle[] = [
     ),
     color: "#FB9B00",
     url: "https://jailbreak.hackmit.org",
-    description: "Jailbreak",
+    description: "Can you escape??",
     annieURL: false,
   },
   {
@@ -162,7 +163,7 @@ export const discord: Puzzle = {
   icon: <FaDiscord />,
   largeIcon: <FaDiscord style={largeIconStyle} />,
   color: "#5865F2",
-  url: "https://discord.gg/94dGUZPSKF",
+  url: "https://discord.gg/WkW3tbPZKx",
   description: "",
 };
 
@@ -174,3 +175,12 @@ export const home: Puzzle = {
   url: "/",
   description: "",
 };
+
+// export const solved: Puzzle = {
+//   name: "Solved Puzzles",
+//   icon: <IconCheck />,
+//   largeIcon: <IconCheck style={largeIconStyle} />,
+//   color: "#00C851",
+//   url: "/profile",
+//   description: "",
+// };

@@ -14,6 +14,7 @@ from server.config import (
     PUZZLE_CORRECT_MESSAGES,
     PUZZLE_FAILURE_MESSAGES,
     PUZZLE_TABLE_METADATA,
+    FRIENDLY_TO_INTERNAL,
 )
 from server.models.Puzzle import PuzzleUser
 from server.models.Submission import Submission
@@ -41,8 +42,10 @@ def submit():
     body = request.json
     if body is None:
         return jsonify({"solved": False, "message": "Invalid request"}), 400
-
+    
     puzzle_name = body.get("puzzle_name", None)
+    if puzzle_name in FRIENDLY_TO_INTERNAL:
+        puzzle_name = FRIENDLY_TO_INTERNAL[puzzle_name]
     user_id = body.get("user_id", None)
     submission = body.get("submission", None)
 
@@ -56,57 +59,58 @@ def submit():
         user_id=user_id, puzzle_name=puzzle_name, submission=submission
     )
 
-    # score = None
+    score = None
     # if puzzle_name == EVAN_ADAM_PUZZLE_NAME:
     #     _, score = get_puzzle_answer_from_submission_evan_adam(
     #         submission, user_id, puzzle_name
     #     )
 
-    # puzzle_user = (
-    #     db.session.execute(
-    #         select(PuzzleUser).where(
-    #             PuzzleUser.user_id == user_id, PuzzleUser.puzzle_name == puzzle_name
-    #         )
-    #     )
-    #     .scalars()
-    #     .first()
-    # )
+    puzzle_user = (
+        db.session.execute(
+            select(PuzzleUser).where(
+                PuzzleUser.user_id == user_id, PuzzleUser.puzzle_name == puzzle_name
+            )
+        )
+        .scalars()
+        .first()
+    )
 
-    # if puzzle_user is None:
-    #     puzzle_user = PuzzleUser(
-    #         user_id=user_id,
-    #         puzzle_name=puzzle_name,
-    #         is_solved=is_solved,
-    #         evan_adam_score=score,
-    #     )
-    #     if is_solved:
-    #         puzzle_user.earliest_correct_time = datetime.now()
-    #     puzzle_user.last_submission_time = datetime.now()
-    #     db.session.add(puzzle_user)
-    #     db.session.commit()
-    # else:
-    #     last_submission_time = puzzle_user.last_submission_time
-    #     if (
-    #         last_submission_time is None
-    #         or datetime.now() - last_submission_time > timedelta(minutes=1)
-    #     ):
-    #         puzzle_user.last_submission_time = datetime.now()
-    #         if is_solved:
-    #             puzzle_user.is_solved = is_solved
-    #         if is_solved and puzzle_user.earliest_correct_time is None:
-    #             puzzle_user.earliest_correct_time = datetime.now()
+    if puzzle_user is None:
+        puzzle_user = PuzzleUser(
+            user_id=user_id,
+            puzzle_name=puzzle_name,
+            is_solved=is_solved,
+            # evan_adam_score=score,
+        )
+        if is_solved:
+            puzzle_user.earliest_correct_time = datetime.now()
+        puzzle_user.last_submission_time = datetime.now()
+        db.session.add(puzzle_user)
+        db.session.commit()
+    else:
+        last_submission_time = puzzle_user.last_submission_time
+        if (
+            last_submission_time is None
+            or datetime.now() - last_submission_time > timedelta(minutes=1)
+        ):
+            puzzle_user.last_submission_time = datetime.now()
+            if is_solved:
+                puzzle_user.is_solved = is_solved
+            if is_solved and puzzle_user.earliest_correct_time is None:
+                puzzle_user.earliest_correct_time = datetime.now()
     #         if puzzle_name == EVAN_ADAM_PUZZLE_NAME:
     #             puzzle_user.evan_adam_score = max(
     #                 puzzle_user.evan_adam_score or 0, score or 0
     #             )
-    #         db.session.commit()
-    #     else:
-    #         return jsonify(
-    #             {
-    #                 "solved": False,
-    #                 "message": "Please wait one minute before submitting again",
-    #             }
-    #         ), 400
+
+            db.session.commit()
+        else:
+            return jsonify(
+                {
+                    "solved": False,
+                    "message": "Please wait one minute before submitting again",
+                }
+            ), 400
 
     submission_db = Submission(
         user_id=user_id,
@@ -178,6 +182,8 @@ def leaderboard():
     for puzzle_name, puzzle_metadata in zip(
         PUZZLE_TABLE_METADATA.keys(), puzzle_metadatas
     ):
+        if puzzle_name in FRIENDLY_TO_INTERNAL:
+            puzzle_name = FRIENDLY_TO_INTERNAL[puzzle_name]
         puzzle_metadata["name"] = puzzle_name
         puzzle_metadata["value"] = puzzle_values[puzzle_name]
 
@@ -222,7 +228,7 @@ def leaderboard():
         # i.e., increasing by puzzle value
         scores = sorted(scores.values(), key=lambda x: puzzle_values[x["name"]])
 
-        base_timestamp = datetime(2024, 7, 8, 12, 0, tzinfo=timezone.utc).timestamp()
+        base_timestamp = datetime(2025, 7, 3, 18, 0, tzinfo=timezone.utc).timestamp()
         total_score = 0
         for score in scores:
             if score["score"] is not None:
@@ -294,18 +300,46 @@ def leaderboard():
 def get_puzzles_solved():
     """Get puzzles solved from a user"""
     if not session.get("user"):
+        print("user not logged in")
         return jsonify({"success": False, "message": "User not logged in"}), 401
     print("ses", session["user"]["login"])
+
     puzzle_users = (
         db.session.execute(
-            select(PuzzleUser).where(PuzzleUser.user_id == session["user"]["login"])
+            select(PuzzleUser).where(PuzzleUser.user_id.like(f"%{session['user']['login']}%"))
         )
         .scalars()
         .all()
     )
     puzzles = get_user_solved_puzzles(puzzle_users)
-    if not puzzles:
-        return jsonify({"success": False, "message": "No puzzles completed"}), 404
+
+    # print("session", session)
+    print("user_id", session["user"]["login"])
+    print("puzzle_users", puzzle_users)
+    print("puzzles", puzzles)
+    # manually add puzzles for testing
+    # test_puzzles = [
+    #     {
+    #         "name": "Chess", 
+    #         "url": "https://chess.hackmit.org",
+    #         "description": "Play chess with the best!",
+    #         "color": "#B5E352"
+    #     },
+    #     {
+    #         "name": "Lemonade Stand", 
+    #         "url": "https://lemonade.hackmit.org",
+    #         "description": "Got any grapes?",
+    #         "color": "#00A2B3"
+    #     },
+    #     {
+    #         "name": "ROM Hack", 
+    #         "url": "https://romhack.hackmit.org",
+    #         "description": "Gotta catch them all!",
+    #         "color": "#B4A8FF"
+    #     }
+    # ]
+    # return jsonify({"success": True, "solved_puzzles": test_puzzles})
+    
     return jsonify({"success": True, "solved_puzzles": puzzles})
 
 

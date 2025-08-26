@@ -88,7 +88,6 @@ const PHASE_TWO_CUSTOMERS = [
     hint: "HackMIT :)"
   }
 ]
-
 const PART_ONE_CUSTOMERS = CUSTOMERS.slice(0, 5);
 
 class ErrorBoundary extends React.Component {
@@ -116,8 +115,6 @@ function Customer({ position, customerData, isLeaving }) {
       groupRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 2) * 0.1
     }
   })
-
-  // const isSolvable = customerData.answer !== 'unsolvable'
 
   return (
     <group ref={groupRef} position={position}>
@@ -501,7 +498,6 @@ export default function App() {
   const [skippedCustomers, setSkippedCustomers] = useState([])
   const [isFreezerLocked, setIsFreezerLocked] = useState(true)
   const [currentPhase, setCurrentPhase] = useState(1)
-  const [finalWord, setFinalWord] = useState('')
   const [wordDisplay, setWordDisplay] = useState('')
   const [showSecondFreezer, setShowSecondFreezer] = useState(false)
   const [isSecondFreezerLocked, setIsSecondFreezerLocked] = useState(true)
@@ -511,89 +507,41 @@ export default function App() {
     ? window.location.pathname.split("/u/")[1]
     : undefined;
 
-  const [ANSWERS, setANSWERS] = useState({})
-
-  useEffect(() => {
-    fetch('/api/answers') // or just '/api/answers' if using proxy
-      .then(res => res.json())
-      .then(data => setANSWERS(data))
-      .catch(err => console.error("Failed to fetch answers", err))
-  }, [])
-
-  // Update word display when final word changes
-  useEffect(() => {
-    if (finalWord) {
-      const display = finalWord
-        .split('')
-        .map(char => char === ' ' ? '  ' : '_')
-        .join(' ')
-      setWordDisplay(display)
-    }
-  }, [finalWord])
-
-  // useEffect(() => {
-  //   if (currentPhase === 1) {
-  //     const requiredCustomers = [1, 2, 3];
-  //     const allRequiredSolved = requiredCustomers.every(id => solvedCustomers.has(id));
-
-  //     if (allRequiredSolved && isFreezerLocked) {
-  //       setIsFreezerLocked(false)
-  //       setFeedback(`Phase 1 ciphers solved! Freezer unlocked.`)
-  //     }
-  //   } else if (currentPhase === 2) {
-  //     // For phase 2, specifically check if customers 9, 10, 11 are solved
-  //     const requiredCustomers = [7, 8, 9];
-  //     const allRequiredSolved = requiredCustomers.every(id => solvedCustomers.has(id));
-
-  //     if (allRequiredSolved && isFreezerLocked) {
-  //       setIsFreezerLocked(false)
-  //       setFeedback(`Phase 2 ciphers solved! Freezer unlocked.`)
-  //     }
-  //   }
-  // }, [solvedCustomers, isFreezerLocked, currentPhase])
   useEffect(() => {
     if (!isFreezerLocked || gameState !== 'waiting' || currentCustomer) return;
 
     setTimeout(() => {
-      let currentCustomers;
-      let requiredIds;
-      let optionalIds = [];
-      let finalCustomerId;
-
+      let currentCustomers, requiredIds, optionalIds = [], finalCustomerId;
       if (currentPhase === 1) {
         currentCustomers = PART_ONE_CUSTOMERS;
         requiredIds = [1, 2, 3];
-        optionalIds = [4];           // 4 is skippable forever
-        finalCustomerId = 5;         // Final for phase 1
+        optionalIds = [4];
+        finalCustomerId = 5;
       } else if (currentPhase === 2) {
-        currentCustomers = PHASE_TWO_CUSTOMERS.slice(0, 5);  // 6–10
+        currentCustomers = PHASE_TWO_CUSTOMERS.slice(0, 5);
         requiredIds = [7, 8, 9];
-        optionalIds = [6];          // 6 is skippable forever
-        finalCustomerId = 10;       // Final for phase 2
+        optionalIds = [6];
+        finalCustomerId = 10;
       }
-
       const finalCustomer = currentCustomers.find(c => c.id === finalCustomerId);
       const allRequiredSolved = requiredIds.every(id => solvedCustomers.has(id));
 
-      let pool;
-
+      let pool = [];
       if (!allRequiredSolved) {
-        // Show any unsolved/skipped required or optional customers (e.g., 1–4 or 7–9+6)
         pool = currentCustomers.filter(
           c => {
+            // Final customer never appears until all required solved and never after solved
+            if (c.id === finalCustomerId) return false;
             if (requiredIds.includes(c.id)) {
-              // Required customers: show if not solved, and if skipped, still show them
               return !solvedCustomers.has(c.id);
             } else if (optionalIds.includes(c.id)) {
-              // Optional customers (troll ciphers): show if not solved, regardless of skip status
-              // This ensures troll ciphers appear at least once
               return !solvedCustomers.has(c.id);
             }
             return false;
           }
         );
       } else {
-        // Show final customer if not yet solved
+        // Only show the final customer if not already solved
         if (!solvedCustomers.has(finalCustomerId)) {
           pool = [finalCustomer];
         } else {
@@ -652,34 +600,30 @@ export default function App() {
   const handleFreezerClick = (isSecond = false) => {
     if (isSecond) {
       if (!isSecondFreezerLocked) {
-        setFinalWord(ANSWERS.FINAL)
         setGameState('final_challenge_second_freezer')
+        const display = "_ _ _ _ _ _ _\n_ _ _ _ _ _ _";
+        setWordDisplay(display);
         setFeedback('')
       } else {
-        setFeedback("The second freezer is locked. Complete phase 2 first.")
+        setFeedback("The final freezer is locked. Complete phase 2 first.")
         setTimeout(() => setFeedback(''), 2000)
       }
     } else {
       if (!isFreezerLocked) {
         if (currentPhase === 1) {
-          setFinalWord(ANSWERS.PHASE1)
           setGameState('final_challenge_phase1')
           setFeedback('')
         } else if (currentPhase === 2) {
-          setFinalWord(ANSWERS.PHASE2)
           setGameState('final_challenge_phase2')
           setFeedback('')
         }
       } else {
-        setFeedback("It's locked. Solve the non-troll ciphers to open it.")
+        // setFeedback("It's locked. Solve the non-troll ciphers to open it.")
         setTimeout(() => setFeedback(''), 2000)
       }
     }
   }
 
-  // const handleRickRoll = () => {
-  //   window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank')
-  // }
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -691,82 +635,74 @@ export default function App() {
     const normalizedInput = userInput.toLowerCase();
 
     if (gameState === 'final_challenge_second_freezer') {
-      const expected = ANSWERS.FINAL?.toLowerCase();
-      if (normalizedInput === expected) {
-        console.log("Submitting final flag:", userInput, "for user:", userId);
-        setScore(prev => prev + 2000);
-        setGameState('game_over');
+      console.log("Submitting final flag:", userInput, "for user:", userId);
+      setScore(prev => prev + 2000);
+      setGameState('game_over');
 
-        fetch("/api/submit", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user: userId, flag: userInput }),
+      fetch("/api/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user: userId, flag: userInput }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.solved) {
+            setFeedback(data.message);  
+          } else {
+            setFeedback("Incorrect final answer.");
+          }
         })
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.solved) {
-              setFeedback(data.message);  
-            } else {
-              setFeedback("Something went wrong submitting your flag.");
-            }
-          })
-          .catch(() => setFeedback("Failed to submit your flag."));
-
+        .catch(() => setFeedback("Failed to submit your flag."));
         return;
-      } else {
-        setFeedback("Incorrect final answer. Try again!");
-        return;
-      }
     }
 
-    const expectedAnswer = ANSWERS[cid.toString()];
-    if (!expectedAnswer) {
-      setFeedback('No answer registered for this customer');
-      return;
-    }
-
-    const normalizedExpected = expectedAnswer.toLowerCase();
-
-    if (normalizedInput === normalizedExpected) {
-      if (cid === 5) {
-        setScore(prev => prev + 500);
-        setFeedback('Phase 1 complete! Starting Phase 2...');
-        setCurrentPhase(2);
-        setIsFreezerLocked(true);
-        setGameState('waiting');
-        setUserInput('');
-        handleCustomerLeave(false);
-        return;
-      }
-
-      if (cid === 10) {
-        setScore(prev => prev + 1000);
-        setFeedback('Phase 2 complete! Second freezer unlocked!');
-        setShowSecondFreezer(true);
-        setIsSecondFreezerLocked(false);
-        setGameState('waiting');
-        setUserInput('');
-        handleCustomerLeave(false);
-        return;
-      }
-
-      const points = currentCustomer.difficulty * 100;
-      setScore(prev => prev + points);
-      setFeedback(`Correct! +${points} dollars`);
-      setSolvedCustomers(prev => new Set([...prev, cid]));
-
-      // Rickroll logic for customer 6 (Phase 2 troll cipher)
-      if (normalizedInput === 'rickroll' && cid === 6) {
-        window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
-      }
-
-      handleCustomerLeave(false);
-    } else {
-      setFeedback('Try again!');
-      const input = document.querySelector('.cipher-input');
-      input.classList.add('shake');
-      setTimeout(() => input.classList.remove('shake'), 500);
-    }
+    fetch('/api/check_answer', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ customerId: cid, answer: userInput }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.correct) {
+          // Correct answer logic
+          if (cid === 5) {
+            setScore(prev => prev + 500);
+            setFeedback('Phase 1 complete! Starting Phase 2...');
+            setCurrentPhase(2);
+            setIsFreezerLocked(true);
+            setGameState('waiting');
+            setUserInput('');
+            handleCustomerLeave(false);
+            return;
+          }
+          if (cid === 10) {
+            setScore(prev => prev + 1000);
+            setFeedback('Phase 2 complete! Second freezer unlocked!');
+            setShowSecondFreezer(true);
+            setIsSecondFreezerLocked(false);
+            setGameState('waiting');
+            setUserInput('');
+            handleCustomerLeave(false);
+            return;
+          }
+          const points = currentCustomer.difficulty * 100;
+          setScore(prev => prev + points);
+          setFeedback(`Correct! +${points} dollars`);
+          setSolvedCustomers(prev => new Set([...prev, cid]));
+          if (userInput.toLowerCase() === 'rickroll' && cid === 6) {
+            window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
+          }
+          handleCustomerLeave(false);
+        } else {
+          setFeedback('Try again!');
+          const input = document.querySelector('.cipher-input');
+          input.classList.add('shake');
+          setTimeout(() => input.classList.remove('shake'), 500);
+        }
+      })
+      .catch(() => setFeedback("Error checking answer. Please try again!"));
+    return;
+      
   };
 
 
@@ -859,36 +795,19 @@ export default function App() {
           </div>
         )}
 
-
       </div>
       {feedback && <div className="feedback">{feedback}</div>}
-{/*       
-      {gameState === 'game_over' && (
-        <div className="game-completion-overlay">
-          <div className="game-completion-content">
-            <div className="game-completion-title">🎉 Congratulations! 🎉</div>
-            <div className="game-completion-message">
-              You've successfully completed Papa's Cipheria!
-            </div>
-            <div className="final-score">Final Score: {score} points</div>
-            <div className="game-completion-message" style={{ fontSize: '1.2em', color: '#e8f4fd' }}>
-              Looking forward to seeing you guys at HackMIT 💙!
-            </div>
-          </div>
-        </div>
-      )} */}
       
-      {(gameState === 'final_challenge_phase1' || gameState === 'final_challenge_phase2' || gameState === 'final_challenge_second_freezer') && (
+      {(gameState === 'final_challenge_second_freezer') && (
         <div className="final-challenge-prompt">
-          <div className="word-display">{wordDisplay}</div>
-          <p>{gameState === 'final_challenge_second_freezer' ? 'Final Challenge' : `Phase ${currentPhase} Final Challenge`}</p>
+          <div className="word-display" style={{ whiteSpace: 'pre-line' }}>
+            {wordDisplay}
+          </div>
+          <p>
+            Final Challenge
+          </p>
           <p style={{ color: '#ffd700', fontSize: '0.9em', marginTop: '10px' }}>
-            {gameState === 'final_challenge_phase1'
-              ? "Think about your previous ciphers..." 
-              : gameState === 'final_challenge_phase2'
-              ? "Think about the year..."
-              : "Hint: Director"
-            }
+              Hint: Director
           </p>
         </div>
       )}

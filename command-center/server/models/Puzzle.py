@@ -31,8 +31,3 @@ class PuzzleUser(db.Model):
         DateTime, default=None, nullable=True
     )
     is_solved: Mapped[bool] = mapped_column(Boolean, default=False)
-
-    # # evan and adam's puzzle has custom scoring
-    # evan_adam_score: Mapped[Optional[int]] = mapped_column(
-    #     Integer, default=None, nullable=True
-    # )

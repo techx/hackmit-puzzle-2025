@@ -32,7 +32,7 @@ const Footer = ({
                   color: "white"
                 }}
               >
-                ABOUT COOLHACKGAMES GAMES
+                ABOUT COOLHACKGAMES
               </Text>
               <Text
                 style={{
@@ -42,11 +42,7 @@ const Footer = ({
                 }}
               >
                 Since the launch of HackMIT in 2013, CoolHackGames has been the most
-                popular gaming site for hackers both young and old. In 2022,
-                we introduced HackScope — followed by bakery, VMHack,
-                HackxGPT, and HackTimes. In early 2023, we proudly added Xd to our collection.
-                We strive to offer puzzles for all skill levels that everyone
-                can enjoy playing every day.
+                popular gaming site for hackers both young and old. 
               </Text>
             </Grid.Col>
           )}
@@ -110,11 +106,7 @@ const Footer = ({
                 }}
               >
                 Since the launch of HackMIT in 2013, CoolHackGames has been the most
-                popular gaming site for hackers both young and old. In 2022,
-                we introduced HackScope — followed by bakery, VMHack,
-                HackxGPT, and HackTimes. In early 2023, we proudly added Xd to our collection.
-                We strive to offer puzzles for all skill levels that everyone
-                can enjoy playing every day.
+                popular gaming site for hackers both young and old. 
               </Text>
               <Text
                 mt="50px"

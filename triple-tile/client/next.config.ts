@@ -4,8 +4,8 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: "/get_triple_flag",
-        destination: "http://localhost:2007/get_triple_flag", // Flask
+        source: "/api/morse_letter",
+        destination: "http://localhost:2007/api/morse_letter", // or whatever port your Flask server runs on
       },
       {
         source: "/api/submit",

@@ -47,7 +47,7 @@ ALLOWED_DOMAINS = [FRONTEND_URL]
 
 # Database
 SQLALCHEMY_DATABASE_URI = _get_config_option(
-    "DATABASE_URL", "postgresql://postgres@localhost/cmd"
+    "DATABASE_URL", "postgresql://postgres@localhost/cmd25"
 )
 
 # Github
@@ -62,13 +62,22 @@ DISCORD_WEBHOOK = cast(str, _get_config_option("DISCORD_WEBHOOK"))
 
 # EVAN_ADAM_PUZZLE_NAME = "Hexhunt"
 
+FRIENDLY_TO_INTERNAL = {
+    "Triple Tile": "TripleTile",
+    "Papas Cipheria": "PapasCipheria",
+    "Lemonade Stand": "LemonadeStand",
+    "Jailbreak": "Jailbreak",
+    "ROM Hack": "Romhack",
+    "Chess": "Chess",
+}
+
 IS_VERCEL = {
     "Chess": False,
     "LemonadeStand": False,
     "Romhack": True,
     "Jailbreak": False,
-    "TripleTile": True,
-    "PapasCipheria": True,
+    "TripleTile": False,
+    "PapasCipheria": False,
 }
 
 PUZZLE_SECRETS = {

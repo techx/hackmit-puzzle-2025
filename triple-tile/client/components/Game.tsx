@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import styles from "./Game.module.css";
-import MorseBuilding from "./Building";
 import Rules from "./Rules";
 import Flag from "./Flag";
 import MorseFlasher from "./MorseFlasher";
@@ -14,41 +13,11 @@ interface Tile {
   iconName: string;
 }
 
-const morseMap: Record<string, string> = {
-  A: ".-",
-  B: "-...",
-  C: "-.-.",
-  D: "-..",
-  E: ".",
-  F: "..-.",
-  G: "--.",
-  H: "....",
-  I: "..",
-  J: ".---",
-  K: "-.-",
-  L: ".-..",
-  M: "--",
-  N: "-.",
-  O: "---",
-  P: ".--.",
-  Q: "--.-",
-  R: ".-.",
-  S: "...",
-  T: "-",
-  U: "..-",
-  V: "...-",
-  W: ".--",
-  X: "-..-",
-  Y: "-.--",
-  Z: "--..",
-};
-
 const PuzzleGame: React.FC = () => {
   const [tiles, setTiles] = useState<Tile[]>([]);
   const [initialTiles, setInitialTiles] = useState<Tile[]>([]);
   const [queue, setQueue] = useState<Tile[]>([]);
   const [matchCount, setMatchCount] = useState(0);
-  const [revealedLetters, setRevealedLetters] = useState<string[]>([]);
   const [gameOver, setGameOver] = useState(false);
   const [showRules, setShowRules] = useState(true);
   const [showFlagInput, setShowFlagInput] = useState(false);
@@ -56,8 +25,8 @@ const PuzzleGame: React.FC = () => {
     null
   );
   const [hashedFlag, setHashedFlag] = useState(null);
-  const [word, setWord] = useState<string>("");
   const [copied, setCopied] = useState(false);
+  const [revealedMorse, setRevealedMorse] = useState<string[]>([]);
 
 
   useEffect(() => {
@@ -67,21 +36,6 @@ const PuzzleGame: React.FC = () => {
         setTiles(data);
         setInitialTiles(data);
       });
-  }, []);
-
-  useEffect(() => {
-    const userId = window.location.href.substring(window.location.href.lastIndexOf("/") + 1);
-
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/get_triple_flag`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.flag) setWord(data.flag.toUpperCase());
-      })
-      .catch((err) => console.error("Failed to load flag word:", err));
   }, []);
 
   // Tile click handler
@@ -101,9 +55,8 @@ const PuzzleGame: React.FC = () => {
       const newCount = matchCount + 1;
       setMatchCount(newCount);
 
-      if (newCount % 5 === 0 && revealedLetters.length < word.length) {
-        const currentLetter = word[revealedLetters.length];
-        setRevealedLetters((prev) => [...prev, currentLetter]);
+      if (newCount % 5 === 0) {
+        revealNextMorse();
       }
     } else {
       setQueue(newQueue);
@@ -147,6 +100,25 @@ const PuzzleGame: React.FC = () => {
       }
     }
     return false;
+  };
+
+  const revealNextMorse = async () => {
+    const index = revealedMorse.length;
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/morse_letter`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ index }),
+      });
+
+      const data = await res.json();
+      if (data.morse) {
+        setRevealedMorse((prev) => [...prev, data.morse]);
+      }
+    } catch (err) {
+      console.error("Failed to fetch", err);
+    }
   };
 
     // Flag guess submission logic
@@ -195,24 +167,6 @@ const PuzzleGame: React.FC = () => {
     return `/icons/${iconName}.${extMap[iconName] || "png"}`;
   };
 
-  // useEffect(() => {
-  //   if (flagStatus === "correct" && !hashedFlag) {
-  //     const userId = window.location.href.substring(window.location.href.lastIndexOf("/") + 1);
-
-  //     fetch("/api/getFlag", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ userId }),
-  //     })
-  //       .then((res) => res.json())
-  //       .then((data) => {
-  //         console.log("Flag response:", data);
-  //         setHashedFlag(data.flag);
-  //       })
-  //       .catch((err) => console.error("Fetch error:", err));
-  //   }
-  // }, [flagStatus, hashedFlag]);
-
   return (
     <>
       <div className={styles.starsWrapper}>
@@ -228,7 +182,6 @@ const PuzzleGame: React.FC = () => {
                   setTiles(initialTiles);
                   setQueue([]);
                   setGameOver(false);
-                  setRevealedLetters([]);
                   setMatchCount(0);
                 }}
               >
@@ -250,7 +203,6 @@ const PuzzleGame: React.FC = () => {
                   setTiles(initialTiles);
                   setQueue([]);
                   setGameOver(false);
-                  setRevealedLetters([]);
                   setMatchCount(0);
                 }}
               >
@@ -277,19 +229,18 @@ const PuzzleGame: React.FC = () => {
               alt="Lit city flicker"
             />
           </div>
-          {revealedLetters.map((letter, idx) => {
-            const morse = morseMap[letter];
+          {revealedMorse.map((morse, idx) => {
             const positions = [
-              { top: "20.87%", left: "25.7%" },   // 1st building (F)
-              { top: "14.73%", left: "92.45%" },  // 2nd building (O)
-              { top: "28.6%", left: "44.1%" },  // 3rd building (R)
-              { top: "15.8%", left: "52.05%" },  // 4th building (E)
-              { top: "24.05%", left: "69.4%" },  // 5th building (S)
-              { top: "20.69%", left: "7.0%" },  // 6th building (T)
-              { top: "16.9%", left: "63.2%" },  // 7th building (T)
-              { top: "25.9%", left: "13.72%" },  // 8th building (M)
-              { top: "16.64%", left: "37.31%" },  // 9th building (P)
-              { top: "13.675%", left: "81.1%" },  // 10th building (L)
+              { top: "20.87%", left: "25.7%" },  
+              { top: "14.73%", left: "92.45%" }, 
+              { top: "28.6%", left: "44.1%" }, 
+              { top: "15.8%", left: "52.05%" },
+              { top: "24.05%", left: "69.4%" },  
+              { top: "20.69%", left: "7.0%" },  
+              { top: "16.9%", left: "63.2%" },  
+              { top: "25.9%", left: "13.72%" },
+              { top: "16.64%", left: "37.31%" },  
+              { top: "13.675%", left: "81.1%" }, 
             ];
             const pos = positions[idx] || { top: "42%", left: "0%" };
 
@@ -403,7 +354,7 @@ const PuzzleGame: React.FC = () => {
           <span style={{ fontSize: "20px" }}>💾</span>
           Export Puzzle
         </button>
-        {/* {matchCount >= 0 && ( */}
+        {matchCount >= 35 && (
           <button
             onClick={() => setShowFlagInput(true)}
             style={{
@@ -417,7 +368,7 @@ const PuzzleGame: React.FC = () => {
           >
             🚩
           </button>
-        {/* )} */}
+        )}
       </div>
 
       {showFlagInput && (

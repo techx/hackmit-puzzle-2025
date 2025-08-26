@@ -6,11 +6,13 @@ from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 
 from make_puzzle.encode_puzzle import get_ciphertext
-
+from pathlib import Path
 app = Flask(__name__, static_folder='assets', static_url_path='/assets')
 CORS(app)
 
-load_dotenv("../.env")
+# Load secrets from .env file (adjust path if needed)
+env_path = Path(__file__).resolve().parents[1] / "command-center" / ".env"
+load_dotenv(dotenv_path=env_path, override=True)
 
 #### command center stuff ####
 

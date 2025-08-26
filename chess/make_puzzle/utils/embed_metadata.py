@@ -44,7 +44,7 @@ png_info = PngImagePlugin.PngInfo()
 png_info.add_text("PGN", pgn_text)
 
 # Output path for the modified image
-output_path = "assets/puzzle_board.png"
+output_path = "assets/a_normal_chessboard.png"
 
 # Save the image with embedded metadata
 img.save(output_path, pnginfo=png_info)

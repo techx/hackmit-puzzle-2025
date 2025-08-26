@@ -10,8 +10,15 @@ from flask import redirect, render_template
 from flask_cors import CORS
 
 from server.db import db, init_db
+import logging
 
 STATIC_FOLDER = "../client/dist"
+
+# Set up logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
+)
 
 cors: CORS = CORS()
 

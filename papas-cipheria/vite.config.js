@@ -9,5 +9,10 @@ export default defineConfig({
     proxy: {
       '/api': 'http://localhost:5103',
     },
+    root: ".", // project root
+    build: {
+    	outDir: "backend/templates", // Flask will serve from here
+    	emptyOutDir: true,
+    },
   }
 }) 

@@ -47,7 +47,7 @@ export default function Games({
             )} */}
           </Text>
         </Group>
-        <Stack spacing="md" px="lg" w="100%" maw={1000} mx="auto">
+        <Stack gap="md" px="lg" w="100%" maw={1000} mx="auto">
           <h2 className="bg-[#e14603] text-xl px-2 py-1 rounded-lg font-semibold uppercase tracking-wider">
             Top Games
           </h2>

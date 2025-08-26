@@ -1,74 +1,9 @@
-# Chess Web App
+# chess
 
-A minimal client-server web application with Flask backend and HTML frontend for displaying captions.
-
-## Features
-
-- Simple web interface with automatic caption loading
-- Flask backend that serves captions via REST API
-- Clean, responsive design
-
-## Setup and Running
-
-### Prerequisites
-
-- Python 3.7+
-- pip
-
-### Installation
-
-1. Create and activate a virtual environment:
-
-```bash
-# Create virtual environment
-python -m venv venv
-
-# Activate it (macOS/Linux)
-source venv/bin/activate
-
-# Activate it (Windows)
-venv\Scripts\activate
-```
-
-2. Install dependencies:
-
+Run
 ```bash
 pip install -r requirements.txt
-```
-
-3. Environment
-
-Put `CHESS_PUZZLE_SECRET` and `SECRET_KEY` in `.env` in `chess/`
-
-### Running the Application
-
-1. Make sure your virtual environment is activated:
-
-```bash
-source venv/bin/activate  # macOS/Linux
-# or
-venv\Scripts\activate     # Windows
-```
-
-2. Start the Flask server:
-
-```bash
 python app.py
 ```
 
-3. Open your browser and navigate to:
-
-```
-http://localhost:5003
-```
-
-The caption will load automatically when the page opens.
-
-## API Endpoints
-
-- `GET /` - Serves the main web interface
-- `GET /get_caption` - Returns JSON with caption
-
-## Development
-
-The app runs in debug mode by default. Any changes to the Python code will automatically restart the server.
+Now, go to `http://localhost:5003/u/<username>`

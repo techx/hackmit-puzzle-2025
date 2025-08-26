@@ -78,10 +78,10 @@ export default function App() {
                 </UnstyledButton>
               </Menu.Target>
               <Menu.Dropdown>
-                <Menu.Item icon={<IconUser size={16} />} onClick={() => navigate("/profile")}>
+                <Menu.Item leftSection={<IconUser size={16} />} onClick={() => navigate("/profile")}>
                   Profile
                 </Menu.Item>
-                <Menu.Item icon={<IconLogout size={16} />} onClick={handleLogout}>
+                <Menu.Item leftSection={<IconLogout size={16} />} onClick={handleLogout}>
                   Log Out
                 </Menu.Item>
               </Menu.Dropdown>
@@ -118,6 +118,7 @@ export default function App() {
                 </div>
                 <NavbarCard key={discord.name} puzzle={discord} user_id={user_id} isLoggedIn={true} />
                 <NavbarCard key={leaderboard.name} puzzle={leaderboard} user_id={user_id} isLoggedIn={true} />
+                {/* <NavbarCard key={solved.name} puzzle={solved} user_id={user_id} isLoggedIn={true} /> */}
               </Stack>
             </div>
 

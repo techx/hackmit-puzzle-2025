@@ -11,6 +11,7 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { Modal, TextInput } from "@mantine/core";
 import CoolGameCard from "../components/CoolGameCard";
+import { puzzles } from "../puzzles"; // Adjust path as needed
 
 const ProfileCard = ({
   loggedIn,
@@ -29,6 +30,7 @@ const ProfileCard = ({
   const [correctMessage, setCorrectMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [solvedPuzzles, setSolvedPuzzles] = useState([]);
+  const [solvedPuzzlesError, setSolvedPuzzlesError] = useState("");
 
   useEffect(() => {
     setCorrectMessage("");
@@ -50,7 +52,18 @@ const ProfileCard = ({
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          setSolvedPuzzles(data.solved_puzzles);
+          const normalize = (s: string) => s.toLowerCase().replace(/\s+/g, "");
+          const solvedObjects = data.solved_puzzles
+            .map((name: string) => puzzles.find(
+              p => normalize(p.name) === normalize(name)
+            ))
+            .filter(Boolean);
+
+          setSolvedPuzzles(solvedObjects);
+          setSolvedPuzzlesError("");
+        } else {
+          setSolvedPuzzlesError(data.message);
+          setSolvedPuzzles([]);
         }
       });
   }, []);
@@ -124,7 +137,7 @@ const ProfileCard = ({
         </Button>
       </Modal>
 
-      <Stack spacing="xl">
+      <Stack gap="xl">
         <Group justify="flex-start" align="center">
           <Image
             src={`https://github.com/${username}.png`}
@@ -142,21 +155,27 @@ const ProfileCard = ({
             )}
           </Stack>
         </Group>
+        
+        {solvedPuzzlesError ? (
+          <Text c="white">{solvedPuzzlesError}</Text>
+        ) : (
+          <>
+            <Text fz={20} fw={600} style={{ color: "white" }} mb="md">
+              Solved Puzzles
+            </Text>
+            <SimpleGrid cols={{ base: 1, sm: 2, md: 2 }} spacing="lg">
+              {solvedPuzzles.map((puzzle) => (
+                <CoolGameCard
+                  key={puzzle.name}
+                  puzzle={puzzle}
+                  loggedIn={loggedIn}
+                  user_id={user_id}
+                />
+              ))}
+            </SimpleGrid>
+          </>
+        )}
 
-        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
-          {solvedPuzzles.length > 0 ? (
-            solvedPuzzles.map((puzzle) => (
-              <CoolGameCard
-                key={puzzle.name}
-                puzzle={puzzle}
-                loggedIn={loggedIn}
-                user_id={user_id}
-              />
-            ))
-          ) : (
-            <Text c="white">No puzzles solved yet.</Text>
-          )}
-        </SimpleGrid>
       </Stack>
     </>
   );

@@ -3,6 +3,7 @@
 import hashlib
 import math
 from typing import Dict, List
+import logging
 
 import requests
 from sqlalchemy import select
@@ -12,6 +13,7 @@ from server.config import (
     IS_VERCEL,
     PUZZLE_SECRETS,
     SECRET_KEY,
+    FRIENDLY_TO_INTERNAL,
 )
 from server.db import db
 from server.models.Puzzle import PuzzleUser
@@ -54,6 +56,7 @@ def generate_user_id(github_username: str) -> str:
     hashed = hashlib.sha256(
         f"{github_username}_{SECRET_KEY}".encode("utf-8")
     ).hexdigest()
+    # logging.warning("git", hashed)
     return f"{github_username}_{hashed[:8]}"
 
 
@@ -64,8 +67,29 @@ def get_username_from_user_id(user_id: str) -> str:
 
 def get_puzzle_answer(user_id: str, puzzle_name: str) -> str:
     """Get the answer for a puzzle."""
+    logging.warning("Requested puzzle_name = %s", puzzle_name)
+    logging.warning("Available PUZZLE_SECRETS keys = %s", PUZZLE_SECRETS.keys())
+    logging.warning("User ID = %s", user_id)
+    #puzzle_name = FRIENDLY_TO_INTERNAL[puzzle_name]
+    
+    puzzle_name = FRIENDLY_TO_INTERNAL.get(puzzle_name, puzzle_name)    
     assert puzzle_name in PUZZLE_SECRETS, "Puzzle not found"
     secret = PUZZLE_SECRETS[puzzle_name]
+    
+    logging.warning("Requested puzzle_name = %s", puzzle_name)
+    logging.warning("puzzle secret = %s", secret)
+    logging.warning("User ID = %s", user_id)
+    logging.warning("expected answer = %s", hashlib.sha256(f"{user_id}_{secret}".encode("utf-8")).hexdigest())
+    
+    logging.warning("get_puzzle_answer: hashing %r", f"{user_id}_{secret}")
+    logging.warning("if i was a vercel %r", hashlib.sha256(f"{user_id}{secret}".encode("utf-8")).hexdigest())
+    if puzzle_name == "Romhack":
+        logging.warning("kossi")
+        logging.warning("hdsalfj=%r", hashlib.sha256(f"{secret}".encode("utf-8")).hexdigest())
+        logging.warning("secret%r", secret)
+        # return hashlib.sha256(f"{secret}".encode("utf-8")).hexdigest()
+        return secret
+
     if IS_VERCEL[puzzle_name]:
         return hashlib.sha256(f"{user_id}{secret}".encode("utf-8")).hexdigest()
     return hashlib.sha256(f"{user_id}_{secret}".encode("utf-8")).hexdigest()
@@ -139,4 +163,19 @@ def validate_user_submission(user_id: str, puzzle_name: str, submission: str) ->
     #         submission, user_id, puzzle_name
     #     )
     #     return is_valid
-    return submission == get_puzzle_answer(user_id, puzzle_name)
+    logging.warning("puzzle sub = %s", submission)
+    logging.warning("puzzle name = %s", puzzle_name)
+    logging.warning("type(submission): %s", type(submission))
+    logging.warning("type(expected): %s", type(get_puzzle_answer(user_id, puzzle_name)))
+    
+    # New, more precise debug logs:
+    expected = get_puzzle_answer(user_id, puzzle_name)
+    logging.warning("repr(submission): %r len=%d", submission, len(submission))
+    logging.warning("repr(expected): %r len=%d", expected, len(expected))
+    logging.warning("submission.strip(): %r", submission.strip())
+    logging.warning("expected.strip(): %r", expected.strip())
+    logging.warning("submission == expected? %s", submission == expected)
+    logging.warning("submission.strip() == expected.strip()? %s", submission.strip() == expected.strip())
+
+
+    return submission.strip() == get_puzzle_answer(user_id, puzzle_name).strip()

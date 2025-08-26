@@ -1,7 +1,7 @@
 # papas-cipheria
-game for hack 2025 puzzle
 
+Run
+```bash
 npm install
 npm run dev
-
-npm install three @react-three/fiber @react-three/drei --legacy-peer-deps
+```
